@@ -1,20 +1,18 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { updateSession } from '@/lib/supabase/middleware'
 
-const COOKIE = "sparc_demo_session";
-
-export function middleware(req: NextRequest) {
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    const has = req.cookies.get(COOKIE)?.value;
-    if (!has) {
-      const url = new URL("/sign-in", req.url);
-      url.searchParams.set("next", req.nextUrl.pathname);
-      return NextResponse.redirect(url);
-    }
-  }
-  return NextResponse.next();
+export async function middleware(request: any) {
+  return await updateSession(request)
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
-};
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
