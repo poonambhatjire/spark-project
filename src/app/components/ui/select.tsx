@@ -165,8 +165,9 @@ export function SelectContent({ children, className }: SelectContentProps) {
     <div className={`absolute top-full left-0 right-0 z-[100] mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto ${className}`}>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === SelectItem) {
+          const childProps = child.props as SelectItemProps
           return React.cloneElement(child as React.ReactElement<SelectItemProps>, {
-            onClick: () => context.onSelect(child.props.value),
+            onClick: () => context.onSelect(childProps.value),
           })
         }
         return child

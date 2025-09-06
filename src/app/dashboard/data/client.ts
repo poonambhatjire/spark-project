@@ -410,12 +410,4 @@ class TimeEntryClient {
 // Export singleton instance
 export const timeEntryClient = new TimeEntryClient();
 
-// Export types for external use
-export type { 
-  TimeEntry, 
-  CreateEntryInput, 
-  UpdateEntryInput, 
-  ListEntriesOptions,
-  TodayTotals,
-  TodayByCategory
-};
+// All types are already exported as interfaces above

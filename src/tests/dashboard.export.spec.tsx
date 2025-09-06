@@ -163,7 +163,7 @@ describe('CSV Export Functionality', () => {
   })
 
   it('exports CSV respecting task filter', async () => {
-    const { exportEntriesToCsv } = await import('@/app/lib/utils/csv')
+    // const { exportEntriesToCsv } = await import('@/app/lib/utils/csv')
     
     render(
       <HistoryPanel

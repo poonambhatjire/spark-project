@@ -1,7 +1,7 @@
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { Play, Calendar, Pause, CheckCircle } from "lucide-react"
-// import Image from "next/image"
+import Image from "next/image"
 
 export default function HeroSection() {
   return (
@@ -44,7 +44,7 @@ export default function HeroSection() {
             </div>
           </div>
           <div className="flex flex-col items-center justify-center">
-            <img
+            <Image
               src="/sparc-logo.png"
               width="600"
               height="400"

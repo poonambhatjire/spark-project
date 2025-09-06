@@ -221,6 +221,12 @@ export function HistoryPanel({
     }
   }, [filteredAndSortedEntries, dateRange, showToast])
 
+  const handleCancelEdit = useCallback(() => {
+    setEditingId(null)
+    setEditingMinutes('')
+    setEditingComment('')
+  }, [])
+
   // Handle escape key to close dropdowns and cancel editing
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -314,12 +320,6 @@ export function HistoryPanel({
       }
     }
   }, [editingId, editingMinutes, editingComment, onUpdateEntry, showToast, filteredAndSortedEntries])
-
-  const handleCancelEdit = useCallback(() => {
-    setEditingId(null)
-    setEditingMinutes('')
-    setEditingComment('')
-  }, [])
 
   // Handle keyboard navigation for inline editing
   const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
