@@ -1,7 +1,7 @@
 import { Button } from "@/app/components/ui/button"
 import { Badge } from "@/app/components/ui/badge"
 import { Play, Calendar, Pause, CheckCircle } from "lucide-react"
-import Image from "next/image"
+// import Image from "next/image"
 
 export default function HeroSection() {
   return (

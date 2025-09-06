@@ -7,9 +7,9 @@ import {
   fixedToday, 
   freezeDate, 
   clearEntries, 
-  readEntries,
-  entryFactory,
-  pafEntry
+  // readEntries,
+  // entryFactory,
+  // pafEntry
 } from '@/tests/utils'
 
 // Mock the telemetry module

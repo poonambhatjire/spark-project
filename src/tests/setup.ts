@@ -9,7 +9,7 @@ import 'jest-axe/extend-expect'
 // Mock Next.js components that aren't available in test environment
 vi.mock('next/link', () => {
   return {
-    default: function MockLink({ children, href, ...props }: any) {
+    default: function MockLink({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) {
       return React.createElement('a', { href, ...props }, children)
     }
   }
@@ -17,7 +17,7 @@ vi.mock('next/link', () => {
 
 vi.mock('next/image', () => {
   return {
-    default: function MockImage({ src, alt, ...props }: any) {
+    default: function MockImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) {
       return React.createElement('img', { src, alt, ...props })
     }
   }

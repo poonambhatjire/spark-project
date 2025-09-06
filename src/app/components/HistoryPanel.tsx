@@ -161,7 +161,7 @@ export function HistoryPanel({
 
     // Sort
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any
+      let aValue: number | string, bValue: number | string
       
       switch (sortField) {
         case 'occurredOn':
@@ -240,7 +240,7 @@ export function HistoryPanel({
 
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
-  }, [showExportDropdown, editingId, showDeleteConfirm])
+  }, [showExportDropdown, editingId, showDeleteConfirm, handleCancelEdit])
 
   // Handle click outside to close export dropdown
   useEffect(() => {
@@ -309,7 +309,7 @@ export function HistoryPanel({
         setEditingMinutes('')
         setEditingComment('')
         showToast('Entry updated successfully', 'success')
-      } catch (error) {
+      } catch {
         showToast('Failed to update entry', 'error')
       }
     }
@@ -344,7 +344,7 @@ export function HistoryPanel({
       
       setSelectedIds(new Set())
       showToast(`Deleted ${idsToDelete.length} entries`, 'success')
-    } catch (error) {
+    } catch {
       showToast('Failed to delete entries', 'error')
     } finally {
       setDeletingIds(new Set())
@@ -361,7 +361,7 @@ export function HistoryPanel({
       
       setSelectedIds(new Set())
       showToast(`Duplicated ${entriesToDuplicate.length} entries`, 'success')
-    } catch (error) {
+    } catch {
       showToast('Failed to duplicate entries', 'error')
     }
   }, [selectedIds, filteredAndSortedEntries, onBulkDuplicate, showToast])

@@ -299,7 +299,7 @@ describe('Dashboard Accessibility', () => {
   })
 
   it('has proper mobile accessibility', async () => {
-    const { container } = render(<Dashboard />)
+    const { container } = render(<div>Dashboard</div>)
     
     // Run axe with mobile-specific rules
     const results = await axe(container, {

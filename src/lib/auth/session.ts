@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { setDemoSession, clearDemoSession, getDemoSession } from "./cookies";
 
-export async function demoSignIn(prevState: any, formData: FormData) {
+export async function demoSignIn(prevState: unknown, formData: FormData) {
   const email = String(formData.get("email") ?? "");
   
   // For testing: accept any email, no password validation
@@ -14,9 +14,9 @@ export async function demoSignIn(prevState: any, formData: FormData) {
   redirect("/dashboard");
 }
 
-export async function demoSignUp(prevState: any, formData: FormData) {
+export async function demoSignUp(prevState: unknown, formData: FormData) {
   const email = String(formData.get("email") ?? "");
-  const name = String(formData.get("name") ?? "");
+  // const name = String(formData.get("name") ?? "");
   
   // For testing: accept any email and name, no password validation
   if (!email) {

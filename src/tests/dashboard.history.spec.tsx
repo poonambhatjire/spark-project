@@ -2,17 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HistoryPanel } from '@/app/components/HistoryPanel'
-import { TimeEntry, Activity } from '@/app/dashboard/data/client'
+import { TimeEntry } from '@/app/dashboard/data/client'
 import { 
   fixedToday, 
   freezeDate, 
   clearEntries, 
   seedEntries,
-  readEntries,
-  entryFactory,
-  pafEntry,
-  priorAuthEntry,
-  educationEntry
+  entryFactory
 } from '@/tests/utils'
 
 // Mock the telemetry module

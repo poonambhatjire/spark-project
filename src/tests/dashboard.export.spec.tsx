@@ -32,7 +32,7 @@ vi.mock('@/app/lib/utils/csv', async () => {
   const actual = await vi.importActual('@/app/lib/utils/csv')
   return {
     ...actual,
-    exportEntriesToCsv: vi.fn()
+    // exportEntriesToCsv: vi.fn()
   }
 })
 

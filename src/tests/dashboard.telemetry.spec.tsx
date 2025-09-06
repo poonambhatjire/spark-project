@@ -28,7 +28,7 @@ vi.mock('@/app/components/ui/toast', () => ({
 describe('Dashboard Telemetry', () => {
   const user = userEvent.setup()
   let cleanupTime: (() => void) | undefined
-  let consoleSpy: any
+  let consoleSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     vi.clearAllMocks()

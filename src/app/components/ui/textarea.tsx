@@ -3,6 +3,7 @@ import * as React from "react"
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   // Additional props can be added here if needed
+  variant?: 'default'
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
