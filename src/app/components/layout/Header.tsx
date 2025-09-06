@@ -42,12 +42,26 @@ export default function Header() {
             </Link>
           </>
         ) : (
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
-          >
-            Sign In
-          </Link>
+          <>
+            <Link
+              href="#about"
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+            >
+              About
+            </Link>
+            <Link
+              href="#contact"
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+            >
+              Contact
+            </Link>
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+            >
+              Sign In
+            </Link>
+          </>
         )}
       </nav>
     </header>

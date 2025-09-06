@@ -1,5 +1,7 @@
 import KeywordBadge from "@/app/components/ui/keyword-badge"
 import Section from "@/app/components/ui/section"
+import AboutUsSection from "@/app/components/sections/AboutUsSection"
+import ContactUsSection from "@/app/components/sections/ContactUsSection"
 
 const keywords = [
   "Antimicrobial Stewardship Programs (ASPs)",
@@ -73,6 +75,12 @@ const LandingPage = () => {
           </ul>
         </div>
       </Section>
+
+      {/* About Us Section */}
+      <AboutUsSection />
+
+      {/* Contact Us Section */}
+      <ContactUsSection />
 
       {/* Access Section */}
       <Section id="access" title="Access" className="bg-slate-50">
