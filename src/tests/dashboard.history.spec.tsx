@@ -63,7 +63,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-2',
-      task: 'PRIOR_AUTH',
+      task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
       minutes: 30,
       occurredOn: fixedToday(),
       comment: 'Prior authorization for antibiotics',
@@ -72,7 +72,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-3',
-      task: 'EDUCATION',
+      task: 'PROVIDING_EDUCATION',
       minutes: 60,
       occurredOn: fixedToday(),
       comment: 'Staff education on audit procedures',
@@ -90,7 +90,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-5',
-      task: 'REPORTING',
+      task: 'SHARING_DATA',
       minutes: 45,
       occurredOn: fixedToday(),
       comment: 'Monthly audit report preparation',
@@ -99,7 +99,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-6',
-      task: 'PRIOR_AUTH',
+      task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
       minutes: 25,
       occurredOn: '2025-01-14', // Yesterday
       comment: 'Yesterday prior auth work',
@@ -108,7 +108,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-7',
-      task: 'EDUCATION',
+      task: 'PROVIDING_EDUCATION',
       minutes: 90,
       occurredOn: '2025-01-12', // 3 days ago
       comment: 'Education session on audit compliance',
@@ -117,7 +117,7 @@ describe('HistoryPanel Component', () => {
     }),
     entryFactory({
       id: 'test-8',
-      task: 'ADMIN',
+      task: 'COMMITTEE_WORK',
       minutes: 35,
       occurredOn: '2025-01-07', // 8 days ago (outside week range)
       comment: 'Administrative audit tasks',

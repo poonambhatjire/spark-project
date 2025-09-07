@@ -40,14 +40,6 @@ const DashboardPage = () => {
     // Other
     OTHER: 0
   })
-  // const [todayByCategory, setTodayByCategory] = useState<TodayByCategory>({
-  //   PAF: 0,
-  //   PRIOR_AUTH: 0,
-  //   EDUCATION: 0,
-  //   REPORTING: 0,
-  //   ADMIN: 0,
-  //   OTHER: 0
-  // })
   const [isLoading, setIsLoading] = useState(true)
 
   // Load initial data
@@ -57,12 +49,10 @@ const DashboardPage = () => {
         const [entriesData, totalsData] = await Promise.all([
           timeEntryClient.listEntries({ range: 'week' }),
           timeEntryClient.getTodayTotals(),
-          // timeEntryClient.getTodayByCategory()
         ])
         
         setEntries(entriesData)
         setTodayTotals(totalsData)
-        // setTodayByCategory(categoryData)
       } catch (error) {
         console.error('Failed to load dashboard data:', error)
       } finally {
@@ -76,15 +66,13 @@ const DashboardPage = () => {
   // Refresh data after operations
   const refreshData = async () => {
     try {
-              const [entriesData, totalsData] = await Promise.all([
-        timeEntryClient.listEntries({ range: 'week' }),
-        timeEntryClient.getTodayTotals(),
-                  // timeEntryClient.getTodayByCategory()
-      ])
-      
-      setEntries(entriesData)
-      setTodayTotals(totalsData)
-              // setTodayByCategory(categoryData)
+        const [entriesData, totalsData] = await Promise.all([
+          timeEntryClient.listEntries({ range: 'week' }),
+          timeEntryClient.getTodayTotals(),
+        ])
+        
+        setEntries(entriesData)
+        setTodayTotals(totalsData)
     } catch (error) {
       console.error('Failed to refresh data:', error)
     }

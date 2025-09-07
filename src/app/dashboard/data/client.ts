@@ -83,30 +83,6 @@ export interface TodayTotals {
   OTHER: number;
 }
 
-export interface TodayByCategory {
-  // Patient Care
-  PAF: number;
-  AUTH_RESTRICTED_ANTIMICROBIALS: number;
-  CLINICAL_ROUNDS: number;
-  // Administrative
-  GUIDELINES_EHR: number;
-  // Tracking
-  AMU: number;
-  AMR: number;
-  ANTIBIOTIC_APPROPRIATENESS: number;
-  INTERVENTION_ACCEPTANCE: number;
-  // Reporting
-  SHARING_DATA: number;
-  // Education
-  PROVIDING_EDUCATION: number;
-  RECEIVING_EDUCATION: number;
-  // Administrative
-  COMMITTEE_WORK: number;
-  QI_PROJECTS_RESEARCH: number;
-  EMAILS: number;
-  // Other
-  OTHER: number;
-}
 
 // Storage configuration
 const STORAGE_KEY = 'sparc.entries.v1';
@@ -318,34 +294,6 @@ class TimeEntryClient {
     return totals;
   }
 
-  async getTodayByCategory(): Promise<TodayByCategory> {
-    const totals = await this.getTodayTotals();
-    
-    return {
-      // Patient Care
-      PAF: totals.PAF,
-      AUTH_RESTRICTED_ANTIMICROBIALS: totals.AUTH_RESTRICTED_ANTIMICROBIALS,
-      CLINICAL_ROUNDS: totals.CLINICAL_ROUNDS,
-      // Administrative
-      GUIDELINES_EHR: totals.GUIDELINES_EHR,
-      // Tracking
-      AMU: totals.AMU,
-      AMR: totals.AMR,
-      ANTIBIOTIC_APPROPRIATENESS: totals.ANTIBIOTIC_APPROPRIATENESS,
-      INTERVENTION_ACCEPTANCE: totals.INTERVENTION_ACCEPTANCE,
-      // Reporting
-      SHARING_DATA: totals.SHARING_DATA,
-      // Education
-      PROVIDING_EDUCATION: totals.PROVIDING_EDUCATION,
-      RECEIVING_EDUCATION: totals.RECEIVING_EDUCATION,
-      // Administrative
-      COMMITTEE_WORK: totals.COMMITTEE_WORK,
-      QI_PROJECTS_RESEARCH: totals.QI_PROJECTS_RESEARCH,
-      EMAILS: totals.EMAILS,
-      // Other
-      OTHER: totals.OTHER
-    };
-  }
 
   async duplicateEntry(entry: TimeEntry): Promise<TimeEntry> {
     const now = new Date().toISOString();

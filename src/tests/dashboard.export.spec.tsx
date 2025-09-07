@@ -68,7 +68,7 @@ describe('CSV Export Functionality', () => {
     }),
     entryFactory({
       id: 'export-2',
-      task: 'PRIOR_AUTH',
+      task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
       minutes: 30,
       occurredOn: fixedToday(),
       comment: 'Prior authorization for antibiotics',
@@ -86,7 +86,7 @@ describe('CSV Export Functionality', () => {
     }),
     entryFactory({
       id: 'export-4',
-      task: 'EDUCATION',
+      task: 'PROVIDING_EDUCATION',
       minutes: 60,
       occurredOn: fixedToday(),
       comment: 'Staff education on rounds procedures',
@@ -95,7 +95,7 @@ describe('CSV Export Functionality', () => {
     }),
     entryFactory({
       id: 'export-5',
-      task: 'REPORTING',
+      task: 'SHARING_DATA',
       minutes: 45,
       occurredOn: '2025-01-14', // Yesterday
       comment: 'Monthly rounds report',
@@ -104,7 +104,7 @@ describe('CSV Export Functionality', () => {
     }),
     entryFactory({
       id: 'export-6',
-      task: 'ADMIN',
+      task: 'COMMITTEE_WORK',
       minutes: 25,
       occurredOn: '2025-01-12', // 3 days ago
       comment: 'Administrative rounds tasks',
@@ -213,7 +213,7 @@ describe('CSV Export Functionality', () => {
     
     // Filter entries containing 'rounds'
     const roundsEntries = entries.filter(entry => 
-      entry.comment.toLowerCase().includes('rounds')
+      entry.comment?.toLowerCase().includes('rounds')
     )
     
     const csvContent = generateCsvFromEntries(roundsEntries)
@@ -272,7 +272,7 @@ describe('CSV Export Functionality', () => {
     // Apply filters: PAF task + 'rounds' search + sort by minutes
     const filteredEntries = entries.filter(entry => 
       entry.task === 'PAF' && 
-      entry.comment.toLowerCase().includes('rounds')
+      entry.comment?.toLowerCase().includes('rounds')
     )
     
     const sortedFilteredEntries = [...filteredEntries].sort((a, b) => a.minutes - b.minutes)
@@ -315,7 +315,7 @@ describe('CSV Export Functionality', () => {
       }),
       entryFactory({
         id: 'special-2',
-        task: 'PRIOR_AUTH',
+        task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
         minutes: 30,
         occurredOn: fixedToday(),
         comment: 'Entry with\nnewlines',

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { axe, toHaveNoViolations } from 'jest-axe'
+import { axe } from 'jest-axe'
 import DashboardPage from '@/app/dashboard/page'
 import { 
   fixedToday, 
@@ -68,7 +68,7 @@ describe('Dashboard Accessibility', () => {
     const results = await axe(container)
     
     // Assert no serious or critical violations
-    expect(results).toHaveNoViolations({
+    expect(results.violations).toHaveLength(0)
       includedImpacts: ['serious', 'critical']
     })
   })
@@ -215,9 +215,7 @@ describe('Dashboard Accessibility', () => {
     })
     
     // Assert no color contrast violations
-    expect(results).toHaveNoViolations({
-      includedImpacts: ['serious', 'critical']
-    })
+    expect(results.violations).toHaveLength(0)
   })
 
   it('has proper keyboard navigation', async () => {
@@ -310,8 +308,6 @@ describe('Dashboard Accessibility', () => {
     })
     
     // Assert no mobile accessibility violations
-    expect(results).toHaveNoViolations({
-      includedImpacts: ['serious', 'critical']
-    })
+    expect(results.violations).toHaveLength(0)
   })
 })

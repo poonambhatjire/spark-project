@@ -35,64 +35,49 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Demo Authentication (temporary)
+## Authentication
 
-This project uses a demo-only session cookie (`sparc_demo_session`) set via server actions. It stores `{ email, issuedAt }` in base64. No password hashing, no persistence. Replace with a production provider (Auth.js/NextAuth, OIDC, SAML, or enterprise SSO) before deployment.
+This project uses **Supabase Authentication** for production-ready user management with the following features:
 
-### Migration Steps to Production Auth
+- ✅ **Email/Password Authentication** - Secure user registration and login
+- ✅ **Email Verification** - Automatic email verification for new accounts
+- ✅ **Session Management** - Secure JWT-based sessions with automatic refresh
+- ✅ **Password Security** - Built-in password hashing and validation
+- ✅ **Custom Domain Support** - Ready for custom domain deployment
+- ✅ **Optional OAuth** - Can be extended with Google, GitHub, etc.
 
-1. **Install Auth.js (NextAuth.js v5)**
-   ```bash
-   npm install next-auth@beta
-   ```
+### Authentication Features
 
-2. **Set up Prisma for user persistence**
-   ```bash
-   npm install prisma @prisma/client
-   npx prisma init
-   ```
+- **Sign Up**: Users can create accounts with email and password
+- **Sign In**: Secure login with email verification
+- **Protected Routes**: Dashboard and other sensitive pages require authentication
+- **Session Persistence**: Users stay logged in across browser sessions
+- **Automatic Redirects**: Seamless navigation between authenticated and public pages
 
-3. **Configure Auth.js with Credentials provider**
-   - Create `src/lib/auth.ts` with Auth.js configuration
-   - Add Prisma adapter for database persistence
-   - Configure session strategy (JWT or database)
-   - Set up environment variables for secrets
+### Environment Variables Required
 
-4. **Replace demo auth files**
-   - Remove `src/lib/auth/` directory
-   - Update `middleware.ts` to use Auth.js middleware
-   - Replace server actions with Auth.js API routes
-   - Update components to use `useSession()` hook
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
 
-5. **Database schema for users**
-   ```prisma
-   model User {
-     id        String   @id @default(cuid())
-     email     String   @unique
-     name      String?
-     password  String?  // Hashed with bcrypt
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
-   }
-   ```
+### Database
 
-6. **Environment variables**
-   ```env
-   DATABASE_URL="postgresql://..."
-   NEXTAUTH_SECRET="your-secret-key"
-   NEXTAUTH_URL="http://localhost:3000"
-   ```
+The application uses Supabase PostgreSQL with the following tables:
+- `profiles` - User profile information
+- `time_entries` - Time tracking data
+- `telemetry_events` - Usage analytics
+- `contact_submissions` - Contact form submissions
 
-7. **Update middleware**
-   ```typescript
-   export { auth as middleware } from "@/lib/auth"
-   export const config = { matcher: ["/dashboard/:path*"] }
-   ```
+### Deployment
 
-8. **Replace form components**
-   - Use `signIn()` and `signOut()` from `next-auth/react`
-   - Replace server actions with client-side auth calls
-   - Update session handling in components
+The application is ready for deployment to Vercel, Netlify, or any other Next.js-compatible platform. Make sure to:
+
+1. **Set up Supabase project** and configure the environment variables
+2. **Deploy to your preferred platform** (Vercel recommended for Next.js)
+3. **Configure custom domain** in Supabase for production use
+4. **Set up email templates** in Supabase for verification emails
 
 ## Testing
 

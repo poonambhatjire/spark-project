@@ -34,7 +34,7 @@ describe('Test Utilities Example', () => {
     it('should seed and read entries', () => {
       const entries = [
         entryFactory({ task: 'PAF', minutes: 15 }),
-        entryFactory({ task: 'PRIOR_AUTH', minutes: 30 })
+        entryFactory({ task: 'AUTH_RESTRICTED_ANTIMICROBIALS', minutes: 30 })
       ]
       
       seedEntries(entries)
@@ -66,12 +66,12 @@ describe('Test Utilities Example', () => {
 
     it('should create entry with overrides', () => {
       const entry = entryFactory({
-        task: 'EDUCATION',
+        task: 'PROVIDING_EDUCATION',
         minutes: 60,
         comment: 'Test comment'
       })
       
-      expect(entry.task).toBe('EDUCATION')
+      expect(entry.task).toBe('PROVIDING_EDUCATION')
       expect(entry.minutes).toBe(60)
       expect(entry.comment).toBe('Test comment')
     })

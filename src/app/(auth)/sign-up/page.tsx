@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import Link from "next/link"
-import { demoSignUp } from "@/lib/auth/session"
+import { signUp } from "@/lib/auth/supabase-actions"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -22,9 +22,11 @@ function SubmitButton() {
 }
 
 const SignUpPage = () => {
-  const [state, formAction] = useActionState(demoSignUp, null)
+  const [state, formAction] = useActionState(signUp, null)
   const hasError = state?.ok === false
+  const hasSuccess = state?.ok === true
   const errorId = hasError ? "signup-error" : undefined
+  const successId = hasSuccess ? "signup-success" : undefined
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
@@ -39,15 +41,15 @@ const SignUpPage = () => {
             {state.message}
           </div>
         )}
-        <Input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          aria-invalid={hasError}
-          aria-describedby={errorId}
-          className="h-12 border-2 border-slate-300 text-slate-900 bg-white rounded-lg text-base placeholder:text-slate-400"
-          aria-label="Full Name"
-        />
+        {hasSuccess && (
+          <div 
+            id={successId}
+            className="text-green-600 text-sm bg-green-50 border border-green-200 rounded-lg p-3"
+            role="alert"
+          >
+            {state.message}
+          </div>
+        )}
         <Input
           type="email"
           name="email"

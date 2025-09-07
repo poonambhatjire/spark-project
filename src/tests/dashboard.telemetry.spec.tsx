@@ -142,7 +142,7 @@ describe('Dashboard Telemetry', () => {
     // Seed a test entry
     const testEntry = entryFactory({
       id: 'test-1',
-      task: 'PRIOR_AUTH',
+      task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
       minutes: 30,
       occurredOn: fixedToday(),
       comment: 'Test entry to delete',
@@ -181,7 +181,7 @@ describe('Dashboard Telemetry', () => {
     // Seed a test entry
     const testEntry = entryFactory({
       id: 'test-1',
-      task: 'EDUCATION',
+      task: 'PROVIDING_EDUCATION',
       minutes: 60,
       occurredOn: fixedToday(),
       comment: 'Test entry to duplicate',
@@ -230,7 +230,7 @@ describe('Dashboard Telemetry', () => {
       }),
       entryFactory({
         id: 'test-2',
-        task: 'PRIOR_AUTH',
+        task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
         minutes: 30,
         occurredOn: fixedToday(),
         comment: 'Test entry 2',
@@ -284,7 +284,7 @@ describe('Dashboard Telemetry', () => {
       }),
       entryFactory({
         id: 'test-2',
-        task: 'PRIOR_AUTH',
+        task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
         minutes: 30,
         occurredOn: fixedToday(),
         comment: 'Test entry 2',
@@ -293,7 +293,7 @@ describe('Dashboard Telemetry', () => {
       }),
       entryFactory({
         id: 'test-3',
-        task: 'EDUCATION',
+        task: 'PROVIDING_EDUCATION',
         minutes: 45,
         occurredOn: fixedToday(),
         comment: 'Test entry 3',
@@ -353,7 +353,7 @@ describe('Dashboard Telemetry', () => {
       }),
       entryFactory({
         id: 'test-2',
-        task: 'PRIOR_AUTH',
+        task: 'AUTH_RESTRICTED_ANTIMICROBIALS',
         minutes: 30,
         occurredOn: fixedToday(),
         comment: 'Test entry 2',
@@ -494,7 +494,7 @@ describe('Dashboard Telemetry', () => {
       
       expect(telemetryCalls).toHaveLength(2)
       
-      const events = telemetryCalls.map(call => call[1].event)
+      const events = telemetryCalls.map(call => (call[1] as { event: string }).event)
       expect(events).toContain('search_used')
       expect(events).toContain('sort_changed')
     })
@@ -503,7 +503,7 @@ describe('Dashboard Telemetry', () => {
   it('does not track events when telemetry is disabled', async () => {
     // Mock environment to disable telemetry
     const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'production'
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true })
     
     // Mock window.location.hostname to be localhost
     Object.defineProperty(window, 'location', {
@@ -526,6 +526,6 @@ describe('Dashboard Telemetry', () => {
     }, { timeout: 1000 })
 
     // Restore original environment
-    process.env.NODE_ENV = originalEnv
+    Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, configurable: true })
   })
 })

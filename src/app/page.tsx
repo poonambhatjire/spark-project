@@ -49,7 +49,7 @@ const LandingPage = () => {
       {/* Access Section */}
       <Section id="access" title="Access" className="bg-slate-50">
         <div className="text-center">
-          <a href="/app" className="btn">
+          <a href="/dashboard" className="btn">
             Open SPARC
           </a>
         </div>

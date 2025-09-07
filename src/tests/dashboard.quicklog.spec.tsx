@@ -25,7 +25,6 @@ vi.mock('@/app/dashboard/data/client', () => ({
     createEntry: vi.fn(),
     listEntries: vi.fn(),
     getTodayTotals: vi.fn(),
-    getTodayByCategory: vi.fn()
   },
   Activity: {
     PAF: 'PAF',

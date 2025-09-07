@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import Link from "next/link"
-import { demoSignIn } from "@/lib/auth/session"
+import { signIn } from "@/lib/auth/supabase-actions"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -22,7 +22,7 @@ function SubmitButton() {
 }
 
 const SignInPage = () => {
-  const [state, formAction] = useActionState(demoSignIn, null)
+  const [state, formAction] = useActionState(signIn, null)
   const hasError = state?.ok === false
   const errorId = hasError ? "signin-error" : undefined
 
