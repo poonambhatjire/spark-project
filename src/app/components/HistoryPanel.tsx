@@ -32,27 +32,27 @@ type DateRange = 'today' | 'week'
 // Task options for filtering
 const TASK_OPTIONS = [
   // Patient Care
-  { value: "PAF", label: "PAF" },
-  { value: "AUTH_RESTRICTED_ANTIMICROBIALS", label: "Auth Restricted Antimicrobials" },
-  { value: "CLINICAL_ROUNDS", label: "Clinical Rounds" },
+  { value: "PAF", label: "Patient Care - Prospective Audit & Feedback" },
+  { value: "AUTH_RESTRICTED_ANTIMICROBIALS", label: "Patient Care - Authorization of Restricted Antimicrobials" },
+  { value: "CLINICAL_ROUNDS", label: "Patient Care - Participating in Clinical Rounds" },
   // Administrative
-  { value: "GUIDELINES_EHR", label: "Guidelines/EHR" },
+  { value: "GUIDELINES_EHR", label: "Administrative - Guidelines/EHR" },
   // Tracking
-  { value: "AMU", label: "AMU" },
-  { value: "AMR", label: "AMR" },
-  { value: "ANTIBIOTIC_APPROPRIATENESS", label: "Antibiotic Appropriateness" },
-  { value: "INTERVENTION_ACCEPTANCE", label: "Intervention Acceptance" },
+  { value: "AMU", label: "Tracking - AMU" },
+  { value: "AMR", label: "Tracking - AMR" },
+  { value: "ANTIBIOTIC_APPROPRIATENESS", label: "Tracking - Antibiotic Appropriateness" },
+  { value: "INTERVENTION_ACCEPTANCE", label: "Tracking - Intervention Acceptance" },
   // Reporting
-  { value: "SHARING_DATA", label: "Data Sharing" },
+  { value: "SHARING_DATA", label: "Reporting - sharing data with prescribers/decision makers" },
   // Education
-  { value: "PROVIDING_EDUCATION", label: "Providing Education" },
-  { value: "RECEIVING_EDUCATION", label: "Receiving Education" },
+  { value: "PROVIDING_EDUCATION", label: "Education - Providing Education" },
+  { value: "RECEIVING_EDUCATION", label: "Education - Receiving Education (e.g. CE)" },
   // Administrative
-  { value: "COMMITTEE_WORK", label: "Committee Work" },
-  { value: "QI_PROJECTS_RESEARCH", label: "QI/Research" },
-  { value: "EMAILS", label: "Emails" },
+  { value: "COMMITTEE_WORK", label: "Administrative - Committee Work" },
+  { value: "QI_PROJECTS_RESEARCH", label: "Administrative - QI projects/research" },
+  { value: "EMAILS", label: "Administrative - Emails" },
   // Other
-  { value: "OTHER", label: "Other" }
+  { value: "OTHER", label: "Other - specify in comments" }
 ]
 
 export function HistoryPanel({
@@ -475,7 +475,7 @@ export function HistoryPanel({
                   telemetry.trackFilterChanged('task_filter')
                 }}
               >
-                <SelectTrigger id="task-filter" className="w-[28rem] min-h-11">
+                <SelectTrigger id="task-filter" className="w-[45rem] min-h-11">
                   <SelectValue placeholder="All tasks" />
                 </SelectTrigger>
                 <SelectContent>
@@ -503,7 +503,7 @@ export function HistoryPanel({
                   telemetry.trackSearchUsed()
                 }
               }}
-              className="pl-10 min-h-11"
+              className="pl-16 min-h-11"
               aria-label="Search entries"
             />
           </div>

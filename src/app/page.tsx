@@ -14,17 +14,6 @@ const keywords = [
   "User-Friendly Web Tool"
 ]
 
-const aims = [
-  "Quantify Activities",
-  "Develop Calculator", 
-  "Support Implementation"
-]
-
-const impact = [
-  "Optimize Antimicrobial Use",
-  "Reduce Drug Resistance",
-  "Improve Patient Outcomes"
-]
 
 const LandingPage = () => {
   return (
@@ -50,31 +39,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Aims Section */}
-      <Section id="aims" title="Aims" className="bg-slate-50">
-        <div className="flex justify-center">
-          <ul className="list">
-            {aims.map((aim, index) => (
-              <li key={index} className="list-item">
-                {aim}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Section>
-
-      {/* Impact Section */}
-      <Section id="impact" title="Impact">
-        <div className="flex justify-center">
-          <ul className="list">
-            {impact.map((item, index) => (
-              <li key={index} className="list-item">
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Section>
 
       {/* About Us Section */}
       <AboutUsSection />
