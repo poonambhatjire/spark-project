@@ -59,9 +59,16 @@ const SignInPage = () => {
           aria-label="Password"
         />
         <SubmitButton />
-        <div className="text-sm text-slate-600 text-center">
-          Don&apos;t have an account?{' '}
-          <Link href="/sign-up" className="text-red-700 hover:underline font-medium">Sign Up</Link>
+        <div className="text-sm text-slate-600 text-center space-y-2">
+          <div>
+            <Link href="/forgot-password" className="text-red-700 hover:underline font-medium">
+              Forgot Password?
+            </Link>
+          </div>
+          <div>
+            Don&apos;t have an account?{' '}
+            <Link href="/sign-up" className="text-red-700 hover:underline font-medium">Sign Up</Link>
+          </div>
         </div>
       </form>
     </div>
