@@ -16,28 +16,31 @@ import { telemetry } from "@/lib/telemetry"
 const quickLogSchema = z.object({
   task: z.enum([
     // Patient Care
-    'PAF', 
-    'AUTH_RESTRICTED_ANTIMICROBIALS', 
-    'CLINICAL_ROUNDS',
+    'Patient Care - Prospective Audit & Feedback', 
+    'Patient Care - Authorization of Restricted Antimicrobials', 
+    'Patient Care - Participating in Clinical Rounds',
     // Administrative
-    'GUIDELINES_EHR',
+    'Administrative - Guidelines/EHR',
     // Tracking
-    'AMU',
-    'AMR', 
-    'ANTIBIOTIC_APPROPRIATENESS',
-    'INTERVENTION_ACCEPTANCE',
+    'Tracking - AMU',
+    'Tracking - AMR', 
+    'Tracking - Antibiotic Appropriateness',
+    'Tracking - Intervention Acceptance',
     // Reporting
-    'SHARING_DATA',
+    'Reporting - sharing data with prescribers/decision makers',
     // Education
-    'PROVIDING_EDUCATION',
-    'RECEIVING_EDUCATION',
+    'Education - Providing Education',
+    'Education - Receiving Education (e.g. CE)',
     // Administrative
-    'COMMITTEE_WORK',
-    'QI_PROJECTS_RESEARCH',
-    'EMAILS',
+    'Administrative - Committee Work',
+    'Administrative - QI projects/research',
+    'Administrative - Emails',
     // Other
-    'OTHER'
-  ] as const),
+    'Other - specify in comments'
+  ] as const, {
+    required_error: "Please select a task type",
+    invalid_type_error: "Please select a valid task type"
+  }),
   otherTask: z.string().optional(),
   minutes: z.number()
     .min(1, "Minutes must be at least 1")
@@ -46,7 +49,7 @@ const quickLogSchema = z.object({
   occurredOn: z.string().min(1, "Date is required"),
   comment: z.string().optional(),
 }).refine((data) => {
-  if (data.task === 'OTHER' && (!data.otherTask || data.otherTask.trim() === "")) {
+  if (data.task === 'Other - specify in comments' && (!data.otherTask || data.otherTask.trim() === "")) {
     return false
   }
   return true
@@ -59,37 +62,37 @@ type QuickLogFormData = z.infer<typeof quickLogSchema>
 
 // Preset templates
 const PRESET_TEMPLATES = [
-  { label: "PAF 15m", task: "PAF" as Activity, minutes: 15 },
-  { label: "PAF 30m", task: "PAF" as Activity, minutes: 30 },
-  { label: "Auth Restricted 15m", task: "AUTH_RESTRICTED_ANTIMICROBIALS" as Activity, minutes: 15 },
-  { label: "Clinical Rounds 30m", task: "CLINICAL_ROUNDS" as Activity, minutes: 30 },
-  { label: "Providing Education 60m", task: "PROVIDING_EDUCATION" as Activity, minutes: 60 },
+  { label: "PAF 15m", task: "Patient Care - Prospective Audit & Feedback" as Activity, minutes: 15 },
+  { label: "PAF 30m", task: "Patient Care - Prospective Audit & Feedback" as Activity, minutes: 30 },
+  { label: "Auth Restricted 15m", task: "Patient Care - Authorization of Restricted Antimicrobials" as Activity, minutes: 15 },
+  { label: "Clinical Rounds 30m", task: "Patient Care - Participating in Clinical Rounds" as Activity, minutes: 30 },
+  { label: "Providing Education 60m", task: "Education - Providing Education" as Activity, minutes: 60 },
 ]
 
 // Task options
 const TASK_OPTIONS = [
   // Patient Care
-  { value: "PAF", label: "Patient Care - Prospective Audit & Feedback" },
-  { value: "AUTH_RESTRICTED_ANTIMICROBIALS", label: "Patient Care - Authorization of Restricted Antimicrobials" },
-  { value: "CLINICAL_ROUNDS", label: "Patient Care - Participating in Clinical Rounds" },
+  { value: "Patient Care - Prospective Audit & Feedback", label: "Patient Care - Prospective Audit & Feedback" },
+  { value: "Patient Care - Authorization of Restricted Antimicrobials", label: "Patient Care - Authorization of Restricted Antimicrobials" },
+  { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
   // Administrative
-  { value: "GUIDELINES_EHR", label: "Administrative - Guidelines/EHR" },
+  { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
   // Tracking
-  { value: "AMU", label: "Tracking - AMU" },
-  { value: "AMR", label: "Tracking - AMR" },
-  { value: "ANTIBIOTIC_APPROPRIATENESS", label: "Tracking - Antibiotic Appropriateness" },
-  { value: "INTERVENTION_ACCEPTANCE", label: "Tracking - Intervention Acceptance" },
+  { value: "Tracking - AMU", label: "Tracking - AMU" },
+  { value: "Tracking - AMR", label: "Tracking - AMR" },
+  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
+  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
   // Reporting
-  { value: "SHARING_DATA", label: "Reporting - sharing data with prescribers/decision makers" },
+  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
   // Education
-  { value: "PROVIDING_EDUCATION", label: "Education - Providing Education" },
-  { value: "RECEIVING_EDUCATION", label: "Education - Receiving Education (e.g. CE)" },
+  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
   // Administrative
-  { value: "COMMITTEE_WORK", label: "Administrative - Committee Work" },
-  { value: "QI_PROJECTS_RESEARCH", label: "Administrative - QI projects/research" },
-  { value: "EMAILS", label: "Administrative - Emails" },
+  { value: "Administrative - Committee Work", label: "Administrative - Committee Work" },
+  { value: "Administrative - QI projects/research", label: "Administrative - QI projects/research" },
+  { value: "Administrative - Emails", label: "Administrative - Emails" },
   // Other
-  { value: "OTHER", label: "Other - specify in comments" },
+  { value: "Other - specify in comments", label: "Other - specify in comments" },
 ]
 
 // Minutes presets
@@ -124,7 +127,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
   } = useForm<QuickLogFormData>({
     resolver: zodResolver(quickLogSchema),
     defaultValues: {
-      task: "" as Activity,
+      task: "Patient Care - Prospective Audit & Feedback" as Activity, // Set a default valid task instead of empty string
       otherTask: "",
       minutes: 30,
       occurredOn: getCurrentDate(),
@@ -159,6 +162,12 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
   }
 
   const handleFormSubmit = async (data: QuickLogFormData) => {
+    // Additional safeguard to ensure task is not empty
+    if (!data.task || data.task.trim() === '') {
+      console.error('Task is required but was empty')
+      return
+    }
+
     setIsSubmitting(true)
     try {
       await onSubmit(data)
@@ -273,7 +282,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
             </div>
 
             {/* Other Task Input (conditional) */}
-            {selectedTask === "OTHER" && (
+            {selectedTask === "Other - specify in comments" && (
               <div className="space-y-2 md:col-span-2">
                 <label htmlFor="other-task" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   Task Name *

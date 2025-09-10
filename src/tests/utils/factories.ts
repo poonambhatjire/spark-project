@@ -12,7 +12,7 @@ export function entryFactory(partial?: Partial<TimeEntry>): TimeEntry {
   
   const defaults: TimeEntry = {
     id,
-    task: "PAF" as Activity,
+    task: "Patient Care - Prospective Audit & Feedback" as Activity,
     minutes: 30,
     occurredOn: fixedToday(),
     comment: "",
@@ -34,7 +34,7 @@ export function entryFactory(partial?: Partial<TimeEntry>): TimeEntry {
  */
 export function pafEntry(minutes: number = 15, partial?: Partial<TimeEntry>): TimeEntry {
   return entryFactory({
-    task: "PAF",
+    task: "Patient Care - Prospective Audit & Feedback",
     minutes,
     comment: `PAF activity for ${minutes} minutes`,
     ...partial
@@ -49,7 +49,7 @@ export function pafEntry(minutes: number = 15, partial?: Partial<TimeEntry>): Ti
  */
 export function authRestrictedEntry(minutes: number = 30, partial?: Partial<TimeEntry>): TimeEntry {
   return entryFactory({
-    task: "AUTH_RESTRICTED_ANTIMICROBIALS",
+    task: "Patient Care - Authorization of Restricted Antimicrobials",
     minutes,
     comment: `Authorization of restricted antimicrobials for ${minutes} minutes`,
     ...partial
@@ -64,7 +64,7 @@ export function authRestrictedEntry(minutes: number = 30, partial?: Partial<Time
  */
 export function providingEducationEntry(minutes: number = 60, partial?: Partial<TimeEntry>): TimeEntry {
   return entryFactory({
-    task: "PROVIDING_EDUCATION",
+    task: "Education - Providing Education",
     minutes,
     comment: `Providing education session for ${minutes} minutes`,
     ...partial
@@ -80,7 +80,7 @@ export function providingEducationEntry(minutes: number = 60, partial?: Partial<
  */
 export function otherEntry(otherTask: string, minutes: number = 45, partial?: Partial<TimeEntry>): TimeEntry {
   return entryFactory({
-    task: "OTHER",
+    task: "Other - specify in comments",
     otherTask,
     minutes,
     comment: `Custom activity: ${otherTask}`,
@@ -113,8 +113,8 @@ export function createMixedTaskEntries(): TimeEntry[] {
     authRestrictedEntry(30),
     providingEducationEntry(60),
     otherEntry("Custom Task", 45),
-    entryFactory({ task: "SHARING_DATA", minutes: 20, comment: "Reporting activity" }),
-    entryFactory({ task: "COMMITTEE_WORK", minutes: 25, comment: "Administrative work" })
+    entryFactory({ task: "Reporting - sharing data with prescribers/decision makers", minutes: 20, comment: "Reporting activity" }),
+    entryFactory({ task: "Administrative - Committee Work", minutes: 25, comment: "Administrative work" })
   ]
 }
 
@@ -154,21 +154,21 @@ export function createDateRangeEntries(): TimeEntry[] {
  */
 export function createLargeDataset(count: number = 100): TimeEntry[] {
   const tasks: Activity[] = [
-    "PAF", 
-    "AUTH_RESTRICTED_ANTIMICROBIALS", 
-    "CLINICAL_ROUNDS",
-    "GUIDELINES_EHR",
-    "AMU",
-    "AMR", 
-    "ANTIBIOTIC_APPROPRIATENESS",
-    "INTERVENTION_ACCEPTANCE",
-    "SHARING_DATA",
-    "PROVIDING_EDUCATION",
-    "RECEIVING_EDUCATION",
-    "COMMITTEE_WORK",
-    "QI_PROJECTS_RESEARCH",
-    "EMAILS",
-    "OTHER"
+    "Patient Care - Prospective Audit & Feedback", 
+    "Patient Care - Authorization of Restricted Antimicrobials", 
+    "Patient Care - Participating in Clinical Rounds",
+    "Administrative - Guidelines/EHR",
+    "Tracking - AMU",
+    "Tracking - AMR", 
+    "Tracking - Antibiotic Appropriateness",
+    "Tracking - Intervention Acceptance",
+    "Reporting - sharing data with prescribers/decision makers",
+    "Education - Providing Education",
+    "Education - Receiving Education (e.g. CE)",
+    "Administrative - Committee Work",
+    "Administrative - QI projects/research",
+    "Administrative - Emails",
+    "Other - specify in comments"
   ]
   const comments = [
     "Patient review",

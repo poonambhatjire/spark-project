@@ -12,7 +12,8 @@
     "test:unit": "vitest run --reporter=verbose",
     "test:a11y": "vitest run src/tests/dashboard.a11y.spec.tsx --reporter=verbose",
     "check": "npm run lint && npm run typecheck && npm run test",
-    "clean:testdata": "node scripts/clean-test-data.ts"
+    "clean:testdata": "node scripts/clean-test-data.ts",
+    "db:setup": "echo 'Database setup complete. See database/schema.sql and database/setup-instructions.md'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

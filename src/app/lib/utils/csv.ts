@@ -99,7 +99,7 @@ export const csvUtils = {
   }
 }
 
-// Pure function for generating CSV content from entries (for testing)
+// Pure function for generating CSV content from entries
 export const generateCsvFromEntries = (entries: TimeEntry[]): string => {
   // Process entries for CSV (format dates consistently)
   const processedEntries = entries.map(entry => ({

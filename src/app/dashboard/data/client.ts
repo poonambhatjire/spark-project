@@ -1,27 +1,27 @@
 // Types
 export type Activity = 
   // Patient Care
-  | 'PAF' 
-  | 'AUTH_RESTRICTED_ANTIMICROBIALS' 
-  | 'CLINICAL_ROUNDS'
+  | 'Patient Care - Prospective Audit & Feedback' 
+  | 'Patient Care - Authorization of Restricted Antimicrobials' 
+  | 'Patient Care - Participating in Clinical Rounds'
   // Administrative
-  | 'GUIDELINES_EHR'
+  | 'Administrative - Guidelines/EHR'
   // Tracking
-  | 'AMU'
-  | 'AMR' 
-  | 'ANTIBIOTIC_APPROPRIATENESS'
-  | 'INTERVENTION_ACCEPTANCE'
+  | 'Tracking - AMU'
+  | 'Tracking - AMR' 
+  | 'Tracking - Antibiotic Appropriateness'
+  | 'Tracking - Intervention Acceptance'
   // Reporting
-  | 'SHARING_DATA'
+  | 'Reporting - sharing data with prescribers/decision makers'
   // Education
-  | 'PROVIDING_EDUCATION'
-  | 'RECEIVING_EDUCATION'
+  | 'Education - Providing Education'
+  | 'Education - Receiving Education (e.g. CE)'
   // Administrative
-  | 'COMMITTEE_WORK'
-  | 'QI_PROJECTS_RESEARCH'
-  | 'EMAILS'
+  | 'Administrative - Committee Work'
+  | 'Administrative - QI projects/research'
+  | 'Administrative - Emails'
   // Other
-  | 'OTHER';
+  | 'Other - specify in comments';
 
 export interface TimeEntry {
   id: string;
@@ -60,27 +60,27 @@ export interface ListEntriesOptions {
 export interface TodayTotals {
   total: number;
   // Patient Care
-  PAF: number;
-  AUTH_RESTRICTED_ANTIMICROBIALS: number;
-  CLINICAL_ROUNDS: number;
+  'Patient Care - Prospective Audit & Feedback': number;
+  'Patient Care - Authorization of Restricted Antimicrobials': number;
+  'Patient Care - Participating in Clinical Rounds': number;
   // Administrative
-  GUIDELINES_EHR: number;
+  'Administrative - Guidelines/EHR': number;
   // Tracking
-  AMU: number;
-  AMR: number;
-  ANTIBIOTIC_APPROPRIATENESS: number;
-  INTERVENTION_ACCEPTANCE: number;
+  'Tracking - AMU': number;
+  'Tracking - AMR': number;
+  'Tracking - Antibiotic Appropriateness': number;
+  'Tracking - Intervention Acceptance': number;
   // Reporting
-  SHARING_DATA: number;
+  'Reporting - sharing data with prescribers/decision makers': number;
   // Education
-  PROVIDING_EDUCATION: number;
-  RECEIVING_EDUCATION: number;
+  'Education - Providing Education': number;
+  'Education - Receiving Education (e.g. CE)': number;
   // Administrative
-  COMMITTEE_WORK: number;
-  QI_PROJECTS_RESEARCH: number;
-  EMAILS: number;
+  'Administrative - Committee Work': number;
+  'Administrative - QI projects/research': number;
+  'Administrative - Emails': number;
   // Other
-  OTHER: number;
+  'Other - specify in comments': number;
 }
 
 
@@ -263,27 +263,27 @@ class TimeEntryClient {
     const totals: TodayTotals = {
       total: 0,
       // Patient Care
-      PAF: 0,
-      AUTH_RESTRICTED_ANTIMICROBIALS: 0,
-      CLINICAL_ROUNDS: 0,
+      'Patient Care - Prospective Audit & Feedback': 0,
+      'Patient Care - Authorization of Restricted Antimicrobials': 0,
+      'Patient Care - Participating in Clinical Rounds': 0,
       // Administrative
-      GUIDELINES_EHR: 0,
+      'Administrative - Guidelines/EHR': 0,
       // Tracking
-      AMU: 0,
-      AMR: 0,
-      ANTIBIOTIC_APPROPRIATENESS: 0,
-      INTERVENTION_ACCEPTANCE: 0,
+      'Tracking - AMU': 0,
+      'Tracking - AMR': 0,
+      'Tracking - Antibiotic Appropriateness': 0,
+      'Tracking - Intervention Acceptance': 0,
       // Reporting
-      SHARING_DATA: 0,
+      'Reporting - sharing data with prescribers/decision makers': 0,
       // Education
-      PROVIDING_EDUCATION: 0,
-      RECEIVING_EDUCATION: 0,
+      'Education - Providing Education': 0,
+      'Education - Receiving Education (e.g. CE)': 0,
       // Administrative
-      COMMITTEE_WORK: 0,
-      QI_PROJECTS_RESEARCH: 0,
-      EMAILS: 0,
+      'Administrative - Committee Work': 0,
+      'Administrative - QI projects/research': 0,
+      'Administrative - Emails': 0,
       // Other
-      OTHER: 0
+      'Other - specify in comments': 0
     };
 
     todayEntries.forEach(entry => {
@@ -339,11 +339,6 @@ class TimeEntryClient {
     return entry || null;
   }
 
-  // Utility method to clear all data (for testing)
-  async clearAll(): Promise<void> {
-    this.entries = [];
-    this.save();
-  }
 
   // Utility method to get storage stats
   getStorageStats(): { total: number; active: number; deleted: number } {

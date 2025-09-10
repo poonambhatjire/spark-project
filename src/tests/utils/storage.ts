@@ -80,7 +80,7 @@ export function seedEntriesWithDates(baseDate: string = "2025-01-15"): void {
   const entries: TimeEntry[] = [
     {
       id: "test-1",
-      task: "PAF",
+      task: "Patient Care - Prospective Audit & Feedback",
       minutes: 15,
       occurredOn: baseDate,
       comment: "Test PAF activity",
@@ -89,7 +89,7 @@ export function seedEntriesWithDates(baseDate: string = "2025-01-15"): void {
     },
     {
       id: "test-2", 
-      task: "AUTH_RESTRICTED_ANTIMICROBIALS",
+      task: "Patient Care - Authorization of Restricted Antimicrobials",
       minutes: 30,
       occurredOn: baseDate,
       comment: "Test prior auth activity",
@@ -98,7 +98,7 @@ export function seedEntriesWithDates(baseDate: string = "2025-01-15"): void {
     },
     {
       id: "test-3",
-      task: "PROVIDING_EDUCATION", 
+      task: "Education - Providing Education", 
       minutes: 60,
       occurredOn: baseDate,
       comment: "Test education activity",
@@ -118,7 +118,7 @@ export function seedEntriesAcrossDays(): void {
     // Today
     {
       id: "test-today-1",
-      task: "PAF",
+      task: "Patient Care - Prospective Audit & Feedback",
       minutes: 15,
       occurredOn: "2025-01-15",
       comment: "Today PAF",
@@ -128,7 +128,7 @@ export function seedEntriesAcrossDays(): void {
     // Yesterday
     {
       id: "test-yesterday-1", 
-      task: "AUTH_RESTRICTED_ANTIMICROBIALS",
+      task: "Patient Care - Authorization of Restricted Antimicrobials",
       minutes: 30,
       occurredOn: "2025-01-14",
       comment: "Yesterday prior auth",
@@ -138,7 +138,7 @@ export function seedEntriesAcrossDays(): void {
     // 3 days ago
     {
       id: "test-3days-1",
-      task: "PROVIDING_EDUCATION",
+      task: "Education - Providing Education",
       minutes: 60,
       occurredOn: "2025-01-12", 
       comment: "3 days ago education",
@@ -148,7 +148,7 @@ export function seedEntriesAcrossDays(): void {
     // 8 days ago (outside week range)
     {
       id: "test-8days-1",
-      task: "SHARING_DATA",
+      task: "Reporting - sharing data with prescribers/decision makers",
       minutes: 45,
       occurredOn: "2025-01-07",
       comment: "8 days ago reporting",

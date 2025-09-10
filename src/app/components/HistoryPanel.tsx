@@ -128,8 +128,7 @@ export function HistoryPanel({
           isMostRecentMatch: entryDateOnly.getTime() === mostRecentDate.getTime()
         })
         
-        // For demo/testing purposes, show entries from the most recent date in the data
-        // This is more user-friendly when testing with future dates
+        // Show entries from the most recent date in the data
         const exactMatch = entryDateOnly.getTime() === today.getTime()
         const mostRecentMatch = entryDateOnly.getTime() === mostRecentDate.getTime()
         
@@ -617,7 +616,7 @@ export function HistoryPanel({
                     <td className="py-2 px-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
-                          {entry.task === 'OTHER' ? 'OTHER' : entry.task}
+                          {entry.task === 'Other - specify in comments' ? 'Other' : entry.task}
                         </Badge>
                         {entry.otherTask && (
                           <span className="text-slate-900 dark:text-slate-100">{entry.otherTask}</span>
