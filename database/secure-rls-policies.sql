@@ -152,9 +152,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.get_all_users_for_admin()
 RETURNS TABLE (
   id uuid,
-  email text,
-  name text,
-  role text,
+  email character varying(255),
+  name character varying(255),
+  role character varying(255),
   is_active boolean,
   created_at timestamptz
 ) AS $$
