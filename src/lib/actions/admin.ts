@@ -7,6 +7,7 @@ export interface AdminUser {
   email: string
   name: string
   role: string
+  is_active?: boolean
   created_at: string
 }
 
@@ -71,7 +72,7 @@ export async function getAllUsers(): Promise<{
     // Get all users
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('id, email, name, role, created_at')
+      .select('id, email, name, role, is_active, created_at')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -85,6 +86,7 @@ export async function getAllUsers(): Promise<{
         email: profile.email || '',
         name: profile.name || '',
         role: profile.role || 'user',
+        is_active: profile.is_active ?? true,
         created_at: profile.created_at
       })) || []
     }
@@ -221,6 +223,156 @@ export async function getUserActivity(userId: string): Promise<{
     }
   } catch (error) {
     console.error('Error fetching user activity:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function updateUserRole(userId: string, newRole: 'user' | 'admin' | 'super_admin'): Promise<{ 
+  success: boolean; 
+  error?: string 
+}> {
+  try {
+    const supabase = await createClient()
+    
+    // First check if user is admin
+    const adminCheck = await checkAdminAccess()
+    if (!adminCheck.success || !adminCheck.isAdmin) {
+      return { success: false, error: 'Admin access required' }
+    }
+
+    // Prevent non-super-admins from creating super-admins
+    if (newRole === 'super_admin' && adminCheck.user?.role !== 'super_admin') {
+      return { success: false, error: 'Only super admins can create super admins' }
+    }
+
+    // Update user role
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', userId)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating user role:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function updateUserStatus(userId: string, isActive: boolean): Promise<{ 
+  success: boolean; 
+  error?: string 
+}> {
+  try {
+    const supabase = await createClient()
+    
+    // First check if user is admin
+    const adminCheck = await checkAdminAccess()
+    if (!adminCheck.success || !adminCheck.isAdmin) {
+      return { success: false, error: 'Admin access required' }
+    }
+
+    // Update user status
+    const { error } = await supabase
+      .from('profiles')
+      .update({ 
+        is_active: isActive,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating user status:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function bulkUpdateUserRoles(
+  userIds: string[],
+  newRole: 'user' | 'admin' | 'super_admin'
+): Promise<{ success: boolean; error?: string; updatedCount?: number }> {
+  try {
+    const supabase = await createClient()
+    
+    // First check if user is admin
+    const adminCheck = await checkAdminAccess()
+    if (!adminCheck.success || !adminCheck.isAdmin) {
+      return { success: false, error: 'Admin access required' }
+    }
+
+    // Only super_admins can do bulk role changes
+    if (adminCheck.user?.role !== 'super_admin') {
+      return { success: false, error: 'Only super admins can perform bulk role updates' }
+    }
+
+    // Prevent creating super_admins via bulk operation
+    if (newRole === 'super_admin') {
+      return { success: false, error: 'Cannot create super admins via bulk operation' }
+    }
+
+    if (userIds.length === 0) {
+      return { success: false, error: 'No users selected' }
+    }
+
+    const { error, count } = await supabase
+      .from('profiles')
+      .update({ 
+        role: newRole,
+        updated_at: new Date().toISOString()
+      })
+      .in('id', userIds)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, updatedCount: count || 0 }
+  } catch (error) {
+    console.error('Error in bulkUpdateUserRoles:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function bulkUpdateUserStatus(
+  userIds: string[],
+  isActive: boolean
+): Promise<{ success: boolean; error?: string; updatedCount?: number }> {
+  try {
+    const supabase = await createClient()
+    
+    // First check if user is admin
+    const adminCheck = await checkAdminAccess()
+    if (!adminCheck.success || !adminCheck.isAdmin) {
+      return { success: false, error: 'Admin access required' }
+    }
+
+    if (userIds.length === 0) {
+      return { success: false, error: 'No users selected' }
+    }
+
+    const { error, count } = await supabase
+      .from('profiles')
+      .update({ 
+        is_active: isActive,
+        updated_at: new Date().toISOString()
+      })
+      .in('id', userIds)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, updatedCount: count || 0 }
+  } catch (error) {
+    console.error('Error in bulkUpdateUserStatus:', error)
     return { success: false, error: 'An unexpected error occurred' }
   }
 }

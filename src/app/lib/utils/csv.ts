@@ -127,3 +127,17 @@ export const exportEntriesToCsv = (
     throw new Error('Failed to export CSV file')
   }
 }
+
+// Generic CSV conversion function for any object array
+export const convertToCSV = (data: Record<string, unknown>[]): string => {
+  if (data.length === 0) return ''
+  
+  const headers = Object.keys(data[0])
+  const headerRow = headers.join(',')
+  
+  const dataRows = data.map(row => 
+    headers.map(header => csvUtils.escapeField(row[header] as string | number | null | undefined)).join(',')
+  )
+  
+  return [headerRow, ...dataRows].join('\n')
+}
