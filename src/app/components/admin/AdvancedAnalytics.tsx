@@ -37,15 +37,8 @@ interface AnalyticsData {
   }>
 }
 
-export default function AdvancedAnalytics() {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d')
-  const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'comparison' | 'patterns'>('overview')
-
-  // Mock data for demonstration
-  const mockAnalyticsData: AnalyticsData = {
+// Mock data for demonstration
+const mockAnalyticsData: AnalyticsData = {
     totalUsers: 25,
     totalEntries: 342,
     totalMinutes: 12840,
@@ -103,6 +96,13 @@ export default function AdvancedAnalytics() {
       { pattern: 'Multi-task Days', description: 'Days with 3+ different tasks', count: 18, percentage: 60.0 }
     ]
   }
+
+export default function AdvancedAnalytics() {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d')
+  const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'comparison' | 'patterns'>('overview')
 
   const loadAnalyticsData = useCallback(async () => {
     try {

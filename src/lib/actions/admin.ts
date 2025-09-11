@@ -80,7 +80,7 @@ export async function getAllUsers(): Promise<{
 
     return {
       success: true,
-      users: users?.map(user => ({
+      users: users?.map((user: { id: string; email?: string; name?: string; role?: string; is_active?: boolean; created_at: string }) => ({
         id: user.id,
         email: user.email || '',
         name: user.name || '',
@@ -136,17 +136,17 @@ export async function getActivityStats(): Promise<{
 
     // Calculate statistics
     const totalEntries = entries?.length || 0
-    const totalMinutes = entries?.reduce((sum, entry) => sum + entry.minutes, 0) || 0
-    const uniqueUsers = new Set(entries?.map(entry => entry.user_name)).size || 0
+    const totalMinutes = entries?.reduce((sum: number, entry: { minutes: number }) => sum + entry.minutes, 0) || 0
+    const uniqueUsers = new Set(entries?.map((entry: { user_name: string }) => entry.user_name)).size || 0
 
     // Activity breakdown by task type
     const activityBreakdown: Record<string, number> = {}
-    entries?.forEach(entry => {
+    entries?.forEach((entry: { task: string; minutes: number }) => {
       activityBreakdown[entry.task] = (activityBreakdown[entry.task] || 0) + entry.minutes
     })
 
     // Recent activity
-    const recentActivity = entries?.slice(0, 10).map(entry => ({
+    const recentActivity = entries?.slice(0, 10).map((entry: { id: string; user_name?: string; user_email?: string; task: string; minutes: number; occurred_on: string; created_at: string }) => ({
       id: entry.id,
       user_name: entry.user_name || 'Unknown',
       user_email: entry.user_email || '',
