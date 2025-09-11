@@ -1,0 +1,283 @@
+{
+  "analysis_date": "2024-12-19",
+  "database_type": "Supabase PostgreSQL",
+  "schema_analysis": {
+    "auth_schema_tables": [
+      {
+        "table_name": "audit_log_entries",
+        "columns": [
+          {"name": "instance_id", "type": "uuid", "nullable": true},
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "payload", "type": "json", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "ip_address", "type": "character varying(64)", "nullable": false, "default": "''::character varying"}
+        ]
+      },
+      {
+        "table_name": "flow_state",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "user_id", "type": "uuid", "nullable": true},
+          {"name": "auth_code", "type": "text", "nullable": false},
+          {"name": "code_challenge_method", "type": "USER-DEFINED", "nullable": false},
+          {"name": "code_challenge", "type": "text", "nullable": false},
+          {"name": "provider_type", "type": "text", "nullable": false},
+          {"name": "provider_access_token", "type": "text", "nullable": true},
+          {"name": "provider_refresh_token", "type": "text", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "authentication_method", "type": "text", "nullable": false},
+          {"name": "auth_code_issued_at", "type": "timestamp with time zone", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "identities",
+        "columns": [
+          {"name": "provider_id", "type": "text", "nullable": false},
+          {"name": "user_id", "type": "uuid", "nullable": false},
+          {"name": "identity_data", "type": "jsonb", "nullable": false},
+          {"name": "provider", "type": "text", "nullable": false},
+          {"name": "last_sign_in_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "email", "type": "text", "nullable": true},
+          {"name": "id", "type": "uuid", "nullable": false, "default": "gen_random_uuid()"}
+        ]
+      },
+      {
+        "table_name": "instances",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "uuid", "type": "uuid", "nullable": true},
+          {"name": "raw_base_config", "type": "text", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "mfa_amr_claims",
+        "columns": [
+          {"name": "session_id", "type": "uuid", "nullable": false},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": false},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": false},
+          {"name": "authentication_method", "type": "text", "nullable": false},
+          {"name": "id", "type": "uuid", "nullable": false}
+        ]
+      },
+      {
+        "table_name": "mfa_challenges",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "factor_id", "type": "uuid", "nullable": false},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": false},
+          {"name": "verified_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "ip_address", "type": "inet", "nullable": false},
+          {"name": "otp_code", "type": "text", "nullable": true},
+          {"name": "web_authn_session_data", "type": "jsonb", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "mfa_factors",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "user_id", "type": "uuid", "nullable": false},
+          {"name": "friendly_name", "type": "text", "nullable": true},
+          {"name": "factor_type", "type": "USER-DEFINED", "nullable": false},
+          {"name": "status", "type": "USER-DEFINED", "nullable": false},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": false},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": false},
+          {"name": "secret", "type": "text", "nullable": true},
+          {"name": "phone", "type": "text", "nullable": true},
+          {"name": "last_challenged_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "web_authn_credential", "type": "jsonb", "nullable": true},
+          {"name": "web_authn_aaguid", "type": "uuid", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "oauth_clients",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "client_id", "type": "text", "nullable": false},
+          {"name": "client_secret_hash", "type": "text", "nullable": false},
+          {"name": "registration_type", "type": "USER-DEFINED", "nullable": false},
+          {"name": "redirect_uris", "type": "text", "nullable": false},
+          {"name": "grant_types", "type": "text", "nullable": false},
+          {"name": "client_name", "type": "text", "nullable": true},
+          {"name": "client_uri", "type": "text", "nullable": true},
+          {"name": "logo_uri", "type": "text", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": false, "default": "now()"},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": false, "default": "now()"},
+          {"name": "deleted_at", "type": "timestamp with time zone", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "one_time_tokens",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "user_id", "type": "uuid", "nullable": false},
+          {"name": "token_type", "type": "USER-DEFINED", "nullable": false},
+          {"name": "token_hash", "type": "text", "nullable": false},
+          {"name": "relates_to", "type": "text", "nullable": false},
+          {"name": "created_at", "type": "timestamp without time zone", "nullable": false, "default": "now()"},
+          {"name": "updated_at", "type": "timestamp without time zone", "nullable": false, "default": "now()"}
+        ]
+      },
+      {
+        "table_name": "refresh_tokens",
+        "columns": [
+          {"name": "instance_id", "type": "uuid", "nullable": true},
+          {"name": "id", "type": "bigint", "nullable": false, "default": "nextval('auth.refresh_tokens_id_seq'::regclass)"},
+          {"name": "token", "type": "character varying(255)", "nullable": true},
+          {"name": "user_id", "type": "character varying(255)", "nullable": true},
+          {"name": "revoked", "type": "boolean", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "parent", "type": "character varying(255)", "nullable": true},
+          {"name": "session_id", "type": "uuid", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "saml_providers",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "sso_provider_id", "type": "uuid", "nullable": false},
+          {"name": "entity_id", "type": "text", "nullable": false},
+          {"name": "metadata_xml", "type": "text", "nullable": false},
+          {"name": "metadata_url", "type": "text", "nullable": true},
+          {"name": "attribute_mapping", "type": "jsonb", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "name_id_format", "type": "text", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "saml_relay_states",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "sso_provider_id", "type": "uuid", "nullable": false},
+          {"name": "request_id", "type": "text", "nullable": false},
+          {"name": "for_email", "type": "text", "nullable": true},
+          {"name": "redirect_to", "type": "text", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "flow_state_id", "type": "uuid", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "schema_migrations",
+        "columns": [
+          {"name": "version", "type": "bigint", "nullable": false},
+          {"name": "inserted_at", "type": "timestamp without time zone", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "sessions",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "user_id", "type": "uuid", "nullable": false},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "factor_id", "type": "uuid", "nullable": true},
+          {"name": "aal", "type": "USER-DEFINED", "nullable": true},
+          {"name": "not_after", "type": "timestamp with time zone", "nullable": true},
+          {"name": "refreshed_at", "type": "timestamp without time zone", "nullable": true},
+          {"name": "user_agent", "type": "text", "nullable": true},
+          {"name": "ip", "type": "inet", "nullable": true},
+          {"name": "tag", "type": "text", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "sso_domains",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "sso_provider_id", "type": "uuid", "nullable": false},
+          {"name": "domain", "type": "text", "nullable": false},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "sso_providers",
+        "columns": [
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "resource_id", "type": "text", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "disabled", "type": "boolean", "nullable": true}
+        ]
+      },
+      {
+        "table_name": "users",
+        "columns": [
+          {"name": "instance_id", "type": "uuid", "nullable": true},
+          {"name": "id", "type": "uuid", "nullable": false},
+          {"name": "aud", "type": "character varying(255)", "nullable": true},
+          {"name": "role", "type": "character varying(255)", "nullable": true},
+          {"name": "email", "type": "character varying(255)", "nullable": true},
+          {"name": "encrypted_password", "type": "character varying(255)", "nullable": true},
+          {"name": "email_confirmed_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "invited_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "confirmation_token", "type": "character varying(255)", "nullable": true},
+          {"name": "confirmation_sent_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "recovery_token", "type": "character varying(255)", "nullable": true},
+          {"name": "recovery_sent_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "email_change_token_new", "type": "character varying(255)", "nullable": true},
+          {"name": "email_change", "type": "character varying(255)", "nullable": true},
+          {"name": "email_change_sent_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "last_sign_in_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "raw_app_meta_data", "type": "jsonb", "nullable": true},
+          {"name": "raw_user_meta_data", "type": "jsonb", "nullable": true},
+          {"name": "is_super_admin", "type": "boolean", "nullable": true},
+          {"name": "created_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "updated_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "phone", "type": "text", "nullable": true, "default": "NULL::character varying"},
+          {"name": "phone_confirmed_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "phone_change", "type": "text", "nullable": true, "default": "''::character varying"},
+          {"name": "phone_change_token", "type": "character varying(255)", "nullable": true, "default": "''::character varying"},
+          {"name": "phone_change_sent_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "confirmed_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "email_change_token_current", "type": "character varying(255)", "nullable": true, "default": "''::character varying"},
+          {"name": "email_change_confirm_status", "type": "smallint", "nullable": true, "default": "0"},
+          {"name": "banned_until", "type": "timestamp with time zone", "nullable": true},
+          {"name": "reauthentication_token", "type": "character varying(255)", "nullable": true, "default": "''::character varying"},
+          {"name": "reauthentication_sent_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "is_sso_user", "type": "boolean", "nullable": false, "default": "false"},
+          {"name": "deleted_at", "type": "timestamp with time zone", "nullable": true},
+          {"name": "is_anonymous", "type": "boolean", "nullable": false, "default": "false"}
+        ]
+      }
+    ]
+  },
+  "key_insights": {
+    "auth_users_table": {
+      "primary_key": "id (uuid)",
+      "required_fields": ["id", "is_sso_user", "is_anonymous"],
+      "optional_fields": ["email", "encrypted_password", "role", "raw_user_meta_data", "raw_app_meta_data"],
+      "default_values": {
+        "is_sso_user": "false",
+        "is_anonymous": "false",
+        "phone": "NULL::character varying",
+        "phone_change": "''::character varying",
+        "phone_change_token": "''::character varying",
+        "email_change_token_current": "''::character varying",
+        "email_change_confirm_status": "0",
+        "reauthentication_token": "''::character varying"
+      }
+    },
+    "sample_data_creation_strategy": {
+      "approach": "Direct INSERT into auth.users table",
+      "required_columns": ["id", "email", "encrypted_password", "email_confirmed_at", "confirmed_at", "created_at", "updated_at"],
+      "optional_columns": ["role", "raw_user_meta_data", "raw_app_meta_data", "last_sign_in_at"],
+      "password_hashing": "Use Supabase's password hashing or bcrypt",
+      "foreign_key_considerations": "profiles table references auth.users.id"
+    }
+  },
+  "notes": [
+    "The auth.users table is the core authentication table in Supabase",
+    "Users can be created directly in auth.users for sample data",
+    "The profiles table in public schema references auth.users.id",
+    "Role field can be used to set user roles (user, admin, researcher)",
+    "raw_user_meta_data and raw_app_meta_data are JSONB fields for additional user data",
+    "Email confirmation and user confirmation timestamps are important for active users"
+  ]
+}
