@@ -1,58 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SPARC Calculator
 
-## Getting Started
+A Next.js application for tracking antimicrobial stewardship activities with secure user authentication and admin management.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **🔐 Secure Authentication** - Supabase-powered user management
+- **⏱️ Time Tracking** - Log antimicrobial stewardship activities
+- **👥 Admin Panel** - User management and analytics
+- **📊 Analytics** - Activity tracking and reporting
+- **🎨 Modern UI** - Built with Tailwind CSS and Next.js 15
+- **♿ Accessibility** - WCAG compliant with automated testing
 
-## Learn More
+## 🔐 Authentication
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Authentication
-
-This project uses **Supabase Authentication** for production-ready user management with the following features:
+**Supabase Authentication** with the following features:
 
 - ✅ **Email/Password Authentication** - Secure user registration and login
-- ✅ **Email Verification** - Automatic email verification for new accounts
+- ✅ **No Email Verification** - Users can sign up and immediately sign in
 - ✅ **Session Management** - Secure JWT-based sessions with automatic refresh
 - ✅ **Password Security** - Built-in password hashing and validation
-- ✅ **Custom Domain Support** - Ready for custom domain deployment
-- ✅ **Optional OAuth** - Can be extended with Google, GitHub, etc.
-
-### Authentication Features
-
-- **Sign Up**: Users can create accounts with email and password
-- **Sign In**: Secure login with email verification
-- **Protected Routes**: Dashboard and other sensitive pages require authentication
-- **Session Persistence**: Users stay logged in across browser sessions
-- **Automatic Redirects**: Seamless navigation between authenticated and public pages
+- ✅ **Role-based Access** - Admin and regular user roles
+- ✅ **Row Level Security** - Users can only access their own data
 
 ### Environment Variables Required
 
@@ -62,22 +42,32 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-### Database
+## 🗄️ Database
 
-The application uses Supabase PostgreSQL with the following tables:
-- `profiles` - User profile information
-- `time_entries` - Time tracking data
+**Supabase PostgreSQL** with the following tables:
+- `profiles` - User profile information with role-based access
+- `time_entries` - Time tracking data with user isolation
 - `telemetry_events` - Usage analytics
 - `contact_submissions` - Contact form submissions
 
-### Deployment
+### Database Setup
 
-The application is ready for deployment to Vercel, Netlify, or any other Next.js-compatible platform. Make sure to:
+1. **Run the database scripts** in Supabase SQL Editor:
+   - `database/fix-user-profile-creation.sql` - Fixes user profile creation
+   - `database/secure-rls-policies.sql` - Implements secure access policies
 
-1. **Set up Supabase project** and configure the environment variables
-2. **Deploy to your preferred platform** (Vercel recommended for Next.js)
-3. **Configure custom domain** in Supabase for production use
-4. **Set up email templates** in Supabase for verification emails
+2. **Set up your admin user** by updating the role in the profiles table
+
+## 🚀 Deployment
+
+Ready for deployment to Vercel, Netlify, or any Next.js-compatible platform:
+
+1. **Set up Supabase project** and configure environment variables
+2. **Deploy to your platform** (Vercel recommended)
+3. **Configure custom domain** in Supabase settings
+4. **Set `NEXT_PUBLIC_SITE_URL`** environment variable
+
+See `PRODUCTION_CONFIG.md` for detailed deployment instructions.
 
 ## Testing
 
@@ -110,25 +100,45 @@ The project includes comprehensive CI checks that run:
 npm run check  # Runs all CI checks
 ```
 
-### Test Data Cleanup
+## 📁 Project Structure
 
-After manual QA or testing, you may need to clear test data from localStorage. Run the cleanup script:
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── (auth)/            # Authentication pages
+│   ├── admin/             # Admin panel
+│   ├── dashboard/         # Main dashboard
+│   ├── components/        # Reusable UI components
+│   └── lib/               # Utility functions
+├── lib/                   # Shared libraries
+│   ├── actions/           # Server actions
+│   ├── auth/              # Authentication logic
+│   └── supabase/          # Supabase client configuration
+└── tests/                 # Test files
+```
+
+## 📚 Documentation
+
+- `PRODUCTION_CONFIG.md` - Production deployment guide
+- `DISABLE_EMAIL_VERIFICATION.md` - Email verification configuration
+- `database/SAMPLE_DATA_README.md` - Sample data documentation
+
+## 🛠️ Development
 
 ```bash
+# Run all checks (lint, typecheck, tests)
+npm run check
+
+# Run tests only
+npm test
+
+# Run accessibility tests
+npm run test:a11y
+
+# Clean test data
 npm run clean:testdata
 ```
 
-This will provide instructions for clearing test data in the browser console.
+## 📄 License
 
-**Manual cleanup in browser console:**
-```javascript
-localStorage.removeItem("sparc.entries.v1");
-```
-
-**Alternative: Clear all localStorage data:**
-```javascript
-localStorage.clear();
-```
-
-⚠️ **Note:** `localStorage.clear()` will remove ALL localStorage data, not just SPARC entries.
-# Deployment trigger Sun Sep  7 15:31:45 PDT 2025
+This project is private and proprietary.

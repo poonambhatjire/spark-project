@@ -33,6 +33,9 @@ export async function signUp(prevState: unknown, formData: FormData) {
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: undefined, // Disable email confirmation
+    }
   });
 
   if (error) {
@@ -44,7 +47,7 @@ export async function signUp(prevState: unknown, formData: FormData) {
 
   return { 
     ok: true, 
-    message: "Check your email for a verification link." 
+    message: "Account created successfully! You can now sign in." 
   };
 }
 

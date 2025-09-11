@@ -69,25 +69,24 @@ export async function getAllUsers(): Promise<{
       return { success: false, error: 'Admin access required' }
     }
 
-    // Get all users
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('id, email, name, role, is_active, created_at')
-      .order('created_at', { ascending: false })
+    // Use secure database function to get all users
+    const { data: users, error } = await supabase
+      .rpc('get_all_users_for_admin')
 
     if (error) {
+      console.error('Error fetching users:', error)
       return { success: false, error: error.message }
     }
 
     return {
       success: true,
-      users: profiles?.map(profile => ({
-        id: profile.id,
-        email: profile.email || '',
-        name: profile.name || '',
-        role: profile.role || 'user',
-        is_active: profile.is_active ?? true,
-        created_at: profile.created_at
+      users: users?.map(user => ({
+        id: user.id,
+        email: user.email || '',
+        name: user.name || '',
+        role: user.role || 'user',
+        is_active: user.is_active ?? true,
+        created_at: user.created_at
       })) || []
     }
   } catch (error) {
@@ -126,29 +125,19 @@ export async function getActivityStats(): Promise<{
       return { success: false, error: 'Admin access required' }
     }
 
-    // Get activity statistics
+    // Use secure database function to get activity statistics
     const { data: entries, error } = await supabase
-      .from('time_entries')
-      .select(`
-        id,
-        task,
-        minutes,
-        occurred_on,
-        created_at,
-        profiles!inner(name, email)
-      `)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(100)
+      .rpc('get_activity_stats_for_admin')
 
     if (error) {
+      console.error('Error fetching activity stats:', error)
       return { success: false, error: error.message }
     }
 
     // Calculate statistics
     const totalEntries = entries?.length || 0
     const totalMinutes = entries?.reduce((sum, entry) => sum + entry.minutes, 0) || 0
-    const uniqueUsers = new Set(entries?.map(entry => (entry.profiles as { name?: string; email?: string })?.name)).size || 0
+    const uniqueUsers = new Set(entries?.map(entry => entry.user_name)).size || 0
 
     // Activity breakdown by task type
     const activityBreakdown: Record<string, number> = {}
@@ -159,8 +148,8 @@ export async function getActivityStats(): Promise<{
     // Recent activity
     const recentActivity = entries?.slice(0, 10).map(entry => ({
       id: entry.id,
-      user_name: (entry.profiles as { name?: string; email?: string })?.name || 'Unknown',
-      user_email: (entry.profiles as { name?: string; email?: string })?.email || '',
+      user_name: entry.user_name || 'Unknown',
+      user_email: entry.user_email || '',
       task: entry.task,
       minutes: entry.minutes,
       occurred_on: entry.occurred_on,
@@ -205,21 +194,18 @@ export async function getUserActivity(userId: string): Promise<{
       return { success: false, error: 'Admin access required' }
     }
 
-    // Get user's activity
-    const { data: entries, error } = await supabase
-      .from('time_entries')
-      .select('id, task, other_task, minutes, occurred_on, comment, created_at')
-      .eq('user_id', userId)
-      .is('deleted_at', null)
-      .order('occurred_on', { ascending: false })
+    // Use secure database function to get user activity
+    const { data: activities, error } = await supabase
+      .rpc('get_user_activity_for_admin', { target_user_id: userId })
 
     if (error) {
+      console.error('Error fetching user activity:', error)
       return { success: false, error: error.message }
     }
 
     return {
       success: true,
-      activities: entries || []
+      activities: activities || []
     }
   } catch (error) {
     console.error('Error fetching user activity:', error)
