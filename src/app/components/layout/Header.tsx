@@ -3,10 +3,15 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { signOut } from "@/lib/auth/supabase-actions"
 
 export default function Header() {
   const pathname = usePathname()
   const isOnDashboard = pathname === "/dashboard"
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
@@ -55,12 +60,14 @@ export default function Header() {
                 >
                   Home
                 </Link>
-                <Link
-                  href="/sign-in"
-                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
-                >
-                  Sign Out
-                </Link>
+                <form action={handleSignOut}>
+                  <button
+                    type="submit"
+                    className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+                  >
+                    Sign Out
+                  </button>
+                </form>
               </>
             ) : (
               <>

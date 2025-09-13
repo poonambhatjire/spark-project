@@ -59,9 +59,4 @@ describe('Landing Page', () => {
     expect(emailLink).toHaveAttribute('href', 'mailto:your-email@example.com')
   })
 
-  it('renders footer note', () => {
-    render(<Page />)
-    
-    expect(screen.getByText('No data stored or transmitted by this page.')).toBeInTheDocument()
-  })
 })

@@ -51,4 +51,3 @@ export const accessHref = "/dashboard"
 
 export const supportEmail = "your-email@example.com"
 
-export const footerNote = "No data stored or transmitted by this page."
