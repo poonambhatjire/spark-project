@@ -46,10 +46,10 @@ export default function HeroSection() {
           <div className="flex flex-col items-center justify-center">
             <Image
               src="/sparc-logo.png"
-              width="600"
-              height="400"
-              alt="Spark Calculator logo"
-              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover shadow-xl border border-slate-200"
+              width="1000"
+              height="563"
+              alt="SPARC — Stewardship Personnel Required for ASPs Resource Calculator"
+              className="mx-auto aspect-video overflow-hidden rounded-xl object-contain shadow-xl border border-slate-200"
             />
             {/* Time tracker widget below the logo */}
             <div className="mt-10 bg-white rounded-lg shadow-lg border border-slate-200 p-4 min-w-[200px] w-fit">

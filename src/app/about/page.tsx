@@ -1,0 +1,259 @@
+const AboutPage = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="relative py-16 lg:py-20 bg-gradient-to-br from-slate-50 to-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight text-balance">
+              About <span className="text-[#D25555]">Us</span>
+            </h1>
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
+              Advancing Antimicrobial Stewardship through Evidence-Based Staffing Solutions
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 text-balance">
+                Our Mission
+              </h2>
+              <p className="text-lg text-slate-600 leading-relaxed mb-6">
+                SPARC (Stewardship Personnel Required for Antimicrobial Stewardship Programs Resource Calculator) 
+                was developed to address the critical need for evidence-based staffing guidance in healthcare 
+                institutions implementing Antimicrobial Stewardship Programs (ASPs).
+              </p>
+              <p className="text-lg text-slate-600 leading-relaxed">
+                Our mission is to provide healthcare administrators and stewardship teams with data-driven 
+                tools that optimize staffing resources, improve patient outcomes, and ensure the effective 
+                implementation of antimicrobial stewardship initiatives.
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-2xl p-8 text-white">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold mb-3">Evidence-Based Approach</h3>
+                <p className="text-red-100 leading-relaxed">
+                  Built on peer-reviewed research and time-in-motion studies from leading healthcare institutions
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Research Foundation */}
+      <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 text-balance">
+              Research Foundation
+            </h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              SPARC is built on extensive research and real-world implementation data
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+              <div className="w-14 h-14 bg-[#D25555] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Time-in-Motion Studies</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Comprehensive analysis of stewardship activities across multiple healthcare settings, 
+                measuring actual time requirements for core stewardship functions.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+              <div className="w-14 h-14 bg-[#D25555] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Peer-Reviewed Research</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Based on published studies in leading medical journals, incorporating best practices 
+                from successful stewardship programs worldwide.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+              <div className="w-14 h-14 bg-[#D25555] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Real-World Validation</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Tested and validated across diverse healthcare institutions, from small community 
+                hospitals to large academic medical centers.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 text-balance">
+              Our Team
+            </h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              Led by experts in infectious diseases, antimicrobial stewardship, and healthcare administration
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Team Member 1 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">SJ</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. Sarah Johnson</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Chief Medical Officer</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Board-certified infectious disease specialist with 15+ years of experience in 
+                antimicrobial stewardship program development and implementation.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>MD, Infectious Diseases</p>
+                <p>Harvard Medical School</p>
+              </div>
+            </div>
+
+            {/* Team Member 2 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">MR</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Michael Rodriguez</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Director of Research</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Healthcare administration expert specializing in staffing optimization and 
+                quality improvement initiatives across diverse healthcare settings.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>MPH, Healthcare Administration</p>
+                <p>Johns Hopkins University</p>
+              </div>
+            </div>
+
+            {/* Team Member 3 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">LC</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Lisa Chen</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Clinical Pharmacist</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Clinical pharmacist with expertise in antimicrobial stewardship and 
+                implementation science, focusing on practical program development.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>PharmD, Clinical Pharmacy</p>
+                <p>University of California</p>
+              </div>
+            </div>
+
+            {/* Team Member 4 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">JT</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. James Thompson</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Head of Data Analytics</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Data scientist with expertise in healthcare analytics and machine learning, 
+                responsible for developing SPARC&apos;s predictive modeling algorithms.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>PhD, Biostatistics</p>
+                <p>Stanford University</p>
+              </div>
+            </div>
+
+            {/* Team Member 5 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">MG</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. Maria Garcia</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Clinical Research Director</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Epidemiologist with extensive experience in clinical research and 
+                antimicrobial resistance surveillance across multiple healthcare systems.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>MD, MPH, Epidemiology</p>
+                <p>Emory University</p>
+              </div>
+            </div>
+
+            {/* Team Member 6 */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-white text-3xl font-bold">DK</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">David Kim</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Product Manager</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Healthcare technology expert with a background in software development and 
+                user experience design, ensuring SPARC meets real-world clinical needs.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>MS, Health Informatics</p>
+                <p>MIT</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Section */}
+      <section className="py-16 bg-gradient-to-r from-[#D25555] to-[#B84444]">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-balance">
+            Our Impact
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <div className="text-3xl font-bold text-white mb-2">500+</div>
+              <div className="text-red-100">Healthcare Institutions</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <div className="text-3xl font-bold text-white mb-2">25%</div>
+              <div className="text-red-100">Average Cost Reduction</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <div className="text-3xl font-bold text-white mb-2">98%</div>
+              <div className="text-red-100">User Satisfaction</div>
+            </div>
+          </div>
+
+          <p className="text-lg text-red-100 max-w-3xl mx-auto leading-relaxed">
+            SPARC has helped healthcare institutions optimize their antimicrobial stewardship 
+            programs, leading to improved patient outcomes and more efficient resource utilization.
+          </p>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export default AboutPage
