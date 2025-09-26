@@ -28,7 +28,7 @@ export interface TimeEntry {
   task: Activity;
   otherTask?: string;
   minutes: number;          // 1..480
-  occurredOn: string;       // ISO date (YYYY-MM-DD)
+  occurredOn: string;       // ISO datetime (YYYY-MM-DDTHH:mm:ssZ)
   comment?: string;
   createdAt: string;        // ISO datetime
   updatedAt: string;        // ISO datetime
@@ -91,6 +91,8 @@ const STORAGE_KEY = 'sparc.entries.v1';
 export const dateUtils = {
   today: (): string => new Date().toISOString().split('T')[0],
   
+  todayDateTime: (): string => new Date().toISOString(),
+  
   startOfWeek: (date: string = new Date().toISOString().split('T')[0]): string => {
     const d = new Date(date);
     const day = d.getDay();
@@ -100,11 +102,15 @@ export const dateUtils = {
   },
   
   isToday: (date: string): boolean => {
-    return date === dateUtils.today();
+    // Handle both date (YYYY-MM-DD) and datetime (YYYY-MM-DDTHH:mm:ssZ) formats
+    const dateOnly = date.includes('T') ? date.split('T')[0] : date;
+    return dateOnly === dateUtils.today();
   },
   
   isThisWeek: (date: string): boolean => {
-    const entryDate = new Date(date);
+    // Handle both date and datetime formats
+    const dateOnly = date.includes('T') ? date.split('T')[0] : date;
+    const entryDate = new Date(dateOnly);
     const startOfWeek = new Date(dateUtils.startOfWeek());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 6);
@@ -116,11 +122,23 @@ export const dateUtils = {
     return new Date(date).toLocaleDateString();
   },
   
+  formatDateTime: (datetime: string): string => {
+    return new Date(datetime).toLocaleString();
+  },
+  
   formatTime: (datetime: string): string => {
     return new Date(datetime).toLocaleTimeString([], { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
+  },
+  
+  formatDateAndTime: (datetime: string): { date: string; time: string } => {
+    const d = new Date(datetime);
+    return {
+      date: d.toLocaleDateString(),
+      time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
   }
 };
 

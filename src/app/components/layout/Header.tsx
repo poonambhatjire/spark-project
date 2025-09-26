@@ -4,10 +4,24 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { signOut } from "@/lib/auth/supabase-actions"
+import { createClient } from "@/lib/supabase/client"
+import { useEffect, useState } from "react"
 
 export default function Header() {
   const pathname = usePathname()
-  const isOnDashboard = pathname === "/dashboard"
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+      setIsLoading(false)
+    }
+    
+    checkAuth()
+  }, [pathname]) // Re-check when pathname changes
 
   const handleSignOut = async () => {
     await signOut()
@@ -33,8 +47,20 @@ export default function Header() {
           </Link>
           
           <nav className="flex items-center gap-4 sm:gap-6" aria-label="Main navigation">
-            {isOnDashboard ? (
+            {isLoading ? (
+              <div className="text-sm text-slate-500">Loading...</div>
+            ) : isAuthenticated ? (
               <>
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded flex items-center gap-1"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21v-4a2 2 0 012-2h4a2 2 0 012 2v4" />
+                  </svg>
+                  Dashboard
+                </Link>
                 <Link
                   href="/profile"
                   className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded flex items-center gap-1"

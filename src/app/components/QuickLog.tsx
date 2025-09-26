@@ -46,7 +46,7 @@ const quickLogSchema = z.object({
     .min(1, "Minutes must be at least 1")
     .max(480, "Minutes cannot exceed 480 (8 hours)")
     .int("Please enter a whole number"),
-  occurredOn: z.string().min(1, "Date is required"),
+  occurredOn: z.string().min(1, "Date and time are required"),
   comment: z.string().optional(),
 }).refine((data) => {
   if (data.task === 'Other - specify in comments' && (!data.otherTask || data.otherTask.trim() === "")) {
@@ -108,13 +108,15 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const taskSelectRef = useRef<HTMLButtonElement>(null)
   
-  // Get current date in local timezone
-  const getCurrentDate = () => {
+  // Get current datetime in local timezone for datetime-local input
+  const getCurrentDateTime = () => {
     const now = new Date()
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day}T${hours}:${minutes}`
   }
   
   const {
@@ -130,7 +132,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
       task: "Patient Care - Prospective Audit & Feedback" as Activity, // Set a default valid task instead of empty string
       otherTask: "",
       minutes: 30,
-      occurredOn: getCurrentDate(),
+      occurredOn: getCurrentDateTime(),
       comment: ""
     }
   })
@@ -168,9 +170,15 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
       return
     }
 
+    // Convert datetime-local format to ISO datetime string
+    const formattedData = {
+      ...data,
+      occurredOn: new Date(data.occurredOn).toISOString()
+    }
+
     setIsSubmitting(true)
     try {
-      await onSubmit(data)
+      await onSubmit(formattedData)
       
       // Track telemetry
       telemetry.trackEntryCreated(data.task, data.minutes)
@@ -181,7 +189,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
         task: data.task,
         otherTask: "",
         minutes: 30,
-        occurredOn: getCurrentDate(),
+        occurredOn: getCurrentDateTime(),
         comment: ""
       })
       // Hide success message after 1.5s
@@ -364,32 +372,35 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
               </div>
             </div>
 
-            {/* Date */}
+            {/* Date and Time */}
             <div className="space-y-2">
-              <label htmlFor="date" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Date *
+              <label htmlFor="datetime" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Date & Time *
               </label>
               <Controller
                 name="occurredOn"
                 control={control}
                 render={({ field }) => (
                   <Input
-                    id="date"
-                    type="date"
+                    id="datetime"
+                    type="datetime-local"
                     className={`min-h-11 border-2 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 rounded-lg ${
                       errors.occurredOn ? 'border-red-300' : 'border-slate-300 dark:border-slate-600'
                     } focus-ring`}
-                    aria-describedby={errors.occurredOn ? "date-error" : undefined}
+                    aria-describedby={errors.occurredOn ? "datetime-error" : undefined}
                     aria-invalid={!!errors.occurredOn}
                     {...field}
                   />
                 )}
               />
               {errors.occurredOn && (
-                <p id="date-error" className="text-sm text-red-600 dark:text-red-400" role="alert">
+                <p id="datetime-error" className="text-sm text-red-600 dark:text-red-400" role="alert">
                   {errors.occurredOn.message}
                 </p>
               )}
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Select the date and time when this activity occurred
+              </p>
             </div>
           </div>
 

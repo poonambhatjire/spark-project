@@ -29,30 +29,30 @@ type SortField = 'occurredOn' | 'task' | 'minutes'
 type SortDirection = 'asc' | 'desc'
 type DateRange = 'today' | 'week'
 
-// Task options for filtering
+// Task options for filtering (matching QuickLog task names)
 const TASK_OPTIONS = [
   // Patient Care
-  { value: "PAF", label: "Patient Care - Prospective Audit & Feedback" },
-  { value: "AUTH_RESTRICTED_ANTIMICROBIALS", label: "Patient Care - Authorization of Restricted Antimicrobials" },
-  { value: "CLINICAL_ROUNDS", label: "Patient Care - Participating in Clinical Rounds" },
+  { value: "Patient Care - Prospective Audit & Feedback", label: "Patient Care - Prospective Audit & Feedback" },
+  { value: "Patient Care - Authorization of Restricted Antimicrobials", label: "Patient Care - Authorization of Restricted Antimicrobials" },
+  { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
   // Administrative
-  { value: "GUIDELINES_EHR", label: "Administrative - Guidelines/EHR" },
+  { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
   // Tracking
-  { value: "AMU", label: "Tracking - AMU" },
-  { value: "AMR", label: "Tracking - AMR" },
-  { value: "ANTIBIOTIC_APPROPRIATENESS", label: "Tracking - Antibiotic Appropriateness" },
-  { value: "INTERVENTION_ACCEPTANCE", label: "Tracking - Intervention Acceptance" },
+  { value: "Tracking - AMU", label: "Tracking - AMU" },
+  { value: "Tracking - AMR", label: "Tracking - AMR" },
+  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
+  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
   // Reporting
-  { value: "SHARING_DATA", label: "Reporting - sharing data with prescribers/decision makers" },
+  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
   // Education
-  { value: "PROVIDING_EDUCATION", label: "Education - Providing Education" },
-  { value: "RECEIVING_EDUCATION", label: "Education - Receiving Education (e.g. CE)" },
+  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
   // Administrative
-  { value: "COMMITTEE_WORK", label: "Administrative - Committee Work" },
-  { value: "QI_PROJECTS_RESEARCH", label: "Administrative - QI projects/research" },
-  { value: "EMAILS", label: "Administrative - Emails" },
+  { value: "Administrative - Committee Work", label: "Administrative - Committee Work" },
+  { value: "Administrative - QI projects/research", label: "Administrative - QI projects/research" },
+  { value: "Administrative - Emails", label: "Administrative - Emails" },
   // Other
-  { value: "OTHER", label: "Other - specify in comments" }
+  { value: "Other - specify in comments", label: "Other - specify in comments" }
 ]
 
 export function HistoryPanel({
@@ -94,48 +94,31 @@ export function HistoryPanel({
     // Find the most recent date in the data for "Today" filter
     const mostRecentDate = entries.length > 0 
       ? new Date(Math.max(...entries.map(entry => {
-          // Parse date string as local date, not UTC
-          const [year, month, day] = entry.occurredOn.split('-').map(Number)
+          // Handle both date (YYYY-MM-DD) and datetime (YYYY-MM-DDTHH:mm:ssZ) formats
+          const dateStr = entry.occurredOn.includes('T') ? entry.occurredOn.split('T')[0] : entry.occurredOn
+          const [year, month, day] = dateStr.split('-').map(Number)
           return new Date(year, month - 1, day).getTime()
         })))
       : new Date()
     mostRecentDate.setHours(0, 0, 0, 0)
     
     const filtered = entries.filter(entry => {
-      // Date range filter - parse dates as local dates
-      const [entryYear, entryMonth, entryDay] = entry.occurredOn.split('-').map(Number)
+      // Date range filter - handle both date and datetime formats
+      const dateStr = entry.occurredOn.includes('T') ? entry.occurredOn.split('T')[0] : entry.occurredOn
+      const [entryYear, entryMonth, entryDay] = dateStr.split('-').map(Number)
       const entryDate = new Date(entryYear, entryMonth - 1, entryDay)
       const today = new Date()
-      today.setHours(0, 0, 0, 0)
       
       if (dateRange === 'today') {
-        const entryDateOnly = new Date(entryYear, entryMonth - 1, entryDay)
-        entryDateOnly.setHours(0, 0, 0, 0)
+        // Get today's date in YYYY-MM-DD format (same as server logic)
+        const todayDateStr = today.toISOString().split('T')[0]
         
-        // Debug logging with expanded values
-        console.log('Today filter details:', {
-          entryDate: entry.occurredOn,
-          entryDateOnly: entryDateOnly.toISOString(),
-          today: today.toISOString(),
-          mostRecentDate: mostRecentDate.toISOString(),
-          entryDay: entryDateOnly.getDate(),
-          todayDay: today.getDate(),
-          entryMonth: entryDateOnly.getMonth() + 1,
-          todayMonth: today.getMonth() + 1,
-          entryYear: entryDateOnly.getFullYear(),
-          todayYear: today.getFullYear(),
-          isExactMatch: entryDateOnly.getTime() === today.getTime(),
-          isMostRecentMatch: entryDateOnly.getTime() === mostRecentDate.getTime()
-        })
+        // Show entries from actual today (compare date strings directly)
+        const entryDateStr = entry.occurredOn.includes('T') 
+          ? entry.occurredOn.split('T')[0] 
+          : entry.occurredOn
         
-        // Show entries from the most recent date in the data
-        const exactMatch = entryDateOnly.getTime() === today.getTime()
-        const mostRecentMatch = entryDateOnly.getTime() === mostRecentDate.getTime()
-        
-        console.log('Match results:', { exactMatch, mostRecentMatch })
-        
-        // Use exact date match for production, but allow most recent date for demo
-        if (!exactMatch && !mostRecentMatch) return false
+        if (entryDateStr !== todayDateStr) return false
       } else if (dateRange === 'week') {
         const weekAgo = new Date(today)
         weekAgo.setDate(today.getDate() - 7)
@@ -184,19 +167,6 @@ export function HistoryPanel({
       } else {
         return aValue < bValue ? 1 : -1
       }
-    })
-
-    console.log('Filtering results:', {
-      totalEntries: entries.length,
-      filteredCount: filtered.length,
-      dateRange,
-      selectedTasks: selectedTasks.length,
-      searchQuery: debouncedSearch,
-      filteredEntries: filtered.map(entry => ({
-        id: entry.id,
-        date: entry.occurredOn,
-        task: entry.task
-      }))
     })
 
     return filtered
@@ -558,9 +528,9 @@ export function HistoryPanel({
                       size="sm"
                       onClick={() => handleSort('occurredOn')}
                       className="h-auto p-0 font-medium hover:bg-transparent min-h-11"
-                      aria-label={`Sort by date ${sortField === 'occurredOn' ? (sortDirection === 'asc' ? 'descending' : 'ascending') : 'ascending'}`}
+                      aria-label={`Sort by date and time ${sortField === 'occurredOn' ? (sortDirection === 'asc' ? 'descending' : 'ascending') : 'ascending'}`}
                     >
-                      Date {getSortIcon('occurredOn')}
+                      Date & Time {getSortIcon('occurredOn')}
                     </Button>
                   </th>
                   <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">
@@ -602,15 +572,31 @@ export function HistoryPanel({
                         checked={selectedIds.has(entry.id)}
                         onCheckedChange={() => handleSelectEntry(entry.id)}
                         aria-label={`Select entry from ${(() => {
-                          const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                          return new Date(year, month - 1, day).toLocaleDateString()
+                          if (entry.occurredOn.includes('T')) {
+                            const date = new Date(entry.occurredOn)
+                            return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                          } else {
+                            const [year, month, day] = entry.occurredOn.split('-').map(Number)
+                            return new Date(year, month - 1, day).toLocaleDateString()
+                          }
                         })()}`}
                       />
                     </td>
                     <td className="py-2 px-2 text-slate-600 dark:text-slate-300">
                       {(() => {
-                        const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                        return new Date(year, month - 1, day).toLocaleDateString()
+                        // Handle both date and datetime formats
+                        if (entry.occurredOn.includes('T')) {
+                          const date = new Date(entry.occurredOn)
+                          return (
+                            <div className="text-sm">
+                              <div className="font-medium">{date.toLocaleDateString()}</div>
+                              <div className="text-xs text-slate-500">{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            </div>
+                          )
+                        } else {
+                          const [year, month, day] = entry.occurredOn.split('-').map(Number)
+                          return new Date(year, month - 1, day).toLocaleDateString()
+                        }
                       })()}
                     </td>
                     <td className="py-2 px-2">
@@ -688,8 +674,13 @@ export function HistoryPanel({
                               onClick={() => handleStartEdit(entry)}
                               className="h-8 w-8 p-0 min-h-[32px] min-w-[32px]"
                               aria-label={`Edit entry from ${(() => {
-                                const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                                return new Date(year, month - 1, day).toLocaleDateString()
+                                if (entry.occurredOn.includes('T')) {
+                                  const date = new Date(entry.occurredOn)
+                                  return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                } else {
+                                  const [year, month, day] = entry.occurredOn.split('-').map(Number)
+                                  return new Date(year, month - 1, day).toLocaleDateString()
+                                }
                               })()}`}
                             >
                               <Edit2 className="w-3 h-3" />
@@ -703,8 +694,13 @@ export function HistoryPanel({
                               }}
                               className="h-8 w-8 p-0 min-h-[32px] min-w-[32px]"
                               aria-label={`Duplicate entry from ${(() => {
-                                const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                                return new Date(year, month - 1, day).toLocaleDateString()
+                                if (entry.occurredOn.includes('T')) {
+                                  const date = new Date(entry.occurredOn)
+                                  return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                } else {
+                                  const [year, month, day] = entry.occurredOn.split('-').map(Number)
+                                  return new Date(year, month - 1, day).toLocaleDateString()
+                                }
                               })()}`}
                             >
                               <Copy className="w-3 h-3" />
@@ -718,8 +714,13 @@ export function HistoryPanel({
                               }}
                               className="h-8 w-8 p-0 min-h-[32px] min-w-[32px] text-red-600 hover:text-red-700"
                               aria-label={`Delete entry from ${(() => {
-                                const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                                return new Date(year, month - 1, day).toLocaleDateString()
+                                if (entry.occurredOn.includes('T')) {
+                                  const date = new Date(entry.occurredOn)
+                                  return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                } else {
+                                  const [year, month, day] = entry.occurredOn.split('-').map(Number)
+                                  return new Date(year, month - 1, day).toLocaleDateString()
+                                }
                               })()}`}
                             >
                               <Trash2 className="w-3 h-3" />

@@ -56,30 +56,18 @@ export function Select({ children, value, onValueChange, className }: SelectProp
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      console.log('Click outside detected', { 
-        isOpen, 
-        target: event.target,
-        selectRefCurrent: selectRef.current,
-        contains: selectRef.current?.contains(event.target as Node)
-      })
-      
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        console.log('Closing dropdown due to click outside')
         setIsOpen(false)
-      } else {
-        console.log('Click was inside select container, not closing')
       }
     }
 
     if (isOpen) {
-      console.log('Adding click outside listener')
       // Use a small delay to ensure the dropdown is fully rendered
       const timeoutId = setTimeout(() => {
         document.addEventListener('mousedown', handleClickOutside)
       }, 10)
 
       return () => {
-        console.log('Removing click outside listener')
         clearTimeout(timeoutId)
         document.removeEventListener('mousedown', handleClickOutside)
       }

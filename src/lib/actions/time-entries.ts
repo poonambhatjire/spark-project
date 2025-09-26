@@ -197,8 +197,19 @@ export async function listTimeEntries(options: { range?: 'today' | 'week' | 'all
 
     // Apply range filter
     if (range === 'today') {
-      const today = new Date().toISOString().split('T')[0];
-      query = query.eq('occurred_on', today);
+      // Use actual current date for "today" instead of most recent date in database
+      const today = new Date();
+      const todayDateOnly = today.toISOString().split('T')[0]; // YYYY-MM-DD
+      
+;
+      
+      // Filter by date range for actual today
+      const startOfDay = `${todayDateOnly}T00:00:00`;
+      const endOfDay = `${todayDateOnly}T23:59:59`;
+      
+      query = query
+        .gte('occurred_on', startOfDay)
+        .lte('occurred_on', endOfDay);
     } else if (range === 'week') {
       const startOfWeek = new Date();
       const day = startOfWeek.getDay();
@@ -227,7 +238,7 @@ export async function listTimeEntries(options: { range?: 'today' | 'week' | 'all
 
     return { 
       success: true, 
-      data: data.map(mapSupabaseRowToTimeEntry) 
+      data: data.map(mapSupabaseRowToTimeEntry)
     };
   } catch (error) {
     console.error('List time entries error:', error);

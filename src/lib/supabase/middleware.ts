@@ -35,6 +35,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Define protected routes that require authentication
+  const protectedRoutes = ['/dashboard', '/profile', '/admin']
+  const isProtectedRoute = protectedRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/sign-in') &&
@@ -42,8 +48,7 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/forgot-password') &&
     !request.nextUrl.pathname.startsWith('/reset-password') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
-    request.nextUrl.pathname !== '/' &&
-    request.nextUrl.pathname.startsWith('/dashboard')
+    isProtectedRoute
   ) {
     // no user, redirect to sign-in page for protected routes
     const url = request.nextUrl.clone()

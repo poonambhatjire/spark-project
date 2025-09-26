@@ -11,7 +11,6 @@ import {
   UpdateEntryInput,
   TodayTotals
 } from "@/app/dashboard/data/client"
-import { dataMigrationService } from "@/app/dashboard/data/migration"
 import { createTimeEntry, updateTimeEntry, deleteTimeEntries, listTimeEntries } from "@/lib/actions/time-entries"
 
 const DashboardPage = () => {
@@ -43,26 +42,11 @@ const DashboardPage = () => {
     'Other - specify in comments': 0
   })
   const [isLoading, setIsLoading] = useState(true)
-  const [migrationStatus, setMigrationStatus] = useState<{
-    hasLocalStorage: boolean;
-    localStorageCount: number;
-    supabaseCount: number;
-    needsMigration: boolean;
-  } | null>(null)
-  const [showMigrationPrompt, setShowMigrationPrompt] = useState(false)
 
-  // Load initial data and check migration status
+  // Load initial data
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Check migration status first
-        const status = await dataMigrationService.getMigrationStatus()
-        setMigrationStatus(status)
-        
-        if (status.needsMigration) {
-          setShowMigrationPrompt(true)
-        }
-
         // Load data from Supabase
         const [entriesResult, todayEntriesResult] = await Promise.all([
           listTimeEntries({ range: 'week' }),
@@ -96,7 +80,10 @@ const DashboardPage = () => {
 
           todayEntriesResult.data.forEach(entry => {
             totals.total += entry.minutes;
-            totals[entry.task] += entry.minutes;
+            // Ensure the task key exists in totals before adding
+            if (entry.task in totals) {
+              totals[entry.task] += entry.minutes;
+            }
           });
           
           setTodayTotals(totals)
@@ -146,7 +133,10 @@ const DashboardPage = () => {
 
         todayEntriesResult.data.forEach(entry => {
           totals.total += entry.minutes;
-          totals[entry.task] += entry.minutes;
+          // Ensure the task key exists in totals before adding
+          if (entry.task in totals) {
+            totals[entry.task] += entry.minutes;
+          }
         });
         
         setTodayTotals(totals)
@@ -156,24 +146,6 @@ const DashboardPage = () => {
     }
   }
 
-  // Migration handler
-  const handleMigration = async () => {
-    try {
-      const result = await dataMigrationService.performFullMigration()
-      
-      if (result.success) {
-        console.log(`Migration successful! Migrated ${result.migrated} entries.`)
-        setShowMigrationPrompt(false)
-        await refreshData() // Refresh to show migrated data
-      } else {
-        console.error('Migration failed:', result.errors)
-        alert(`Migration failed: ${result.errors.join(', ')}`)
-      }
-    } catch (error) {
-      console.error('Migration error:', error)
-      alert('Migration failed. Please try again.')
-    }
-  }
 
   // Event handlers
   const handleCreateEntry = async (data: CreateEntryInput) => {
@@ -293,60 +265,15 @@ const DashboardPage = () => {
         {/* Profile Completion Prompt */}
         <ProfileCompletionPrompt />
         
-        {/* Migration Prompt */}
-        {showMigrationPrompt && migrationStatus && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
-                  Migrate Your Data to Cloud Storage
-                </h3>
-                <p className="text-blue-700 dark:text-blue-300 mb-3">
-                  We found {migrationStatus.localStorageCount} time entries in your browser storage. 
-                  Would you like to migrate them to our secure cloud database? This will make your data 
-                  accessible across all your devices and enable admin features.
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleMigration}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                  >
-                    Migrate Data ({migrationStatus.localStorageCount} entries)
-                  </button>
-                  <button
-                    onClick={() => setShowMigrationPrompt(false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-                  >
-                    Not Now
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         {/* Today Summary Section */}
         <section aria-labelledby="summary-title" className="mb-8">
           <h2 id="summary-title" className="sr-only">Today Summary</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-4 min-h-20 flex flex-col items-center justify-center">
-              <div className="text-2xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${todayTotals.total} minutes total today`}>
+          <div className="flex justify-center">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-6 min-h-24 flex flex-col items-center justify-center w-full max-w-sm">
+              <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${todayTotals.total} minutes total today`}>
                 {todayTotals.total} min
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-300">Today Total</div>
-            </div>
-            
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-4 min-h-20 flex flex-col items-center justify-center">
-              <div className="text-2xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${todayTotals['Patient Care - Prospective Audit & Feedback']} minutes of PAF activities today`}>
-                {todayTotals['Patient Care - Prospective Audit & Feedback']} min
-              </div>
-              <div className="text-sm text-slate-600 dark:text-slate-300">PAF Today</div>
-            </div>
-            
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-4 min-h-20 flex flex-col items-center justify-center">
-              <div className="text-2xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${todayTotals['Patient Care - Authorization of Restricted Antimicrobials']} minutes of authorization activities today`}>
-                {todayTotals['Patient Care - Authorization of Restricted Antimicrobials']} min
-              </div>
-              <div className="text-sm text-slate-600 dark:text-slate-300">Auth Restricted Today</div>
+              <div className="text-lg text-slate-600 dark:text-slate-300">Today Total</div>
             </div>
           </div>
         </section>
