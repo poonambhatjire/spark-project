@@ -1,0 +1,39 @@
+name: Keep Supabase Database Active
+
+on:
+  schedule:
+    # Runs every 6 hours (at 00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  
+  # Allows manual triggering from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping Keep-Alive Endpoint
+        run: |
+          echo "🔄 Pinging keep-alive endpoint..."
+          response=$(curl -s -w "\n%{http_code}" ${{ secrets.KEEP_ALIVE_URL }})
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "📡 Response Code: $http_code"
+          echo "📊 Response Body: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Keep-alive successful!"
+          else
+            echo "❌ Keep-alive failed with code $http_code"
+            exit 1
+          fi
+      
+      - name: Report Status
+        if: always()
+        run: |
+          echo "🕐 Timestamp: $(date -u)"
+          echo "🎯 Job completed"
+
+
