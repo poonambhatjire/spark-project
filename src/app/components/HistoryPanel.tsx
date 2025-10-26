@@ -12,6 +12,7 @@ import { Search, Filter, SortAsc, SortDesc, Edit2, Copy, Trash2, X, Check, Downl
 import { useDebounce } from "@/app/hooks/useDebounce"
 import { TimeEntry, Activity, UpdateEntryInput } from "@/app/dashboard/data/client"
 import { exportEntriesToCsv } from "@/app/lib/utils/csv"
+import { exportEntriesToExcel } from "@/app/lib/utils/excel"
 import { Toast, useToast } from "@/app/components/ui/toast"
 import { telemetry } from "@/lib/telemetry"
 
@@ -190,6 +191,23 @@ export function HistoryPanel({
     }
   }, [filteredAndSortedEntries, dateRange, showToast])
 
+  const handleExportExcel = useCallback(async () => {
+    try {
+      await exportEntriesToExcel(filteredAndSortedEntries, dateRange)
+      
+      // Track telemetry
+      telemetry.trackExportCsv(filteredAndSortedEntries.length) // Reuse CSV tracking for now
+      
+      showToast(`Exported ${filteredAndSortedEntries.length} entries to Excel`, 'success')
+      setShowExportDropdown(false)
+      // Return focus to export button
+      setTimeout(() => exportButtonRef.current?.focus(), 100)
+    } catch (error) {
+      console.error('Excel export failed:', error)
+      showToast('Failed to export Excel file', 'error')
+    }
+  }, [filteredAndSortedEntries, dateRange, showToast])
+
   const handleCancelEdit = useCallback(() => {
     setEditingId(null)
     setEditingMinutes('')
@@ -220,13 +238,20 @@ export function HistoryPanel({
   // Handle click outside to close export dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showExportDropdown && exportButtonRef.current && !exportButtonRef.current.contains(event.target as Node)) {
+      // Check if click is inside the export button or dropdown
+      const isInsideExportButton = exportButtonRef.current?.contains(event.target as Node)
+      const isInsideDropdown = (event.target as Element)?.closest('[role="menu"]')
+      
+      if (showExportDropdown && !isInsideExportButton && !isInsideDropdown) {
         setShowExportDropdown(false)
       }
     }
 
     if (showExportDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
+      // Use a small delay to prevent immediate closure
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside)
+      }, 100)
     }
 
     return () => {
@@ -386,12 +411,20 @@ export function HistoryPanel({
               >
                 <div className="py-1">
                   <button
+                    onClick={handleExportExcel}
+                    className="w-full px-4 py-3 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 min-h-11"
+                    role="menuitem"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export to Excel ({filteredAndSortedEntries.length} entries)
+                  </button>
+                  <button
                     onClick={handleExportCsv}
                     className="w-full px-4 py-3 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 min-h-11"
                     role="menuitem"
                   >
                     <Download className="w-4 h-4" />
-                    Export CSV ({filteredAndSortedEntries.length} entries)
+                    Export to CSV ({filteredAndSortedEntries.length} entries)
                   </button>
                 </div>
               </div>

@@ -119,24 +119,50 @@ const AboutPage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Team Member 1 */}
+            {/* Team Member 1 - Amy Kang */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">SJ</span>
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Amy Kang.png" 
+                  alt="Amy Kang" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. Sarah Johnson</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Chief Medical Officer</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Amy Kang, PharmD, BCIDP</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Associate Professor</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Board-certified infectious disease specialist with 15+ years of experience in 
-                antimicrobial stewardship program development and implementation.
+                Associate Professor at Chapman University School of Pharmacy and Infectious Diseases 
+                Pharmacist at Harbor-UCLA Medical Center, specializing in antimicrobial stewardship.
               </p>
               <div className="text-xs text-slate-500">
-                <p>MD, Infectious Diseases</p>
-                <p>Harvard Medical School</p>
+                <p>PharmD, BCIDP</p>
+                <p>Chapman University School of Pharmacy</p>
+                <p>Harbor-UCLA Medical Center</p>
               </div>
             </div>
 
-            {/* Team Member 2 */}
+            {/* Team Member 2 - Bradley J. Langford */}
+            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Brad Langford.png" 
+                  alt="Bradley J. Langford" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Bradley J. Langford</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Antimicrobial Stewardship Pharmacist</p>
+              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
+                Experienced antimicrobial stewardship pharmacist with expertise in clinical pharmacy 
+                practice and public health, specializing in optimizing antimicrobial use and resistance prevention.
+              </p>
+              <div className="text-xs text-slate-500">
+                <p>BScPhm, PharmD, MPH</p>
+                <p>Antimicrobial Stewardship Specialist</p>
+              </div>
+            </div>
+
+            {/* Team Member 3 */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
               <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
                 <span className="text-white text-3xl font-bold">MR</span>
@@ -150,23 +176,6 @@ const AboutPage = () => {
               <div className="text-xs text-slate-500">
                 <p>MPH, Healthcare Administration</p>
                 <p>Johns Hopkins University</p>
-              </div>
-            </div>
-
-            {/* Team Member 3 */}
-            <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">LC</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Lisa Chen</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Clinical Pharmacist</p>
-              <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Clinical pharmacist with expertise in antimicrobial stewardship and 
-                implementation science, focusing on practical program development.
-              </p>
-              <div className="text-xs text-slate-500">
-                <p>PharmD, Clinical Pharmacy</p>
-                <p>University of California</p>
               </div>
             </div>
 
