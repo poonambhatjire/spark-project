@@ -129,7 +129,7 @@ const AboutPage = () => {
                 />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">Amy Kang, PharmD, BCIDP</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Associate Professor</p>
+              <p className="text-[#D25555] font-semibold mb-3">Infectious Diseases Pharmacist</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
                 Associate Professor at Chapman University School of Pharmacy and Infectious Diseases 
                 Pharmacist at Harbor-UCLA Medical Center, specializing in antimicrobial stewardship.
@@ -162,71 +162,87 @@ const AboutPage = () => {
               </div>
             </div>
 
-            {/* Team Member 3 */}
+            {/* Team Member 3 - Elizabeth Leung */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">MR</span>
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Elizabeth.png" 
+                  alt="Elizabeth Leung" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Michael Rodriguez</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Director of Research</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Elizabeth Leung, PharmD, BCPS</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Infectious Diseases Clinical Pharmacist</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Healthcare administration expert specializing in staffing optimization and 
-                quality improvement initiatives across diverse healthcare settings.
+                Infectious Diseases Clinical Pharmacist with expertise in antimicrobial stewardship 
+                and clinical pharmacy practice at the Leslie Dan Faculty of Pharmacy, University of Toronto.
               </p>
               <div className="text-xs text-slate-500">
-                <p>MPH, Healthcare Administration</p>
-                <p>Johns Hopkins University</p>
+                <p>PharmD, BCPS</p>
+                <p>Leslie Dan Faculty of Pharmacy</p>
+                <p>University of Toronto</p>
               </div>
             </div>
 
-            {/* Team Member 4 */}
+            {/* Team Member 4 - Poonam Bhatjire */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">JT</span>
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Poonam.png" 
+                  alt="Poonam Bhatjire" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. James Thompson</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Head of Data Analytics</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Poonam Bhatjire, MS, PhD</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Health Economics, Epidemiology, and Real-World Evidence Researcher</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Data scientist with expertise in healthcare analytics and machine learning, 
-                responsible for developing SPARC&apos;s predictive modeling algorithms.
+                Researcher specializing in health economics, epidemiology, and real-world evidence 
+                at Chapman University School of Pharmacy, contributing to evidence-based healthcare solutions.
               </p>
               <div className="text-xs text-slate-500">
-                <p>PhD, Biostatistics</p>
-                <p>Stanford University</p>
+                <p>MS, PhD</p>
+                <p>Chapman University School of Pharmacy</p>
+                <p>Health Economics & Epidemiology</p>
               </div>
             </div>
 
-            {/* Team Member 5 */}
+            {/* Team Member 5 - Karen Huynh */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">MG</span>
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Karen Huynh.png" 
+                  alt="Karen Huynh" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Dr. Maria Garcia</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Clinical Research Director</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Karen Huynh</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Pharmacy Student Researcher</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Epidemiologist with extensive experience in clinical research and 
-                antimicrobial resistance surveillance across multiple healthcare systems.
+                Pharmacy student researcher at Chapman University, contributing to antimicrobial 
+                stewardship research and supporting evidence-based healthcare initiatives.
               </p>
               <div className="text-xs text-slate-500">
-                <p>MD, MPH, Epidemiology</p>
-                <p>Emory University</p>
+                <p>Pharmacy Student Researcher</p>
+                <p>Chapman University</p>
+                <p>Antimicrobial Stewardship Research</p>
               </div>
             </div>
 
-            {/* Team Member 6 */}
+            {/* Team Member 6 - Seoyun (Yuna) Lim */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
               <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">DK</span>
+                <span className="text-white text-3xl font-bold">SL</span>
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">David Kim</h3>
-              <p className="text-[#D25555] font-semibold mb-3">Product Manager</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Seoyun (Yuna) Lim</h3>
+              <p className="text-[#D25555] font-semibold mb-3">Pharmacy Student Researcher</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Healthcare technology expert with a background in software development and 
-                user experience design, ensuring SPARC meets real-world clinical needs.
+                Pharmacy student researcher at Chapman University, contributing to antimicrobial 
+                stewardship research and supporting evidence-based healthcare initiatives.
               </p>
               <div className="text-xs text-slate-500">
-                <p>MS, Health Informatics</p>
-                <p>MIT</p>
+                <p>Pharmacy Student Researcher</p>
+                <p>Chapman University</p>
+                <p>Antimicrobial Stewardship Research</p>
               </div>
             </div>
           </div>

@@ -7,93 +7,39 @@ import { z } from "zod"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
-import { Textarea } from "@/app/components/ui/textarea"
+// Textarea no longer needed
 
 // Validation schema for user profile
 const userProfileSchema = z.object({
-  // Personal Information
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  phoneNumber: z.string().optional(),
-  professionalTitle: z.string().min(2, "Professional title is required"),
-  
-  // Professional Information
+  title: z.string().min(1, "Professional title is required"),
+  titleOther: z.string().optional(),
+  experienceLevel: z.string().min(1, "Experience level is required"),
   institution: z.string().min(2, "Institution is required"),
-  department: z.string().min(2, "Department is required"),
-  specialty: z.string().min(2, "Specialty is required"),
-  yearsOfExperience: z.string().min(1, "Years of experience is required"),
-  licenseNumber: z.string().optional(),
-  
-  // SPARC-Specific
-  workLocation: z.string().min(2, "Work location is required"),
-  stewardshipRole: z.string().min(2, "Stewardship role is required"),
-  certificationStatus: z.string().optional(),
-  timeZone: z.string().optional(),
-  
-  // Optional
-  manager: z.string().optional(),
-  team: z.string().optional(),
-  notes: z.string().optional()
+}).refine((data) => {
+  // If "Other" is selected, titleOther must be provided
+  if (data.title === 'Other, please specify') {
+    return data.titleOther && data.titleOther.length >= 2
+  }
+  return true
+}, {
+  message: "Please specify your title",
+  path: ["titleOther"]
 })
 
 type UserProfileFormData = z.infer<typeof userProfileSchema>
 
-// Professional titles
+// Professional titles (from screenshot requirements)
 const PROFESSIONAL_TITLES = [
-  "Physician",
-  "Pharmacist",
-  "Nurse",
-  "Microbiologist",
-  "Infection Preventionist",
-  "Quality Improvement Specialist",
-  "Administrator",
-  "Researcher",
-  "Other"
-]
-
-// Specialties
-const SPECIALTIES = [
-  "Infectious Diseases",
-  "Pharmacy",
-  "Microbiology",
-  "Internal Medicine",
-  "Critical Care",
-  "Emergency Medicine",
-  "Surgery",
-  "Pediatrics",
-  "Infection Prevention",
-  "Quality Improvement",
-  "Administration",
-  "Research",
-  "Other"
-]
-
-// Stewardship roles
-const STEWARDSHIP_ROLES = [
-  "Antimicrobial Stewardship Program Director",
-  "Antimicrobial Stewardship Pharmacist",
-  "Infectious Diseases Physician",
-  "Microbiology Lab Director",
-  "Infection Preventionist",
-  "Quality Improvement Coordinator",
+  "Infectious Disease Physician",
   "Clinical Pharmacist",
-  "Resident/Fellow",
-  "Student/Trainee",
-  "Administrator",
-  "Other"
+  "Microbiologist",
+  "Infection Prevention Specialist",
+  "Hospital administrator",
+  "Other, please specify"
 ]
 
-// Work locations
-const WORK_LOCATIONS = [
-  "Hospital",
-  "Clinic",
-  "Long-term Care Facility",
-  "Outpatient Center",
-  "Research Institution",
-  "Government Agency",
-  "Pharmaceutical Company",
-  "Consulting Firm",
-  "Other"
-]
+// No longer needed - removed deprecated fields
 
 // Experience levels
 const EXPERIENCE_LEVELS = [
@@ -113,35 +59,27 @@ interface UserProfileFormProps {
 
 export default function UserProfileForm({ onSubmit, initialData, isEditing = false }: UserProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const totalSteps = 3
 
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors }
   } = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
-      phoneNumber: initialData?.phoneNumber || "",
-      professionalTitle: initialData?.professionalTitle || "",
-      institution: initialData?.institution || "",
-      department: initialData?.department || "",
-      specialty: initialData?.specialty || "",
-      yearsOfExperience: initialData?.yearsOfExperience || "",
-      licenseNumber: initialData?.licenseNumber || "",
-      workLocation: initialData?.workLocation || "",
-      stewardshipRole: initialData?.stewardshipRole || "",
-      certificationStatus: initialData?.certificationStatus || "",
-      timeZone: initialData?.timeZone || "",
-      manager: initialData?.manager || "",
-      team: initialData?.team || "",
-      notes: initialData?.notes || ""
+      title: initialData?.title || "",
+      titleOther: initialData?.titleOther || "",
+      experienceLevel: initialData?.experienceLevel || "",
+      institution: initialData?.institution || ""
     }
   })
+
+  // Watch title field to show/hide "Other" input
+  const watchedTitle = watch('title')
 
   const handleFormSubmit = async (data: UserProfileFormData) => {
     setIsSubmitting(true)
@@ -166,27 +104,11 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
     }
   }
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1)
-    }
-  }
+  // No longer using multi-step form
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
-
-  const renderStep1 = () => (
+  // Simplified single-step form
+  const renderForm = () => (
     <div className="space-y-6">
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-          <span className="text-sm font-medium text-blue-600">1</span>
-        </div>
-        <h3 className="text-lg font-semibold text-slate-900">Personal Information</h3>
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-slate-700">Full Name *</label>
@@ -207,53 +129,61 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Phone Number</label>
-          <Controller
-            name="phoneNumber"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter your phone number"
-                className="border-2 border-slate-300"
-              />
+          <label className="text-sm font-medium text-slate-700">Your Job Title *</label>
+          <div className="space-y-2">
+            {PROFESSIONAL_TITLES.map((title) => (
+              <div key={title} className="flex items-center space-x-2">
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="radio"
+                      id={`title-${title}`}
+                      value={title}
+                      checked={field.value === title}
+                      onChange={field.onChange}
+                      className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                    />
+                  )}
+                />
+                <label htmlFor={`title-${title}`} className="text-sm text-slate-700 cursor-pointer">
+                  {title === 'Other, please specify' ? 'Other, please specify:' : title}
+                </label>
+              </div>
+            ))}
+            {watchedTitle === 'Other, please specify' && (
+              <div className="ml-6 mt-2">
+                <Controller
+                  name="titleOther"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Specify your title"
+                      className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  )}
+                />
+                {errors.titleOther && (
+                  <p className="text-sm text-red-600 mt-1">{errors.titleOther.message}</p>
+                )}
+              </div>
             )}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Professional Title *</label>
-          <Controller
-            name="professionalTitle"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Select your title" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROFESSIONAL_TITLES.map((title) => (
-                    <SelectItem key={title} value={title}>
-                      {title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.professionalTitle && (
-            <p className="text-sm text-red-600">{errors.professionalTitle.message}</p>
+          </div>
+          {errors.title && (
+            <p className="text-sm text-red-600">{errors.title.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Years of Experience *</label>
+          <label className="text-sm font-medium text-slate-700">Experience Level *</label>
           <Controller
-            name="yearsOfExperience"
+            name="experienceLevel"
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="border-2 border-slate-300">
+                <SelectTrigger className="border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                   <SelectValue placeholder="Select experience level" />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,26 +196,13 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
               </Select>
             )}
           />
-          {errors.yearsOfExperience && (
-            <p className="text-sm text-red-600">{errors.yearsOfExperience.message}</p>
+          {errors.experienceLevel && (
+            <p className="text-sm text-red-600">{errors.experienceLevel.message}</p>
           )}
         </div>
-      </div>
-    </div>
-  )
 
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-          <span className="text-sm font-medium text-blue-600">2</span>
-        </div>
-        <h3 className="text-lg font-semibold text-slate-900">Professional Information</h3>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Institution *</label>
+          <label className="text-sm font-medium text-slate-700">Institution *</label>
           <Controller
             name="institution"
             control={control}
@@ -293,180 +210,13 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
               <Input
                 {...field}
                 placeholder="Enter your institution"
-                className="border-2 border-slate-300"
+                className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
               />
             )}
           />
           {errors.institution && (
             <p className="text-sm text-red-600">{errors.institution.message}</p>
           )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Department *</label>
-          <Controller
-            name="department"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter your department"
-                className="border-2 border-slate-300"
-              />
-            )}
-          />
-          {errors.department && (
-            <p className="text-sm text-red-600">{errors.department.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Specialty *</label>
-          <Controller
-            name="specialty"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="border-2 border-slate-300">
-                  <SelectValue placeholder="Select your specialty" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SPECIALTIES.map((specialty) => (
-                    <SelectItem key={specialty} value={specialty}>
-                      {specialty}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.specialty && (
-            <p className="text-sm text-red-600">{errors.specialty.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">License Number</label>
-          <Controller
-            name="licenseNumber"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter your license number"
-                className="border-2 border-slate-300"
-              />
-            )}
-          />
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderStep3 = () => (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-          <span className="text-sm font-medium text-blue-600">3</span>
-        </div>
-        <h3 className="text-lg font-semibold text-slate-900">SPARC-Specific Information</h3>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Work Location *</label>
-          <Controller
-            name="workLocation"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="border-2 border-slate-300">
-                  <SelectValue placeholder="Select work location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {WORK_LOCATIONS.map((location) => (
-                    <SelectItem key={location} value={location}>
-                      {location}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.workLocation && (
-            <p className="text-sm text-red-600">{errors.workLocation.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Stewardship Role *</label>
-          <Controller
-            name="stewardshipRole"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="border-2 border-slate-300">
-                  <SelectValue placeholder="Select your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STEWARDSHIP_ROLES.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.stewardshipRole && (
-            <p className="text-sm text-red-600">{errors.stewardshipRole.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Manager/Supervisor</label>
-          <Controller
-            name="manager"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter manager's name"
-                className="border-2 border-slate-300"
-              />
-            )}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Team/Group</label>
-          <Controller
-            name="team"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter team name"
-                className="border-2 border-slate-300"
-              />
-            )}
-          />
-        </div>
-
-        <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium">Additional Notes</label>
-          <Controller
-            name="notes"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                placeholder="Any additional information..."
-                className="border-2 border-slate-300"
-                rows={3}
-              />
-            )}
-          />
         </div>
       </div>
     </div>
@@ -528,76 +278,34 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
             </div>
           )}
 
-          {/* Progress indicator */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-slate-700">Step {currentStep} of {totalSteps}</span>
-              <span className="text-sm font-medium text-blue-600">{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
-            </div>
-            <div className="w-full bg-slate-200 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
-            </div>
-          </div>
-
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {/* Step content */}
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
+          {/* Form content */}
+          {renderForm()}
 
-          {/* Navigation buttons */}
-          <div className="flex items-center justify-between pt-8 border-t border-slate-200">
+          {/* Submit button */}
+          <div className="flex items-center justify-end pt-8 border-t border-slate-200">
             <Button
-              type="button"
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="border-slate-300 text-slate-600 hover:bg-slate-50"
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Previous
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  {isEditing ? "Update Profile" : "Complete Profile"}
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </>
+              )}
             </Button>
-            
-            {currentStep < totalSteps ? (
-              <Button
-                type="button"
-                onClick={nextStep}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-              >
-                Next
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    {isEditing ? "Update Profile" : "Complete Profile"}
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </>
-                )}
-              </Button>
-            )}
           </div>
         </form>
         </div>
@@ -605,3 +313,4 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
     </div>
   )
 }
+

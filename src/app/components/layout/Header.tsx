@@ -81,6 +81,12 @@ export default function Header() {
                   Admin
                 </Link>
                 <Link
+                  href="/about"
+                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+                >
+                  About Us
+                </Link>
+                <Link
                   href="/"
                   className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
                 >

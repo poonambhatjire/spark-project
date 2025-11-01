@@ -59,20 +59,10 @@ export default async function ProfilePage() {
           }}
           initialData={profile ? {
             fullName: (profile.name as string) || '',
-            phoneNumber: (profile.phone_number as string) || '',
-            professionalTitle: (profile.professional_title as string) || '',
-            institution: (profile.organization as string) || '',
-            department: (profile.department as string) || '',
-            specialty: (profile.specialty as string) || '',
-            yearsOfExperience: (profile.years_of_experience as string) || '',
-            licenseNumber: (profile.license_number as string) || '',
-            workLocation: (profile.work_location as string) || '',
-            stewardshipRole: (profile.stewardship_role as string) || '',
-            certificationStatus: (profile.certification_status as string) || '',
-            timeZone: (profile.time_zone as string) || '',
-            manager: (profile.manager as string) || '',
-            team: (profile.team as string) || '',
-            notes: (profile.notes as string) || ''
+            title: (profile.title as string) || (profile.professional_title as string) || '',
+            titleOther: (profile.title_other as string) || '',
+            experienceLevel: (profile.experience_level as string) || (profile.years_of_experience as string) || '',
+            institution: (profile.institution as string) || (profile.organization as string) || ''
           } : undefined}
           isEditing={true}
         />

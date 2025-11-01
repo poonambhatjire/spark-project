@@ -6,20 +6,10 @@ import { revalidatePath } from 'next/cache'
 
 export interface UserProfileData {
   fullName: string
-  phoneNumber?: string
-  professionalTitle: string
+  title: string
+  titleOther?: string // For "Other, please specify" option
+  experienceLevel: string
   institution: string
-  department: string
-  specialty: string
-  yearsOfExperience: string
-  licenseNumber?: string
-  workLocation: string
-  stewardshipRole: string
-  certificationStatus?: string
-  timeZone?: string
-  manager?: string
-  team?: string
-  notes?: string
 }
 
 export async function updateUserProfile(data: UserProfileData): Promise<{ success: boolean; error?: string }> {
@@ -36,25 +26,19 @@ export async function updateUserProfile(data: UserProfileData): Promise<{ succes
       }
     }
 
+    // Use "Other" title if provided, otherwise use selected title
+    const finalTitle = data.title === 'Other, please specify' && data.titleOther 
+      ? data.titleOther 
+      : data.title
+
     // Update the profile
     const { error } = await supabase
       .from('profiles')
       .update({
         name: data.fullName,
-        phone_number: data.phoneNumber,
-        professional_title: data.professionalTitle,
-        organization: data.institution,
-        department: data.department,
-        specialty: data.specialty,
-        years_of_experience: data.yearsOfExperience,
-        license_number: data.licenseNumber,
-        work_location: data.workLocation,
-        stewardship_role: data.stewardshipRole,
-        certification_status: data.certificationStatus,
-        time_zone: data.timeZone,
-        manager: data.manager,
-        team: data.team,
-        notes: data.notes,
+        title: finalTitle,
+        experience_level: data.experienceLevel,
+        institution: data.institution,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id)
@@ -142,13 +126,9 @@ export async function checkProfileCompletion(): Promise<{ isComplete: boolean; m
     // Check required fields
     const requiredFields = [
       'name',
-      'professional_title',
-      'organization',
-      'department',
-      'specialty',
-      'years_of_experience',
-      'work_location',
-      'stewardship_role'
+      'title',
+      'experience_level',
+      'institution'
     ]
 
     const missingFields = requiredFields.filter(field => !data[field] || data[field] === '')
