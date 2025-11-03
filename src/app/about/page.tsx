@@ -166,7 +166,7 @@ const AboutPage = () => {
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
               <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
                 <img 
-                  src="/Elizabeth.png" 
+                  src="/Elizabeth Leung.png" 
                   alt="Elizabeth Leung" 
                   className="w-full h-full object-cover"
                 />
@@ -188,7 +188,7 @@ const AboutPage = () => {
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
               <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
                 <img 
-                  src="/Poonam.png" 
+                  src="/Poonam Bhatjire.png" 
                   alt="Poonam Bhatjire" 
                   className="w-full h-full object-cover"
                 />
@@ -228,21 +228,25 @@ const AboutPage = () => {
               </div>
             </div>
 
-            {/* Team Member 6 - Seoyun (Yuna) Lim */}
+            {/* Team Member 6 - Seoyun Lim */}
             <div className="bg-slate-50 p-6 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
-                <span className="text-white text-3xl font-bold">SL</span>
+              <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <img 
+                  src="/Seoyun Lim.png" 
+                  alt="Seoyun Lim" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Seoyun (Yuna) Lim</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Seoyun Lim</h3>
               <p className="text-[#D25555] font-semibold mb-3">Pharmacy Student Researcher</p>
               <p className="text-slate-600 leading-relaxed mb-3 text-sm">
-                Pharmacy student researcher at Chapman University, contributing to antimicrobial 
-                stewardship research and supporting evidence-based healthcare initiatives.
+                Pharm.D. candidate at Chapman University School of Pharmacy, Class of 2027, with a strong 
+                interest in Infectious Diseases and Antimicrobial Stewardship research.
               </p>
               <div className="text-xs text-slate-500">
-                <p>Pharmacy Student Researcher</p>
-                <p>Chapman University</p>
-                <p>Antimicrobial Stewardship Research</p>
+                <p>Pharm.D. Candidate Class of 2027</p>
+                <p>Chapman University School of Pharmacy</p>
+                <p>Infectious Diseases & Antimicrobial Stewardship</p>
               </div>
             </div>
           </div>
