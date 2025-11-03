@@ -60,15 +60,6 @@ const quickLogSchema = z.object({
 
 type QuickLogFormData = z.infer<typeof quickLogSchema>
 
-// Preset templates
-const PRESET_TEMPLATES = [
-  { label: "PAF 15m", task: "Patient Care - Prospective Audit & Feedback" as Activity, minutes: 15 },
-  { label: "PAF 30m", task: "Patient Care - Prospective Audit & Feedback" as Activity, minutes: 30 },
-  { label: "Auth Restricted 15m", task: "Patient Care - Authorization of Restricted Antimicrobials" as Activity, minutes: 15 },
-  { label: "Clinical Rounds 30m", task: "Patient Care - Participating in Clinical Rounds" as Activity, minutes: 30 },
-  { label: "Providing Education 60m", task: "Education - Providing Education" as Activity, minutes: 60 },
-]
-
 // Task options
 const TASK_OPTIONS = [
   // Patient Care
@@ -149,16 +140,6 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
     }
   }, [showSuccess])
 
-  const handlePresetClick = (template: typeof PRESET_TEMPLATES[0]) => {
-    setValue("task", template.task)
-    setValue("minutes", template.minutes)
-    // Focus the submit button after preset selection
-    setTimeout(() => {
-      const submitButton = formRef.current?.querySelector('button[type="submit"]') as HTMLButtonElement
-      submitButton?.focus()
-    }, 100)
-  }
-
   const handleMinutesPresetClick = (minutes: number) => {
     setValue("minutes", minutes)
   }
@@ -201,14 +182,6 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
     }
   }
 
-  // Handle keyboard navigation for presets
-  const handlePresetKeyDown = (e: React.KeyboardEvent, template: typeof PRESET_TEMPLATES[0]) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handlePresetClick(template)
-    }
-  }
-
   const handleMinutesPresetKeyDown = (e: React.KeyboardEvent, minutes: number) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
@@ -222,30 +195,6 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
         {/* Header */}
         <div>
           <h2 className="page-title font-semibold text-slate-900 dark:text-slate-100">Quick Log</h2>
-        </div>
-
-        {/* Preset Templates */}
-        <div>
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3 block">
-            Quick Templates
-          </label>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Quick template options">
-            {PRESET_TEMPLATES.map((template) => (
-              <Button
-                key={template.label}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handlePresetClick(template)}
-                onKeyDown={(e) => handlePresetKeyDown(e, template)}
-                className="text-xs px-3 py-2 h-auto min-h-11 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-ring"
-                aria-pressed={watch("task") === template.task && watch("minutes") === template.minutes}
-                aria-label={`Select ${template.label} template`}
-              >
-                {template.label}
-              </Button>
-            ))}
-          </div>
         </div>
 
         <form ref={formRef} onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">

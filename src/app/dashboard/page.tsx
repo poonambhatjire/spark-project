@@ -247,6 +247,26 @@ const DashboardPage = () => {
     }
   }
 
+  // Format minutes to hours and minutes
+  const formatTimeDisplay = (totalMinutes: number): string => {
+    if (totalMinutes === 0) {
+      return "0 minutes"
+    }
+    
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    
+    if (hours === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`
+    }
+    
+    if (minutes === 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}`
+    }
+    
+    return `${hours} hour${hours !== 1 ? 's' : ''} and ${minutes} minute${minutes !== 1 ? 's' : ''}`
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -270,8 +290,8 @@ const DashboardPage = () => {
           <h2 id="summary-title" className="sr-only">Today Summary</h2>
           <div className="flex justify-center">
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-6 min-h-24 flex flex-col items-center justify-center w-full max-w-sm">
-              <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${todayTotals.total} minutes total today`}>
-                {todayTotals.total} min
+              <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${formatTimeDisplay(todayTotals.total)} total today`}>
+                {formatTimeDisplay(todayTotals.total)}
               </div>
               <div className="text-lg text-slate-600 dark:text-slate-300">Today Total</div>
             </div>
