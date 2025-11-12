@@ -12,6 +12,8 @@ const mapSupabaseRowToTimeEntry = (row: Record<string, unknown>): TimeEntry => (
   task: row.task as Activity,
   otherTask: (row.other_task as string) || undefined,
   minutes: row.minutes as number,
+  patientCount: (row.patient_count as number) ?? null,
+  isTypicalDay: (row.is_typical_day as boolean) ?? true,
   occurredOn: row.occurred_on as string,
   comment: (row.comment as string) || undefined,
   createdAt: row.created_at as string,
@@ -26,6 +28,8 @@ const mapTimeEntryToSupabaseRow = (entry: CreateEntryInput | UpdateEntryInput) =
   if ('task' in entry) row.task = entry.task;
   if ('otherTask' in entry) row.other_task = entry.otherTask;
   if ('minutes' in entry) row.minutes = entry.minutes;
+  if ('patientCount' in entry) row.patient_count = entry.patientCount ?? null;
+  if ('isTypicalDay' in entry) row.is_typical_day = entry.isTypicalDay ?? true;
   if ('occurredOn' in entry) row.occurred_on = entry.occurredOn;
   if ('comment' in entry) row.comment = entry.comment;
   
@@ -53,6 +57,8 @@ export async function createTimeEntry(input: CreateEntryInput): Promise<{ succes
         task: input.task,
         other_task: input.otherTask,
         minutes: input.minutes,
+      patient_count: input.patientCount ?? null,
+        is_typical_day: input.isTypicalDay ?? true,
         occurred_on: input.occurredOn,
         comment: input.comment
       })
@@ -177,7 +183,7 @@ export async function listTimeEntries(options: { range?: 'today' | 'week' | 'all
       };
     }
 
-    const { range = 'all', task, includeDeleted = false } = options;
+  const { range = 'all', task, includeDeleted = false } = options;
     
     let query = supabase
       .from('time_entries')
@@ -196,35 +202,33 @@ export async function listTimeEntries(options: { range?: 'today' | 'week' | 'all
     }
 
     // Apply range filter
-    if (range === 'today') {
-      // Use actual current date for "today" instead of most recent date in database
-      const today = new Date();
-      const todayDateOnly = today.toISOString().split('T')[0]; // YYYY-MM-DD
-      
-;
-      
-      // Filter by date range for actual today
-      const startOfDay = `${todayDateOnly}T00:00:00`;
-      const endOfDay = `${todayDateOnly}T23:59:59`;
-      
-      query = query
-        .gte('occurred_on', startOfDay)
-        .lte('occurred_on', endOfDay);
-    } else if (range === 'week') {
-      const startOfWeek = new Date();
-      const day = startOfWeek.getDay();
-      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(startOfWeek.setDate(diff));
-      const startOfWeekStr = monday.toISOString().split('T')[0];
-      
-      const endOfWeek = new Date();
-      endOfWeek.setDate(monday.getDate() + 6);
-      const endOfWeekStr = endOfWeek.toISOString().split('T')[0];
-      
-      query = query
-        .gte('occurred_on', startOfWeekStr)
-        .lte('occurred_on', endOfWeekStr);
-    }
+  if (range === 'today') {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const startOfDay = today.toISOString()
+
+    const endOfDay = new Date(today)
+    endOfDay.setHours(23, 59, 59, 999)
+
+    query = query
+      .gte('occurred_on', startOfDay)
+      .lte('occurred_on', endOfDay.toISOString())
+  } else if (range === 'week') {
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    const day = startOfWeek.getDay()
+    const diff = day === 0 ? -6 : 1 - day
+    startOfWeek.setDate(startOfWeek.getDate() + diff)
+    startOfWeek.setHours(0, 0, 0, 0)
+
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    endOfWeek.setHours(23, 59, 59, 999)
+
+    query = query
+      .gte('occurred_on', startOfWeek.toISOString())
+      .lte('occurred_on', endOfWeek.toISOString())
+  }
 
     const { data, error } = await query;
 

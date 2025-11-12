@@ -43,6 +43,8 @@ export const excelUtils = {
       'Task': entry.task,
       'Other Task': entry.otherTask || '',
       'Minutes': entry.minutes,
+      'Patient Count': entry.patientCount ?? '',
+      'Typical Day': entry.isTypicalDay ? 'Yes' : 'No',
       'Comment': entry.comment || '',
       'Created At': formatDateTimeForExcel(entry.createdAt),
       'Updated At': formatDateTimeForExcel(entry.updatedAt)
@@ -105,6 +107,8 @@ export const exportEntriesToExcel = async (
       { wch: 20 }, // Task
       { wch: 20 }, // Other Task
       { wch: 10 }, // Minutes
+      { wch: 14 }, // Patient Count
+      { wch: 14 }, // Typical Day
       { wch: 30 }, // Comment
       { wch: 20 }, // Created At
       { wch: 20 }  // Updated At

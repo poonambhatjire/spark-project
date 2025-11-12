@@ -23,11 +23,24 @@ export type Activity =
   // Other
   | 'Other - specify in comments';
 
+export const PATIENT_CARE_ACTIVITIES: Activity[] = [
+  'Patient Care - Prospective Audit & Feedback',
+  'Patient Care - Authorization of Restricted Antimicrobials',
+  'Patient Care - Participating in Clinical Rounds',
+];
+
+export const isPatientCareTask = (task?: Activity | null): boolean => {
+  if (!task) return false;
+  return PATIENT_CARE_ACTIVITIES.includes(task);
+};
+
 export interface TimeEntry {
   id: string;
   task: Activity;
   otherTask?: string;
   minutes: number;          // 1..480
+  patientCount?: number | null;
+  isTypicalDay: boolean;
   occurredOn: string;       // ISO datetime (YYYY-MM-DDTHH:mm:ssZ)
   comment?: string;
   createdAt: string;        // ISO datetime
@@ -39,6 +52,8 @@ export interface CreateEntryInput {
   task: Activity;
   otherTask?: string;
   minutes: number;
+  patientCount?: number | null;
+  isTypicalDay?: boolean;
   occurredOn: string;
   comment?: string;
 }
@@ -47,6 +62,8 @@ export interface UpdateEntryInput {
   task?: Activity;
   otherTask?: string;
   minutes?: number;
+  patientCount?: number | null;
+  isTypicalDay?: boolean;
   occurredOn?: string;
   comment?: string;
 }
@@ -199,6 +216,8 @@ class TimeEntryClient {
     const entry: TimeEntry = {
       id: generateId(),
       ...input,
+      patientCount: input.patientCount ?? null,
+      isTypicalDay: input.isTypicalDay ?? true,
       createdAt: now,
       updatedAt: now,
       deletedAt: null
@@ -222,6 +241,8 @@ class TimeEntryClient {
     const updatedEntry: TimeEntry = {
       ...this.entries[index],
       ...patch,
+      patientCount: patch.patientCount ?? this.entries[index].patientCount ?? null,
+      isTypicalDay: patch.isTypicalDay ?? this.entries[index].isTypicalDay ?? true,
       updatedAt: new Date().toISOString()
     };
 

@@ -9,7 +9,7 @@ import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
 
-import { Activity, CreateEntryInput } from "@/app/dashboard/data/client"
+import { Activity, CreateEntryInput, isPatientCareTask } from "@/app/dashboard/data/client"
 import { telemetry } from "@/lib/telemetry"
 
 // Validation schema
@@ -46,8 +46,14 @@ const quickLogSchema = z.object({
     .min(1, "Minutes must be at least 1")
     .max(480, "Minutes cannot exceed 480 (8 hours)")
     .int("Please enter a whole number"),
+  patientCount: z.number({ invalid_type_error: "Please enter the number of patients" })
+    .int("Please enter a whole number")
+    .min(0, "Number of patients cannot be negative")
+    .nullable()
+    .optional(),
   occurredOn: z.string().min(1, "Date and time are required"),
   comment: z.string().optional(),
+  isTypicalDay: z.boolean()
 }).refine((data) => {
   if (data.task === 'Other - specify in comments' && (!data.otherTask || data.otherTask.trim() === "")) {
     return false
@@ -56,6 +62,14 @@ const quickLogSchema = z.object({
 }, {
   message: "Please specify the task name",
   path: ["otherTask"]
+}).refine((data) => {
+  if (isPatientCareTask(data.task)) {
+    return typeof data.patientCount === 'number' && data.patientCount >= 0
+  }
+  return true
+}, {
+  message: "Please enter the number of patients",
+  path: ["patientCount"]
 })
 
 type QuickLogFormData = z.infer<typeof quickLogSchema>
@@ -87,7 +101,7 @@ const TASK_OPTIONS = [
 ]
 
 // Minutes presets
-const MINUTES_PRESETS = [15, 30, 60]
+const MINUTES_PRESETS = [5, 10, 15, 30]
 
 interface QuickLogProps {
   onSubmit: (data: CreateEntryInput) => Promise<void>
@@ -123,12 +137,25 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
       task: "Patient Care - Prospective Audit & Feedback" as Activity, // Set a default valid task instead of empty string
       otherTask: "",
       minutes: 30,
+      patientCount: 0,
       occurredOn: getCurrentDateTime(),
-      comment: ""
+      comment: "",
+      isTypicalDay: true
     }
   })
 
   const selectedTask = watch("task")
+  const patientCountValue = watch("patientCount")
+
+  useEffect(() => {
+    if (isPatientCareTask(selectedTask)) {
+      if (patientCountValue === null || patientCountValue === undefined) {
+        setValue("patientCount", 0)
+      }
+    } else if (patientCountValue !== null) {
+      setValue("patientCount", null)
+    }
+  }, [selectedTask, patientCountValue, setValue])
 
   // Focus management after form reset
   useEffect(() => {
@@ -152,9 +179,21 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
     }
 
     // Convert datetime-local format to ISO datetime string
-    const formattedData = {
-      ...data,
-      occurredOn: new Date(data.occurredOn).toISOString()
+    const patientCount = isPatientCareTask(data.task) ? (data.patientCount ?? 0) : null
+    const otherTask =
+      data.task === 'Other - specify in comments'
+        ? (data.otherTask?.trim() || undefined)
+        : undefined
+    const comment = data.comment?.trim() ? data.comment.trim() : undefined
+
+    const formattedData: CreateEntryInput = {
+      task: data.task,
+      otherTask,
+      minutes: data.minutes,
+      patientCount,
+      isTypicalDay: data.isTypicalDay,
+      occurredOn: new Date(data.occurredOn).toISOString(),
+      comment
     }
 
     setIsSubmitting(true)
@@ -170,8 +209,10 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
         task: data.task,
         otherTask: "",
         minutes: 30,
+        patientCount: isPatientCareTask(data.task) ? 0 : null,
         occurredOn: getCurrentDateTime(),
-        comment: ""
+        comment: "",
+        isTypicalDay: true
       })
       // Hide success message after 1.5s
       setTimeout(() => setShowSuccess(false), 1500)
@@ -319,6 +360,82 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
                   </p>
                 )}
               </div>
+            </div>
+
+            {/* Patient Count */}
+            {isPatientCareTask(selectedTask) && (
+              <div className="space-y-2">
+                <label htmlFor="patient-count" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  # of Patients *
+                </label>
+                <Controller
+                  name="patientCount"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="patient-count"
+                      type="number"
+                      min={0}
+                      className={`min-h-11 border-2 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 rounded-lg ${
+                        errors.patientCount ? 'border-red-300' : 'border-slate-300 dark:border-slate-600'
+                      } focus-ring`}
+                      aria-describedby={errors.patientCount ? "patient-count-error" : undefined}
+                      aria-invalid={!!errors.patientCount}
+                      value={field.value ?? 0}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value === '' ? null : Number(value));
+                      }}
+                    />
+                  )}
+                />
+                {errors.patientCount && (
+                  <p id="patient-count-error" className="text-sm text-red-600 dark:text-red-400" role="alert">
+                    {errors.patientCount.message}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Typical Day Selection */}
+            <div className="space-y-2">
+              <span id="typical-day-label" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                This is a typical day *
+              </span>
+              <Controller
+                name="isTypicalDay"
+                control={control}
+                render={({ field }) => (
+                  <div
+                    className="flex items-center gap-4"
+                    role="radiogroup"
+                    aria-labelledby="typical-day-label"
+                  >
+                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                      <input
+                        type="radio"
+                        name="isTypicalDay"
+                        value="yes"
+                        checked={field.value === true}
+                        onChange={() => field.onChange(true)}
+                        className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                      <input
+                        type="radio"
+                        name="isTypicalDay"
+                        value="no"
+                        checked={field.value === false}
+                        onChange={() => field.onChange(false)}
+                        className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                )}
+              />
             </div>
 
             {/* Date and Time */}

@@ -25,6 +25,8 @@ export const csvUtils = {
       entry.task,
       entry.otherTask || '',
       entry.minutes,
+      entry.patientCount ?? '',
+      entry.isTypicalDay ? 'Yes' : 'No',
       entry.comment || '',
       entry.createdAt,
       entry.updatedAt
@@ -40,6 +42,8 @@ export const csvUtils = {
       'Task',
       'Other Task',
       'Minutes',
+      'Patient Count',
+      'Typical Day',
       'Comment',
       'Created At',
       'Updated At'

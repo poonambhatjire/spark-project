@@ -33,7 +33,7 @@ const createEmptyTotals = (): TodayTotals => ({
   'Other - specify in comments': 0
 })
 
-const DashboardPage = () => {
+const DataEntryPage = () => {
   // State
   const [entries, setEntries] = useState<TimeEntry[]>([])
   const [todayTotals, setTodayTotals] = useState<TodayTotals>(createEmptyTotals())
@@ -55,7 +55,7 @@ const DashboardPage = () => {
 
         await fetchDashboardData()
       } catch (error) {
-        console.error('Failed to load dashboard data:', error)
+        console.error('Failed to load data entry information:', error)
       } finally {
         setIsLoading(false)
       }
@@ -66,7 +66,7 @@ const DashboardPage = () => {
 
   const fetchDashboardData = async () => {
     const [entriesResult, todayEntriesResult] = await Promise.all([
-      listTimeEntries({ range: 'week' }),
+      listTimeEntries({ range: 'all' }),
       listTimeEntries({ range: 'today' }),
     ])
 
@@ -102,7 +102,7 @@ const DashboardPage = () => {
     try {
       await fetchDashboardData()
     } catch (error) {
-      console.error('Failed to refresh data:', error)
+      console.error('Failed to refresh data entry information:', error)
     }
   }
 
@@ -165,6 +165,8 @@ const DashboardPage = () => {
         task: entry.task,
         otherTask: entry.otherTask,
         minutes: entry.minutes,
+        patientCount: entry.patientCount ?? null,
+        isTypicalDay: entry.isTypicalDay,
         occurredOn: new Date().toISOString().split('T')[0], // Today
         comment: entry.comment
       }
@@ -206,6 +208,8 @@ const DashboardPage = () => {
           task: entry.task,
           otherTask: entry.otherTask,
           minutes: entry.minutes,
+          patientCount: entry.patientCount ?? null,
+          isTypicalDay: entry.isTypicalDay,
           occurredOn: today,
           comment: entry.comment
         })
@@ -250,7 +254,7 @@ const DashboardPage = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-900 mx-auto mb-4" aria-label="Loading"></div>
-          <p className="text-slate-600">Loading dashboard...</p>
+          <p className="text-slate-600">Loading data entry workspace...</p>
         </div>
       </div>
     )
@@ -266,7 +270,7 @@ const DashboardPage = () => {
             setIsProfileComplete(true)
             setIsLoading(true)
             fetchDashboardData()
-              .catch((error) => console.error('Failed to load data after profile completion:', error))
+              .catch((error) => console.error('Failed to load data entry information after profile completion:', error))
               .finally(() => setIsLoading(false))
           }}
         />
@@ -316,4 +320,4 @@ const DashboardPage = () => {
   )
 }
 
-export default DashboardPage 
+export default DataEntryPage 

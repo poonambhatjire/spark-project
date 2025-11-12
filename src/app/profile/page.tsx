@@ -29,7 +29,7 @@ export default async function ProfilePage() {
               <h2 className="text-xl font-semibold text-red-600 mb-2">Error Loading Profile</h2>
               <p className="text-slate-600 mb-4">{profileResult.error}</p>
               <Link href="/dashboard">
-                <Button variant="outline">Back to Dashboard</Button>
+                <Button variant="outline">Back to Data Entry</Button>
               </Link>
             </div>
           </CardContent>
@@ -77,11 +77,11 @@ export default async function ProfilePage() {
           isEditing={true}
         />
 
-        {/* Back to Dashboard */}
+        {/* Back to Data Entry */}
         <div className="mt-8 text-center">
           <Link href="/dashboard">
             <Button variant="outline" className="border-slate-300">
-              Back to Dashboard
+              Back to Data Entry
             </Button>
           </Link>
         </div>

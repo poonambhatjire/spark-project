@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/app/components/ui/textarea"
 import { Search, Filter, SortAsc, SortDesc, Edit2, Copy, Trash2, X, Check, Download, ChevronDown } from "lucide-react"
 import { useDebounce } from "@/app/hooks/useDebounce"
-import { TimeEntry, Activity, UpdateEntryInput } from "@/app/dashboard/data/client"
+import { TimeEntry, Activity, UpdateEntryInput, isPatientCareTask } from "@/app/dashboard/data/client"
 import { exportEntriesToCsv } from "@/app/lib/utils/csv"
 import { exportEntriesToExcel } from "@/app/lib/utils/excel"
 import { Toast, useToast } from "@/app/components/ui/toast"
@@ -28,7 +28,7 @@ interface HistoryPanelProps {
 
 type SortField = 'occurredOn' | 'task' | 'minutes'
 type SortDirection = 'asc' | 'desc'
-type DateRange = 'today' | 'week'
+type DateRange = 'today' | 'week' | 'all'
 
 // Task options for filtering (matching QuickLog task names)
 const TASK_OPTIONS = [
@@ -74,6 +74,10 @@ export function HistoryPanel({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingMinutes, setEditingMinutes] = useState('')
   const [editingComment, setEditingComment] = useState('')
+const [editingTask, setEditingTask] = useState<Activity | null>(null)
+const [editingOtherTask, setEditingOtherTask] = useState('')
+const [editingPatientCount, setEditingPatientCount] = useState('')
+const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
   const [showExportDropdown, setShowExportDropdown] = useState(false)
@@ -212,6 +216,10 @@ export function HistoryPanel({
     setEditingId(null)
     setEditingMinutes('')
     setEditingComment('')
+  setEditingTask(null)
+  setEditingOtherTask('')
+  setEditingPatientCount('')
+  setEditingIsTypicalDay(true)
   }, [])
 
   // Handle escape key to close dropdowns and cancel editing
@@ -287,33 +295,86 @@ export function HistoryPanel({
     setEditingId(entry.id)
     setEditingMinutes(entry.minutes.toString())
     setEditingComment(entry.comment || '')
+  setEditingTask(entry.task)
+  setEditingOtherTask(entry.otherTask || '')
+  setEditingPatientCount(
+    entry.patientCount !== null && entry.patientCount !== undefined
+      ? entry.patientCount.toString()
+      : isPatientCareTask(entry.task)
+        ? '0'
+        : ''
+  )
+  setEditingIsTypicalDay(entry.isTypicalDay)
     // Focus the minutes input after a short delay
     setTimeout(() => editingMinutesRef.current?.focus(), 100)
   }, [])
 
-  const handleSaveEdit = useCallback(async () => {
-    if (editingId) {
+const handleSaveEdit = useCallback(async () => {
+  if (editingId && editingTask) {
       try {
         const entry = filteredAndSortedEntries.find(e => e.id === editingId)
-        await onUpdateEntry(editingId, {
-          minutes: parseInt(editingMinutes) || 0,
-          comment: editingComment
-        })
+      const minutesValue = parseInt(editingMinutes, 10)
+
+      if (Number.isNaN(minutesValue) || minutesValue < 1 || minutesValue > 480) {
+        showToast('Please enter minutes between 1 and 480', 'error')
+        return
+      }
+
+      let patientCountValue: number | null = null
+      if (isPatientCareTask(editingTask)) {
+        const trimmedPatient = editingPatientCount.trim()
+        const parsedCount = trimmedPatient === '' ? NaN : parseInt(trimmedPatient, 10)
+        if (Number.isNaN(parsedCount) || parsedCount < 0) {
+          showToast('Please enter a non-negative number of patients', 'error')
+          return
+        }
+        patientCountValue = parsedCount
+      }
+
+      const trimmedOtherTask = editingTask === 'Other - specify in comments'
+        ? editingOtherTask.trim()
+        : ''
+
+      if (editingTask === 'Other - specify in comments' && trimmedOtherTask === '') {
+        showToast('Please specify the task name', 'error')
+        return
+      }
+
+      const trimmedComment = editingComment.trim()
+
+      await onUpdateEntry(editingId, {
+        task: editingTask,
+        otherTask: editingTask === 'Other - specify in comments' ? trimmedOtherTask : undefined,
+        minutes: minutesValue,
+        patientCount: patientCountValue,
+        isTypicalDay: editingIsTypicalDay,
+        comment: trimmedComment || undefined
+      })
         
         // Track telemetry
         if (entry) {
-          telemetry.trackEntryUpdated(entry.task, parseInt(editingMinutes) || 0)
+        telemetry.trackEntryUpdated(editingTask, minutesValue)
         }
         
-        setEditingId(null)
-        setEditingMinutes('')
-        setEditingComment('')
+      handleCancelEdit()
         showToast('Entry updated successfully', 'success')
       } catch {
         showToast('Failed to update entry', 'error')
       }
     }
-  }, [editingId, editingMinutes, editingComment, onUpdateEntry, showToast, filteredAndSortedEntries])
+}, [
+  editingId,
+  editingTask,
+  editingMinutes,
+  editingComment,
+  editingOtherTask,
+  editingPatientCount,
+  editingIsTypicalDay,
+  onUpdateEntry,
+  showToast,
+  filteredAndSortedEntries,
+  handleCancelEdit
+])
 
   // Handle keyboard navigation for inline editing
   const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -439,7 +500,7 @@ export function HistoryPanel({
             {/* Date Range */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Range:</span>
-              <div className="flex border border-slate-300 dark:border-slate-600 rounded-lg" role="group" aria-label="Date range selection">
+              <div className="inline-flex border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden" role="group" aria-label="Date range selection">
                 <Button
                   variant={dateRange === 'today' ? 'default' : 'ghost'}
                   size="sm"
@@ -447,7 +508,7 @@ export function HistoryPanel({
                     setDateRange('today')
                     telemetry.trackFilterChanged('date_range_today')
                   }}
-                  className="rounded-r-none border-r border-slate-300 dark:border-slate-600 min-h-11"
+                  className="rounded-none border-r border-slate-300 dark:border-slate-600 min-h-11"
                   aria-pressed={dateRange === 'today'}
                 >
                   Today
@@ -459,10 +520,22 @@ export function HistoryPanel({
                     setDateRange('week')
                     telemetry.trackFilterChanged('date_range_week')
                   }}
-                  className="rounded-l-none min-h-11"
+                  className="rounded-none border-r border-slate-300 dark:border-slate-600 min-h-11"
                   aria-pressed={dateRange === 'week'}
                 >
                   This Week
+                </Button>
+                <Button
+                  variant={dateRange === 'all' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => {
+                    setDateRange('all')
+                    telemetry.trackFilterChanged('date_range_all')
+                  }}
+                  className="rounded-none min-h-11"
+                  aria-pressed={dateRange === 'all'}
+                >
+                  All Time
                 </Button>
               </div>
             </div>
@@ -632,7 +705,89 @@ export function HistoryPanel({
                         }
                       })()}
                     </td>
-                    <td className="py-2 px-2">
+                <td className="py-2 px-2">
+                  {editingId === entry.id ? (
+                    <div className="space-y-3">
+                      <Select
+                        value={editingTask ?? entry.task}
+                        onValueChange={(value) => {
+                          const taskValue = value as Activity
+                          setEditingTask(taskValue)
+                          if (taskValue !== 'Other - specify in comments') {
+                            setEditingOtherTask('')
+                          }
+                          if (isPatientCareTask(taskValue)) {
+                            if (editingPatientCount.trim() === '') {
+                              setEditingPatientCount('0')
+                            }
+                          } else {
+                            setEditingPatientCount('')
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="min-h-9 border-slate-300 dark:border-slate-600">
+                          <SelectValue placeholder="Select task" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TASK_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {editingTask === 'Other - specify in comments' && (
+                        <Input
+                          value={editingOtherTask}
+                          onChange={(e) => setEditingOtherTask(e.target.value)}
+                          placeholder="Specify task name"
+                          className="min-h-9 border-slate-300 dark:border-slate-600 text-sm"
+                        />
+                      )}
+
+                      {isPatientCareTask(editingTask) && (
+                        <Input
+                          value={editingPatientCount}
+                          onChange={(e) => setEditingPatientCount(e.target.value)}
+                          type="number"
+                          min={0}
+                          className="min-h-9 border-slate-300 dark:border-slate-600 text-sm"
+                          placeholder="# of patients"
+                        />
+                      )}
+
+                      <div
+                        className="flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300"
+                        role="radiogroup"
+                        aria-label="This is a typical day"
+                      >
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={`typical-day-${entry.id}`}
+                            value="yes"
+                            checked={editingIsTypicalDay === true}
+                            onChange={() => setEditingIsTypicalDay(true)}
+                            className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                          />
+                          <span>Yes</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={`typical-day-${entry.id}`}
+                            value="no"
+                            checked={editingIsTypicalDay === false}
+                            onChange={() => setEditingIsTypicalDay(false)}
+                            className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                          />
+                          <span>No</span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
                           {entry.task === 'Other - specify in comments' ? 'Other' : entry.task}
@@ -641,7 +796,15 @@ export function HistoryPanel({
                           <span className="text-slate-900 dark:text-slate-100">{entry.otherTask}</span>
                         )}
                       </div>
-                    </td>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-4">
+                        {isPatientCareTask(entry.task) && (
+                          <span>Patients: {entry.patientCount ?? '—'}</span>
+                        )}
+                        <span>Typical Day: {entry.isTypicalDay ? 'Yes' : 'No'}</span>
+                      </div>
+                    </div>
+                  )}
+                </td>
                     <td className="py-2 px-2">
                       {editingId === entry.id ? (
                         <Input

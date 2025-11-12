@@ -63,7 +63,7 @@ export default function AdminPage() {
               {error || 'You do not have admin privileges to access this panel.'}
             </p>
             <Button onClick={() => window.location.href = '/dashboard'}>
-              Back to Dashboard
+              Back to Data Entry
             </Button>
           </CardContent>
         </Card>
@@ -237,7 +237,7 @@ export default function AdminPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Dashboard
+                Back to Data Entry
               </Button>
             </div>
             <UsersList currentUserRole={user?.role || 'user'} />
@@ -258,7 +258,7 @@ export default function AdminPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Dashboard
+                Back to Data Entry
               </Button>
             </div>
             <ActivityAnalytics />
@@ -279,7 +279,7 @@ export default function AdminPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Dashboard
+                Back to Data Entry
               </Button>
             </div>
             <AdvancedAnalytics />
@@ -300,7 +300,7 @@ export default function AdminPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Dashboard
+                Back to Data Entry
               </Button>
             </div>
             <SystemSettings />
