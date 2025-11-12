@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -9,9 +9,12 @@ import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 // Textarea no longer needed
 
+import { PROFESSIONAL_TITLES, EXPERIENCE_LEVELS } from "@/lib/constants/profile"
+
 // Validation schema for user profile
 const userProfileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  email: z.string().trim().email("Enter a valid email address"),
   title: z.string().min(1, "Professional title is required"),
   titleOther: z.string().optional(),
   experienceLevel: z.string().min(1, "Experience level is required"),
@@ -29,28 +32,6 @@ const userProfileSchema = z.object({
 
 type UserProfileFormData = z.infer<typeof userProfileSchema>
 
-// Professional titles (from screenshot requirements)
-const PROFESSIONAL_TITLES = [
-  "Infectious Disease Physician",
-  "Clinical Pharmacist",
-  "Microbiologist",
-  "Infection Prevention Specialist",
-  "Hospital administrator",
-  "Other, please specify"
-]
-
-// No longer needed - removed deprecated fields
-
-// Experience levels
-const EXPERIENCE_LEVELS = [
-  "0-1 years",
-  "2-5 years",
-  "6-10 years",
-  "11-15 years",
-  "16-20 years",
-  "20+ years"
-]
-
 interface UserProfileFormProps {
   onSubmit: (data: UserProfileFormData) => Promise<{ success: boolean; error?: string }>
   initialData?: Partial<UserProfileFormData>
@@ -66,17 +47,32 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors }
   } = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
+      email: initialData?.email || "",
       title: initialData?.title || "",
       titleOther: initialData?.titleOther || "",
       experienceLevel: initialData?.experienceLevel || "",
       institution: initialData?.institution || ""
     }
   })
+
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        fullName: initialData.fullName || "",
+        email: initialData.email || "",
+        title: initialData.title || "",
+        titleOther: initialData.titleOther || "",
+        experienceLevel: initialData.experienceLevel || "",
+        institution: initialData.institution || ""
+      })
+    }
+  }, [initialData, reset])
 
   // Watch title field to show/hide "Other" input
   const watchedTitle = watch('title')
@@ -129,6 +125,25 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
         </div>
 
         <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">Email Address *</label>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="email"
+                placeholder="Enter your email address"
+                className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            )}
+          />
+          {errors.email && (
+            <p className="text-sm text-red-600">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-700">Your Job Title *</label>
           <div className="space-y-2">
             {PROFESSIONAL_TITLES.map((title) => (

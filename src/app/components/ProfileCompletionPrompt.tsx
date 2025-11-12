@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/app/components/ui/button"
 import { Card, CardContent } from "@/app/components/ui/card"
-import { checkProfileCompletion, updateUserProfile, UserProfileData } from "@/lib/actions/user-profile"
+import { checkProfileCompletion, updateUserProfile, getUserProfile, UserProfileData } from "@/lib/actions/user-profile"
+import { PROFESSIONAL_TITLES } from "@/lib/constants/profile"
 import UserProfileForm from "./UserProfileForm"
 
 interface ProfileCompletionPromptProps {
@@ -11,20 +11,44 @@ interface ProfileCompletionPromptProps {
 }
 
 export default function ProfileCompletionPrompt({ onComplete }: ProfileCompletionPromptProps) {
-  const [showForm, setShowForm] = useState(false)
   const [isComplete, setIsComplete] = useState(true)
   const [missingFields, setMissingFields] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [profileInitialData, setProfileInitialData] = useState<Partial<UserProfileData> | undefined>()
+
+  const TOTAL_REQUIRED_FIELDS = 5
 
   useEffect(() => {
     checkProfileStatus()
   }, [])
 
   const checkProfileStatus = async () => {
+    setIsLoading(true)
     try {
       const result = await checkProfileCompletion()
       setIsComplete(result.isComplete)
       setMissingFields(result.missingFields)
+      if (!result.isComplete) {
+        const profileResponse = await getUserProfile()
+        if (profileResponse.success && profileResponse.data) {
+          const profile = profileResponse.data
+          const rawTitle = (profile?.title as string) || (profile?.professional_title as string) || ""
+          const isKnownTitle = rawTitle !== "" && PROFESSIONAL_TITLES.includes(rawTitle as typeof PROFESSIONAL_TITLES[number])
+
+          setProfileInitialData({
+            fullName: (profile?.name as string) || "",
+            email: (profile?.email as string) || "",
+            title: isKnownTitle ? rawTitle : rawTitle ? "Other, please specify" : "",
+            titleOther: isKnownTitle ? undefined : rawTitle || undefined,
+            experienceLevel: (profile?.experience_level as string) || (profile?.years_of_experience as string) || "",
+            institution: (profile?.institution as string) || (profile?.organization as string) || ""
+          })
+        } else {
+          setProfileInitialData(undefined)
+        }
+      } else {
+        setProfileInitialData(undefined)
+      }
     } catch (error) {
       console.error('Error checking profile completion:', error)
     } finally {
@@ -36,9 +60,7 @@ export default function ProfileCompletionPrompt({ onComplete }: ProfileCompletio
     try {
       const result = await updateUserProfile(data)
       if (result.success) {
-        setShowForm(false)
-        setIsComplete(true)
-        setMissingFields([])
+        await checkProfileStatus()
         onComplete?.()
       } else {
         console.error('Failed to update profile:', result.error)
@@ -66,23 +88,15 @@ export default function ProfileCompletionPrompt({ onComplete }: ProfileCompletio
   if (isComplete) {
     return null // Don't show anything if profile is complete
   }
-
-  if (showForm) {
-    return (
-      <div className="w-full max-w-4xl mx-auto mb-6">
-        <UserProfileForm 
-          onSubmit={handleProfileSubmit}
-          isEditing={false}
-        />
-      </div>
-    )
-  }
+  const completionPercent = Math.max(0, Math.round(((TOTAL_REQUIRED_FIELDS - missingFields.length) / TOTAL_REQUIRED_FIELDS) * 100))
+  const friendlyFieldName = (field: string) => field
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-8">
+    <div className="w-full max-w-4xl mx-auto mb-10 space-y-6">
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm">
         <div className="p-6">
-          {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
@@ -93,59 +107,41 @@ export default function ProfileCompletionPrompt({ onComplete }: ProfileCompletio
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Complete Your Profile</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Complete Your Profile to Continue</h3>
                 <p className="text-sm text-slate-600 mt-1">
-                  Help us personalize your SPARC experience with professional information
+                  Profile information is required before you can log stewardship activities.
                 </p>
               </div>
             </div>
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-blue-600">
-                  {Math.round((missingFields.length / 8) * 100)}%
-                </span>
+              <div className="w-12 h-12 bg-white border border-blue-200 rounded-full flex items-center justify-center">
+                <span className="text-sm font-semibold text-blue-600">{completionPercent}%</span>
               </div>
             </div>
           </div>
 
-          {/* Missing Fields */}
-          <div className="mb-6">
-            <h4 className="text-sm font-medium text-slate-700 mb-3">Missing Information:</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div>
+            <h4 className="text-sm font-medium text-slate-700 mb-3">Still needed:</h4>
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
               {missingFields.map((field) => (
                 <div key={field} className="flex items-center space-x-2 text-sm text-slate-600">
                   <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
-                  <span className="capitalize">
-                    {field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </span>
+                  <span>{friendlyFieldName(field)}</span>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-slate-500">
-              This will help us provide better insights and recommendations
-            </div>
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsComplete(true)}
-                className="border-slate-300 text-slate-600 hover:bg-slate-50"
-              >
-                Skip for Now
-              </Button>
-              <Button 
-                onClick={() => setShowForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-              >
-                Complete Profile
-              </Button>
-            </div>
+            <p className="mt-4 text-xs text-slate-500">
+              Completing your profile helps us link calculator outputs with survey responses and provide accurate insights.
+            </p>
           </div>
         </div>
       </div>
+
+      <UserProfileForm 
+        onSubmit={handleProfileSubmit}
+        initialData={profileInitialData}
+        isEditing={false}
+      />
     </div>
   )
 }

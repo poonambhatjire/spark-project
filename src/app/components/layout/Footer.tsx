@@ -19,27 +19,6 @@ export default function Footer() {
               className="h-8 w-8"
             />
           </Link>
-          
-          <nav className="flex gap-4 sm:gap-6" aria-label="Footer navigation">
-            <Link 
-              href="#" 
-              className="text-xs hover:underline underline-offset-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
-            >
-              Privacy Policy
-            </Link>
-            <Link 
-              href="#" 
-              className="text-xs hover:underline underline-offset-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
-            >
-              Terms of Service
-            </Link>
-            <Link 
-              href="#" 
-              className="text-xs hover:underline underline-offset-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
-            >
-              Help Center
-            </Link>
-          </nav>
         </div>
       </div>
     </footer>

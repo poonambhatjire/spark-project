@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 
 export interface UserProfileData {
   fullName: string
+  email: string
   title: string
   titleOther?: string // For "Other, please specify" option
   experienceLevel: string
@@ -30,15 +31,21 @@ export async function updateUserProfile(data: UserProfileData): Promise<{ succes
     const finalTitle = data.title === 'Other, please specify' && data.titleOther 
       ? data.titleOther 
       : data.title
+    const normalizedName = data.fullName.trim()
+    const normalizedEmail = data.email.trim()
+    const normalizedExperience = data.experienceLevel.trim()
+    const normalizedInstitution = data.institution.trim()
+    const normalizedTitle = finalTitle.trim()
 
     // Update the profile
     const { error } = await supabase
       .from('profiles')
       .update({
-        name: data.fullName,
-        title: finalTitle,
-        experience_level: data.experienceLevel,
-        institution: data.institution,
+        name: normalizedName,
+        email: normalizedEmail,
+        title: normalizedTitle,
+        experience_level: normalizedExperience,
+        institution: normalizedInstitution,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id)
@@ -126,12 +133,19 @@ export async function checkProfileCompletion(): Promise<{ isComplete: boolean; m
     // Check required fields
     const requiredFields = [
       'name',
+      'email',
       'title',
       'experience_level',
       'institution'
     ]
 
-    const missingFields = requiredFields.filter(field => !data[field] || data[field] === '')
+    const missingFields = requiredFields.filter(field => {
+      const value = data[field as keyof typeof data]
+      if (typeof value === 'string') {
+        return value.trim() === ''
+      }
+      return !value
+    })
 
     return {
       isComplete: missingFields.length === 0,

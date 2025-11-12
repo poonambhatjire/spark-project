@@ -5,6 +5,7 @@ import UserProfileForm from "@/app/components/UserProfileForm"
 import { Card, CardContent } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import Link from "next/link"
+import { PROFESSIONAL_TITLES } from "@/lib/constants/profile"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -38,6 +39,14 @@ export default async function ProfilePage() {
   }
 
   const profile = profileResult.data
+  const rawTitle = (profile?.title as string) || (profile?.professional_title as string) || ""
+  const isRecognizedTitle = rawTitle !== "" && PROFESSIONAL_TITLES.includes(rawTitle as typeof PROFESSIONAL_TITLES[number])
+  const normalizedTitle = isRecognizedTitle ? rawTitle : rawTitle ? "Other, please specify" : ""
+  const normalizedTitleOther = isRecognizedTitle ? "" : rawTitle
+  const normalizedExperience = (profile?.experience_level as string) || (profile?.years_of_experience as string) || ""
+  const normalizedInstitution = (profile?.institution as string) || (profile?.organization as string) || ""
+  const normalizedFullName = (profile?.name as string) || ""
+  const normalizedEmail = (profile?.email as string) || user.email || ""
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -57,13 +66,14 @@ export default async function ProfilePage() {
             const { updateUserProfile } = await import('@/lib/actions/user-profile')
             return await updateUserProfile(data)
           }}
-          initialData={profile ? {
-            fullName: (profile.name as string) || '',
-            title: (profile.title as string) || (profile.professional_title as string) || '',
-            titleOther: (profile.title_other as string) || '',
-            experienceLevel: (profile.experience_level as string) || (profile.years_of_experience as string) || '',
-            institution: (profile.institution as string) || (profile.organization as string) || ''
-          } : undefined}
+          initialData={{
+            fullName: normalizedFullName,
+            email: normalizedEmail,
+            title: normalizedTitle,
+            titleOther: normalizedTitleOther,
+            experienceLevel: normalizedExperience,
+            institution: normalizedInstitution
+          }}
           isEditing={true}
         />
 

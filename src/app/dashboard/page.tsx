@@ -12,82 +12,48 @@ import {
   TodayTotals
 } from "@/app/dashboard/data/client"
 import { createTimeEntry, updateTimeEntry, deleteTimeEntries, listTimeEntries } from "@/lib/actions/time-entries"
+import { checkProfileCompletion } from "@/lib/actions/user-profile"
+
+const createEmptyTotals = (): TodayTotals => ({
+  total: 0,
+  'Patient Care - Prospective Audit & Feedback': 0,
+  'Patient Care - Authorization of Restricted Antimicrobials': 0,
+  'Patient Care - Participating in Clinical Rounds': 0,
+  'Administrative - Guidelines/EHR': 0,
+  'Tracking - AMU': 0,
+  'Tracking - AMR': 0,
+  'Tracking - Antibiotic Appropriateness': 0,
+  'Tracking - Intervention Acceptance': 0,
+  'Reporting - sharing data with prescribers/decision makers': 0,
+  'Education - Providing Education': 0,
+  'Education - Receiving Education (e.g. CE)': 0,
+  'Administrative - Committee Work': 0,
+  'Administrative - QI projects/research': 0,
+  'Administrative - Emails': 0,
+  'Other - specify in comments': 0
+})
 
 const DashboardPage = () => {
   // State
   const [entries, setEntries] = useState<TimeEntry[]>([])
-  const [todayTotals, setTodayTotals] = useState<TodayTotals>({
-    total: 0,
-    // Patient Care
-    'Patient Care - Prospective Audit & Feedback': 0,
-    'Patient Care - Authorization of Restricted Antimicrobials': 0,
-    'Patient Care - Participating in Clinical Rounds': 0,
-    // Administrative
-    'Administrative - Guidelines/EHR': 0,
-    // Tracking
-    'Tracking - AMU': 0,
-    'Tracking - AMR': 0,
-    'Tracking - Antibiotic Appropriateness': 0,
-    'Tracking - Intervention Acceptance': 0,
-    // Reporting
-    'Reporting - sharing data with prescribers/decision makers': 0,
-    // Education
-    'Education - Providing Education': 0,
-    'Education - Receiving Education (e.g. CE)': 0,
-    // Administrative
-    'Administrative - Committee Work': 0,
-    'Administrative - QI projects/research': 0,
-    'Administrative - Emails': 0,
-    // Other
-    'Other - specify in comments': 0
-  })
+  const [todayTotals, setTodayTotals] = useState<TodayTotals>(createEmptyTotals())
   const [isLoading, setIsLoading] = useState(true)
+  const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null)
 
   // Load initial data
   useEffect(() => {
-    const loadData = async () => {
+    const initialize = async () => {
       try {
-        // Load data from Supabase
-        const [entriesResult, todayEntriesResult] = await Promise.all([
-          listTimeEntries({ range: 'week' }),
-          listTimeEntries({ range: 'today' }),
-        ])
-        
-        if (entriesResult.success && entriesResult.data) {
-          setEntries(entriesResult.data)
-        }
-        
-        if (todayEntriesResult.success && todayEntriesResult.data) {
-          // Calculate today's totals
-          const totals: TodayTotals = {
-            total: 0,
-            'Patient Care - Prospective Audit & Feedback': 0,
-            'Patient Care - Authorization of Restricted Antimicrobials': 0,
-            'Patient Care - Participating in Clinical Rounds': 0,
-            'Administrative - Guidelines/EHR': 0,
-            'Tracking - AMU': 0,
-            'Tracking - AMR': 0,
-            'Tracking - Antibiotic Appropriateness': 0,
-            'Tracking - Intervention Acceptance': 0,
-            'Reporting - sharing data with prescribers/decision makers': 0,
-            'Education - Providing Education': 0,
-            'Education - Receiving Education (e.g. CE)': 0,
-            'Administrative - Committee Work': 0,
-            'Administrative - QI projects/research': 0,
-            'Administrative - Emails': 0,
-            'Other - specify in comments': 0
-          };
+        const status = await checkProfileCompletion()
+        setIsProfileComplete(status.isComplete)
 
-          todayEntriesResult.data.forEach(entry => {
-            totals.total += entry.minutes;
-            // Ensure the task key exists in totals before adding
-            if (entry.task in totals) {
-              totals[entry.task] += entry.minutes;
-            }
-          });
-          
-          setTodayTotals(totals)
+        if (!status.isComplete) {
+          setEntries([])
+          setTodayTotals(createEmptyTotals())
+          return
         }
+
+        await fetchDashboardData()
       } catch (error) {
         console.error('Failed to load dashboard data:', error)
       } finally {
@@ -95,52 +61,46 @@ const DashboardPage = () => {
       }
     }
 
-    loadData()
+    initialize()
   }, [])
+
+  const fetchDashboardData = async () => {
+    const [entriesResult, todayEntriesResult] = await Promise.all([
+      listTimeEntries({ range: 'week' }),
+      listTimeEntries({ range: 'today' }),
+    ])
+
+    if (entriesResult.success && entriesResult.data) {
+      setEntries(entriesResult.data)
+    } else if (!entriesResult.success) {
+      setEntries([])
+    }
+
+    if (todayEntriesResult.success && todayEntriesResult.data) {
+      const totals = createEmptyTotals()
+
+      todayEntriesResult.data.forEach((entry) => {
+        totals.total += entry.minutes
+        if (entry.task in totals) {
+          const key = entry.task as keyof TodayTotals
+          totals[key] += entry.minutes
+        }
+      })
+
+      setTodayTotals(totals)
+    } else if (!todayEntriesResult.success) {
+      setTodayTotals(createEmptyTotals())
+    }
+  }
 
   // Refresh data after operations
   const refreshData = async () => {
-    try {
-      const [entriesResult, todayEntriesResult] = await Promise.all([
-        listTimeEntries({ range: 'week' }),
-        listTimeEntries({ range: 'today' }),
-      ])
-      
-      if (entriesResult.success && entriesResult.data) {
-        setEntries(entriesResult.data)
-      }
-      
-      if (todayEntriesResult.success && todayEntriesResult.data) {
-        // Calculate today's totals
-        const totals: TodayTotals = {
-          total: 0,
-          'Patient Care - Prospective Audit & Feedback': 0,
-          'Patient Care - Authorization of Restricted Antimicrobials': 0,
-          'Patient Care - Participating in Clinical Rounds': 0,
-          'Administrative - Guidelines/EHR': 0,
-          'Tracking - AMU': 0,
-          'Tracking - AMR': 0,
-          'Tracking - Antibiotic Appropriateness': 0,
-          'Tracking - Intervention Acceptance': 0,
-          'Reporting - sharing data with prescribers/decision makers': 0,
-          'Education - Providing Education': 0,
-          'Education - Receiving Education (e.g. CE)': 0,
-          'Administrative - Committee Work': 0,
-          'Administrative - QI projects/research': 0,
-          'Administrative - Emails': 0,
-          'Other - specify in comments': 0
-        };
+    if (!isProfileComplete) {
+      return
+    }
 
-        todayEntriesResult.data.forEach(entry => {
-          totals.total += entry.minutes;
-          // Ensure the task key exists in totals before adding
-          if (entry.task in totals) {
-            totals[entry.task] += entry.minutes;
-          }
-        });
-        
-        setTodayTotals(totals)
-      }
+    try {
+      await fetchDashboardData()
     } catch (error) {
       console.error('Failed to refresh data:', error)
     }
@@ -149,6 +109,9 @@ const DashboardPage = () => {
 
   // Event handlers
   const handleCreateEntry = async (data: CreateEntryInput) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before logging entries.')
+    }
     try {
       const result = await createTimeEntry(data)
       if (!result.success) {
@@ -162,6 +125,9 @@ const DashboardPage = () => {
   }
 
   const handleUpdateEntry = async (id: string, updates: UpdateEntryInput) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before updating entries.')
+    }
     try {
       const result = await updateTimeEntry(id, updates)
       if (!result.success) {
@@ -175,6 +141,9 @@ const DashboardPage = () => {
   }
 
   const handleDeleteEntry = async (id: string) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before deleting entries.')
+    }
     try {
       const result = await deleteTimeEntries([id])
       if (!result.success) {
@@ -188,6 +157,9 @@ const DashboardPage = () => {
   }
 
   const handleDuplicateEntry = async (entry: TimeEntry) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before duplicating entries.')
+    }
     try {
       const duplicateData: CreateEntryInput = {
         task: entry.task,
@@ -208,6 +180,9 @@ const DashboardPage = () => {
   }
 
   const handleBulkDelete = async (ids: string[]) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before managing entries.')
+    }
     try {
       const result = await deleteTimeEntries(ids)
       if (!result.success) {
@@ -221,6 +196,9 @@ const DashboardPage = () => {
   }
 
   const handleBulkDuplicate = async (entries: TimeEntry[]) => {
+    if (!isProfileComplete) {
+      throw new Error('Complete your profile before duplicating entries.')
+    }
     try {
       const today = new Date().toISOString().split('T')[0]
       const duplicatePromises = entries.map(entry => 
@@ -283,40 +261,56 @@ const DashboardPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Profile Completion Prompt */}
-        <ProfileCompletionPrompt />
-        
-        {/* Today Summary Section */}
-        <section aria-labelledby="summary-title" className="mb-8">
-          <h2 id="summary-title" className="sr-only">Today Summary</h2>
-          <div className="flex justify-center">
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-6 min-h-24 flex flex-col items-center justify-center w-full max-w-sm">
-              <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${formatTimeDisplay(todayTotals.total)} total today`}>
-                {formatTimeDisplay(todayTotals.total)}
+        <ProfileCompletionPrompt
+          onComplete={() => {
+            setIsProfileComplete(true)
+            setIsLoading(true)
+            fetchDashboardData()
+              .catch((error) => console.error('Failed to load data after profile completion:', error))
+              .finally(() => setIsLoading(false))
+          }}
+        />
+
+        {isProfileComplete ? (
+          <>
+            {/* Today Summary Section */}
+            <section aria-labelledby="summary-title" className="mb-8">
+              <h2 id="summary-title" className="sr-only">Today Summary</h2>
+              <div className="flex justify-center">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 p-6 min-h-24 flex flex-col items-center justify-center w-full max-w-sm">
+                  <div className="text-3xl font-semibold text-slate-900 dark:text-slate-100" aria-label={`${formatTimeDisplay(todayTotals.total)} total today`}>
+                    {formatTimeDisplay(todayTotals.total)}
+                  </div>
+                  <div className="text-lg text-slate-600 dark:text-slate-300">Today Total</div>
+                </div>
               </div>
-              <div className="text-lg text-slate-600 dark:text-slate-300">Today Total</div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        {/* Main Content Section */}
-        <section className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Left Pane: Quick Log Form */}
-          <div className="w-full">
-            <QuickLog onSubmit={handleCreateEntry} />
-          </div>
+            {/* Main Content Section */}
+            <section className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {/* Left Pane: Quick Log Form */}
+              <div className="w-full">
+                <QuickLog onSubmit={handleCreateEntry} />
+              </div>
 
-          {/* Right Pane: History Panel */}
-          <div className="w-full">
-            <HistoryPanel
-              entries={entries}
-              onUpdateEntry={handleUpdateEntry}
-              onDeleteEntry={handleDeleteEntry}
-              onDuplicateEntry={handleDuplicateEntry}
-              onBulkDelete={handleBulkDelete}
-              onBulkDuplicate={handleBulkDuplicate}
-            />
+              {/* Right Pane: History Panel */}
+              <div className="w-full">
+                <HistoryPanel
+                  entries={entries}
+                  onUpdateEntry={handleUpdateEntry}
+                  onDeleteEntry={handleDeleteEntry}
+                  onDuplicateEntry={handleDuplicateEntry}
+                  onBulkDelete={handleBulkDelete}
+                  onBulkDuplicate={handleBulkDuplicate}
+                />
+              </div>
+            </section>
+          </>
+        ) : (
+          <div className="rounded-xl border border-dashed border-blue-200 bg-white/50 dark:bg-slate-900/40 p-10 text-center text-slate-600 dark:text-slate-300">
+            Complete your profile to unlock the SPARC calculator and start logging stewardship activities.
           </div>
-        </section>
+        )}
       </div>
     </div>
   )

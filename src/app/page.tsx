@@ -37,63 +37,17 @@ const LandingPage = () => {
                 href="/dashboard" 
                 className="group inline-flex items-center px-12 py-6 text-xl font-semibold text-white bg-[#D25555] rounded-2xl hover:bg-[#B84444] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D25555] focus-visible:ring-offset-2"
               >
-                <span>Start Calculating</span>
+                <span>Enter Your Data</span>
                 <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </a>
               <a 
-                href="#features" 
+                href="/about" 
                 className="inline-flex items-center px-12 py-6 text-xl font-semibold text-slate-700 bg-white border-2 border-slate-300 rounded-2xl hover:border-[#D25555] hover:text-[#D25555] transition-all duration-300 shadow-lg hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D25555] focus-visible:ring-offset-2"
               >
                 Learn More
               </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-gradient-to-b from-white to-slate-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 text-balance">
-              Why Choose SPARC?
-            </h2>
-            <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
-              Built on evidence-based research and time-in-motion studies
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            <div className="group text-center p-10 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Evidence-Based</h3>
-              <p className="text-lg text-slate-600 leading-relaxed">Built on peer-reviewed research and real-world data from leading healthcare institutions</p>
-            </div>
-            
-            <div className="group text-center p-10 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Easy to Use</h3>
-              <p className="text-lg text-slate-600 leading-relaxed">Intuitive interface designed specifically for healthcare professionals and administrators</p>
-            </div>
-            
-            <div className="group text-center p-10 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Tailored Results</h3>
-              <p className="text-lg text-slate-600 leading-relaxed">Customized recommendations based on your institution&apos;s size, type, and specific needs</p>
             </div>
           </div>
         </div>
