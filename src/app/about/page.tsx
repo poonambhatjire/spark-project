@@ -1,4 +1,48 @@
+const steeringCommitteeMembers: Array<{ name: string; organization?: string }> = [
+  { name: "Amy Kang, PharmD", organization: "Chapman School of Pharmacy" },
+  { name: "Brad Langford, PharmD", organization: "University of Toronto" },
+  { name: "Beth Leung, PharmD", organization: "University of Toronto / Unity Health" },
+  { name: "Priya Nori, MD", organization: "Montefiore Health System" },
+  { name: "Michael Bolaris, MD", organization: "LA County – DHS" },
+  { name: "Star Cervantes, PharmD", organization: "Chicago Department of Public Health" },
+  { name: "Marcia Glick, PharmD", organization: "California / LA County Department of Public Health" },
+  { name: "Rekha Murthy, MD", organization: "California / LA County Department of Public Health" },
+  { name: "Melinda Neuhauser, PharmD", organization: "Centers for Disease Control and Prevention" },
+  { name: "Kevin Brown, PhD", organization: "University of Toronto" },
+  { name: "Christina Rivera, PharmD", organization: "Mayo Clinic" },
+  { name: "Valerie Leung, PharmD", organization: "Public Health Ontario" },
+  { name: "William Simmons, MD", organization: "UCSF" },
+  { name: "Julianne Joo, PharmD", organization: "Harbor-UCLA Medical Center" },
+  { name: "Loren Miller, MD", organization: "UCLA / Lundquist Institute" },
+  { name: "Betsy Hirsch, PharmD", organization: "University of Minnesota College of Pharmacy" },
+  { name: "Kelly Echevarria", organization: "" },
+  { name: "Stephanie May", organization: "" },
+  { name: "Eric Lofgren, PhD", organization: "Washington State University" },
+  { name: "Kevin Schwartz, MD", organization: "Public Health Ontario" },
+  { name: "David Ha, PharmD", organization: "" }
+]
+
 const AboutPage = () => {
+  const highlightedMembers = steeringCommitteeMembers.slice(0, 6)
+  const additionalMembers = steeringCommitteeMembers.slice(6)
+
+  const renderCommitteeMember = (member: { name: string; organization?: string }) => {
+    const organizationText =
+      member.organization && member.organization.trim().length > 0
+        ? member.organization
+        : "Organization forthcoming"
+
+    return (
+      <article
+        key={member.name}
+        className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-shadow hover:shadow-md"
+      >
+        <h3 className="text-base font-semibold text-slate-900">{member.name}</h3>
+        <p className="mt-2 text-sm text-slate-600">{organizationText}</p>
+      </article>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -218,44 +262,25 @@ const AboutPage = () => {
               and healthcare leaders dedicated to advancing antimicrobial stewardship.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Amy Kang, PharmD, BCIDP</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Infectious Diseases Pharmacist, Chapman University School of Pharmacy & Harbor-UCLA Medical Center
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Bradley J. Langford, PharmD, BCIDP, MPH</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Antimicrobial Stewardship Pharmacist, McMaster University
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Elizabeth Leung, PharmD, BCPS</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Infectious Diseases Clinical Pharmacist, Leslie Dan Faculty of Pharmacy, University of Toronto
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Poonam Bhatjire, MS, PhD</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Health Economics, Epidemiology, and Real-World Evidence Researcher, Chapman University School of Pharmacy
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Karen Huynh</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Pharmacy Student Researcher, Chapman University
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Seoyun Lim</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Pharm.D. Candidate, Chapman University School of Pharmacy
-              </p>
-            </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {highlightedMembers.map(renderCommitteeMember)}
           </div>
+
+          {additionalMembers.length > 0 && (
+            <details className="group mt-6">
+              <summary className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#D25555] transition-colors hover:text-[#B84444] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555]/30 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+                <span className="group-open:hidden">
+                  Show all {steeringCommitteeMembers.length} members
+                </span>
+                <span className="hidden group-open:inline">
+                  Hide additional members
+                </span>
+              </summary>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {additionalMembers.map(renderCommitteeMember)}
+              </div>
+            </details>
+          )}
         </div>
       </section>
     </div>
