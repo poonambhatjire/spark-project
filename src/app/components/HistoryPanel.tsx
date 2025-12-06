@@ -36,6 +36,8 @@ const TASK_OPTIONS = [
   { value: "Patient Care - Prospective Audit & Feedback", label: "Patient Care - Prospective Audit & Feedback" },
   { value: "Patient Care - Authorization of Restricted Antimicrobials", label: "Patient Care - Authorization of Restricted Antimicrobials" },
   { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
+  { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
+  { value: "Patient Care - ASP Rounds (including \"handshake\" ASP)", label: "Patient Care - ASP Rounds (including \"handshake\" ASP)" },
   // Administrative
   { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
   // Tracking

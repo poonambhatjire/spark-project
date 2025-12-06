@@ -19,6 +19,8 @@ const quickLogSchema = z.object({
     'Patient Care - Prospective Audit & Feedback', 
     'Patient Care - Authorization of Restricted Antimicrobials', 
     'Patient Care - Participating in Clinical Rounds',
+    'Patient Care - Curbside ASP Questions',
+    'Patient Care - ASP Rounds (including "handshake" ASP)',
     // Administrative
     'Administrative - Guidelines/EHR',
     // Tracking
@@ -80,6 +82,8 @@ const TASK_OPTIONS = [
   { value: "Patient Care - Prospective Audit & Feedback", label: "Patient Care - Prospective Audit & Feedback" },
   { value: "Patient Care - Authorization of Restricted Antimicrobials", label: "Patient Care - Authorization of Restricted Antimicrobials" },
   { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
+  { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
+  { value: "Patient Care - ASP Rounds (including \"handshake\" ASP)", label: "Patient Care - ASP Rounds (including \"handshake\" ASP)" },
   // Administrative
   { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
   // Tracking
@@ -101,7 +105,7 @@ const TASK_OPTIONS = [
 ]
 
 // Minutes presets
-const MINUTES_PRESETS = [5, 10, 15, 30]
+const MINUTES_PRESETS = [5, 10, 15, 30, 60]
 
 interface QuickLogProps {
   onSubmit: (data: CreateEntryInput) => Promise<void>

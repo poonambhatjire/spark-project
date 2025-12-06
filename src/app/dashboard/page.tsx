@@ -19,6 +19,8 @@ const createEmptyTotals = (): TodayTotals => ({
   'Patient Care - Prospective Audit & Feedback': 0,
   'Patient Care - Authorization of Restricted Antimicrobials': 0,
   'Patient Care - Participating in Clinical Rounds': 0,
+  'Patient Care - Curbside ASP Questions': 0,
+  'Patient Care - ASP Rounds (including "handshake" ASP)': 0,
   'Administrative - Guidelines/EHR': 0,
   'Tracking - AMU': 0,
   'Tracking - AMR': 0,

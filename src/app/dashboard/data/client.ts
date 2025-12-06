@@ -4,6 +4,8 @@ export type Activity =
   | 'Patient Care - Prospective Audit & Feedback' 
   | 'Patient Care - Authorization of Restricted Antimicrobials' 
   | 'Patient Care - Participating in Clinical Rounds'
+  | 'Patient Care - Curbside ASP Questions'
+  | 'Patient Care - ASP Rounds (including "handshake" ASP)'
   // Administrative
   | 'Administrative - Guidelines/EHR'
   // Tracking
@@ -27,6 +29,8 @@ export const PATIENT_CARE_ACTIVITIES: Activity[] = [
   'Patient Care - Prospective Audit & Feedback',
   'Patient Care - Authorization of Restricted Antimicrobials',
   'Patient Care - Participating in Clinical Rounds',
+  'Patient Care - Curbside ASP Questions',
+  'Patient Care - ASP Rounds (including "handshake" ASP)',
 ];
 
 export const isPatientCareTask = (task?: Activity | null): boolean => {
@@ -80,6 +84,8 @@ export interface TodayTotals {
   'Patient Care - Prospective Audit & Feedback': number;
   'Patient Care - Authorization of Restricted Antimicrobials': number;
   'Patient Care - Participating in Clinical Rounds': number;
+  'Patient Care - Curbside ASP Questions': number;
+  'Patient Care - ASP Rounds (including "handshake" ASP)': number;
   // Administrative
   'Administrative - Guidelines/EHR': number;
   // Tracking
@@ -305,6 +311,8 @@ class TimeEntryClient {
       'Patient Care - Prospective Audit & Feedback': 0,
       'Patient Care - Authorization of Restricted Antimicrobials': 0,
       'Patient Care - Participating in Clinical Rounds': 0,
+      'Patient Care - Curbside ASP Questions': 0,
+      'Patient Care - ASP Rounds (including "handshake" ASP)': 0,
       // Administrative
       'Administrative - Guidelines/EHR': 0,
       // Tracking
