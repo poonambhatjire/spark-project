@@ -6,11 +6,12 @@ export type Activity =
   | 'Patient Care - Participating in Clinical Rounds'
   | 'Patient Care - Curbside ASP Questions'
   | 'Patient Care - ASP Rounds (including "handshake" ASP)'
+  | 'Patient Care - Other (please specify under comment section)'
   // Administrative
   | 'Administrative - Guidelines/EHR'
   // Tracking
-  | 'Tracking - AMU'
-  | 'Tracking - AMR' 
+  | 'Tracking - Antimicrobial Use'
+  | 'Tracking - Antimicrobial Resistance' 
   | 'Tracking - Antibiotic Appropriateness'
   | 'Tracking - Intervention Acceptance'
   // Reporting
@@ -22,8 +23,13 @@ export type Activity =
   | 'Administrative - Committee Work'
   | 'Administrative - QI projects/research'
   | 'Administrative - Emails'
-  // Other
-  | 'Other - specify in comments';
+  | 'Administrative - Other (please specify under comment section)'
+  // Tracking
+  | 'Tracking - Other (please specify under comment section)'
+  // Reporting
+  | 'Reporting - Other (please specify under comment section)'
+  // Education
+  | 'Education - Other (please specify under comment section)';
 
 export const PATIENT_CARE_ACTIVITIES: Activity[] = [
   'Patient Care - Prospective Audit & Feedback',
@@ -31,7 +37,14 @@ export const PATIENT_CARE_ACTIVITIES: Activity[] = [
   'Patient Care - Participating in Clinical Rounds',
   'Patient Care - Curbside ASP Questions',
   'Patient Care - ASP Rounds (including "handshake" ASP)',
+  'Patient Care - Other (please specify under comment section)',
 ];
+
+// Helper function to check if a task is an "Other" option that requires specification
+export const isOtherTask = (task?: Activity | null): boolean => {
+  if (!task) return false;
+  return task.includes('Other (please specify under comment section)');
+};
 
 export const isPatientCareTask = (task?: Activity | null): boolean => {
   if (!task) return false;
@@ -86,11 +99,12 @@ export interface TodayTotals {
   'Patient Care - Participating in Clinical Rounds': number;
   'Patient Care - Curbside ASP Questions': number;
   'Patient Care - ASP Rounds (including "handshake" ASP)': number;
+  'Patient Care - Other (please specify under comment section)': number;
   // Administrative
   'Administrative - Guidelines/EHR': number;
   // Tracking
-  'Tracking - AMU': number;
-  'Tracking - AMR': number;
+  'Tracking - Antimicrobial Use': number;
+  'Tracking - Antimicrobial Resistance': number;
   'Tracking - Antibiotic Appropriateness': number;
   'Tracking - Intervention Acceptance': number;
   // Reporting
@@ -102,8 +116,13 @@ export interface TodayTotals {
   'Administrative - Committee Work': number;
   'Administrative - QI projects/research': number;
   'Administrative - Emails': number;
-  // Other
-  'Other - specify in comments': number;
+  'Administrative - Other (please specify under comment section)': number;
+  // Tracking
+  'Tracking - Other (please specify under comment section)': number;
+  // Reporting
+  'Reporting - Other (please specify under comment section)': number;
+  // Education
+  'Education - Other (please specify under comment section)': number;
 }
 
 
@@ -313,24 +332,27 @@ class TimeEntryClient {
       'Patient Care - Participating in Clinical Rounds': 0,
       'Patient Care - Curbside ASP Questions': 0,
       'Patient Care - ASP Rounds (including "handshake" ASP)': 0,
+      'Patient Care - Other (please specify under comment section)': 0,
       // Administrative
       'Administrative - Guidelines/EHR': 0,
       // Tracking
-      'Tracking - AMU': 0,
-      'Tracking - AMR': 0,
+      'Tracking - Antimicrobial Use': 0,
+      'Tracking - Antimicrobial Resistance': 0,
       'Tracking - Antibiotic Appropriateness': 0,
       'Tracking - Intervention Acceptance': 0,
+      'Tracking - Other (please specify under comment section)': 0,
       // Reporting
       'Reporting - sharing data with prescribers/decision makers': 0,
+      'Reporting - Other (please specify under comment section)': 0,
       // Education
       'Education - Providing Education': 0,
       'Education - Receiving Education (e.g. CE)': 0,
+      'Education - Other (please specify under comment section)': 0,
       // Administrative
       'Administrative - Committee Work': 0,
       'Administrative - QI projects/research': 0,
       'Administrative - Emails': 0,
-      // Other
-      'Other - specify in comments': 0
+      'Administrative - Other (please specify under comment section)': 0
     };
 
     todayEntries.forEach(entry => {

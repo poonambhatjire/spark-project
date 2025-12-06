@@ -9,7 +9,7 @@ import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
 
-import { Activity, CreateEntryInput, isPatientCareTask } from "@/app/dashboard/data/client"
+import { Activity, CreateEntryInput, isPatientCareTask, isOtherTask } from "@/app/dashboard/data/client"
 import { telemetry } from "@/lib/telemetry"
 
 // Validation schema
@@ -21,11 +21,12 @@ const quickLogSchema = z.object({
     'Patient Care - Participating in Clinical Rounds',
     'Patient Care - Curbside ASP Questions',
     'Patient Care - ASP Rounds (including "handshake" ASP)',
+    'Patient Care - Other (please specify under comment section)',
     // Administrative
     'Administrative - Guidelines/EHR',
     // Tracking
-    'Tracking - AMU',
-    'Tracking - AMR', 
+    'Tracking - Antimicrobial Use',
+    'Tracking - Antimicrobial Resistance', 
     'Tracking - Antibiotic Appropriateness',
     'Tracking - Intervention Acceptance',
     // Reporting
@@ -37,13 +38,17 @@ const quickLogSchema = z.object({
     'Administrative - Committee Work',
     'Administrative - QI projects/research',
     'Administrative - Emails',
-    // Other
-    'Other - specify in comments'
+    'Administrative - Other (please specify under comment section)',
+    // Tracking
+    'Tracking - Other (please specify under comment section)',
+    // Reporting
+    'Reporting - Other (please specify under comment section)',
+    // Education
+    'Education - Other (please specify under comment section)'
   ] as const, {
     required_error: "Please select a task type",
     invalid_type_error: "Please select a valid task type"
   }),
-  otherTask: z.string().optional(),
   minutes: z.number()
     .min(1, "Minutes must be at least 1")
     .max(480, "Minutes cannot exceed 480 (8 hours)")
@@ -57,13 +62,13 @@ const quickLogSchema = z.object({
   comment: z.string().optional(),
   isTypicalDay: z.boolean()
 }).refine((data) => {
-  if (data.task === 'Other - specify in comments' && (!data.otherTask || data.otherTask.trim() === "")) {
+  if (isOtherTask(data.task) && (!data.comment || data.comment.trim() === "")) {
     return false
   }
   return true
 }, {
-  message: "Please specify the task name",
-  path: ["otherTask"]
+  message: "Please specify the task details in the comment section",
+  path: ["comment"]
 }).refine((data) => {
   if (isPatientCareTask(data.task)) {
     return typeof data.patientCount === 'number' && data.patientCount >= 0
@@ -84,24 +89,26 @@ const TASK_OPTIONS = [
   { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
   { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
   { value: "Patient Care - ASP Rounds (including \"handshake\" ASP)", label: "Patient Care - ASP Rounds (including \"handshake\" ASP)" },
+  { value: "Patient Care - Other (please specify under comment section)", label: "Patient Care - Other (please specify under comment section)" },
   // Administrative
   { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
-  // Tracking
-  { value: "Tracking - AMU", label: "Tracking - AMU" },
-  { value: "Tracking - AMR", label: "Tracking - AMR" },
-  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
-  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
-  // Reporting
-  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
-  // Education
-  { value: "Education - Providing Education", label: "Education - Providing Education" },
-  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
-  // Administrative
   { value: "Administrative - Committee Work", label: "Administrative - Committee Work" },
   { value: "Administrative - QI projects/research", label: "Administrative - QI projects/research" },
   { value: "Administrative - Emails", label: "Administrative - Emails" },
-  // Other
-  { value: "Other - specify in comments", label: "Other - specify in comments" },
+  { value: "Administrative - Other (please specify under comment section)", label: "Administrative - Other (please specify under comment section)" },
+  // Tracking
+  { value: "Tracking - Antimicrobial Use", label: "Tracking - Antimicrobial Use" },
+  { value: "Tracking - Antimicrobial Resistance", label: "Tracking - Antimicrobial Resistance" },
+  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
+  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
+  { value: "Tracking - Other (please specify under comment section)", label: "Tracking - Other (please specify under comment section)" },
+  // Reporting
+  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
+  { value: "Reporting - Other (please specify under comment section)", label: "Reporting - Other (please specify under comment section)" },
+  // Education
+  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
+  { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" },
 ]
 
 // Minutes presets
@@ -139,7 +146,6 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
     resolver: zodResolver(quickLogSchema),
     defaultValues: {
       task: "Patient Care - Prospective Audit & Feedback" as Activity, // Set a default valid task instead of empty string
-      otherTask: "",
       minutes: 30,
       patientCount: 0,
       occurredOn: getCurrentDateTime(),
@@ -184,15 +190,10 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
 
     // Convert datetime-local format to ISO datetime string
     const patientCount = isPatientCareTask(data.task) ? (data.patientCount ?? 0) : null
-    const otherTask =
-      data.task === 'Other - specify in comments'
-        ? (data.otherTask?.trim() || undefined)
-        : undefined
     const comment = data.comment?.trim() ? data.comment.trim() : undefined
 
     const formattedData: CreateEntryInput = {
       task: data.task,
-      otherTask,
       minutes: data.minutes,
       patientCount,
       isTypicalDay: data.isTypicalDay,
@@ -211,7 +212,6 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
       // Clear form but keep task for convenience
       reset({
         task: data.task,
-        otherTask: "",
         minutes: 30,
         patientCount: isPatientCareTask(data.task) ? 0 : null,
         occurredOn: getCurrentDateTime(),
@@ -283,33 +283,12 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
               )}
             </div>
 
-            {/* Other Task Input (conditional) */}
-            {selectedTask === "Other - specify in comments" && (
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="other-task" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Task Name *
-                </label>
-                <Controller
-                  name="otherTask"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="other-task"
-                      placeholder="Specify the task name"
-                      className={`min-h-11 border-2 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 rounded-lg ${
-                        errors.otherTask ? 'border-red-300' : 'border-slate-300 dark:border-slate-600'
-                      } focus-ring`}
-                      aria-describedby={errors.otherTask ? "other-task-error" : undefined}
-                      aria-invalid={!!errors.otherTask}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.otherTask && (
-                  <p id="other-task-error" className="text-sm text-red-600 dark:text-red-400" role="alert">
-                    {errors.otherTask.message}
-                  </p>
-                )}
+            {/* Comment reminder for Other tasks */}
+            {isOtherTask(selectedTask) && (
+              <div className="md:col-span-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <strong>Note:</strong> Please specify the task details in the comment section below.
+                </p>
               </div>
             )}
 

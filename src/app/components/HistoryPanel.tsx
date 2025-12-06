@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/app/components/ui/textarea"
 import { Search, Filter, SortAsc, SortDesc, Edit2, Copy, Trash2, X, Check, Download, ChevronDown } from "lucide-react"
 import { useDebounce } from "@/app/hooks/useDebounce"
-import { TimeEntry, Activity, UpdateEntryInput, isPatientCareTask } from "@/app/dashboard/data/client"
+import { TimeEntry, Activity, UpdateEntryInput, isPatientCareTask, isOtherTask } from "@/app/dashboard/data/client"
 import { exportEntriesToCsv } from "@/app/lib/utils/csv"
 import { exportEntriesToExcel } from "@/app/lib/utils/excel"
 import { Toast, useToast } from "@/app/components/ui/toast"
@@ -38,24 +38,26 @@ const TASK_OPTIONS = [
   { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
   { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
   { value: "Patient Care - ASP Rounds (including \"handshake\" ASP)", label: "Patient Care - ASP Rounds (including \"handshake\" ASP)" },
+  { value: "Patient Care - Other (please specify under comment section)", label: "Patient Care - Other (please specify under comment section)" },
   // Administrative
   { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },
-  // Tracking
-  { value: "Tracking - AMU", label: "Tracking - AMU" },
-  { value: "Tracking - AMR", label: "Tracking - AMR" },
-  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
-  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
-  // Reporting
-  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
-  // Education
-  { value: "Education - Providing Education", label: "Education - Providing Education" },
-  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
-  // Administrative
   { value: "Administrative - Committee Work", label: "Administrative - Committee Work" },
   { value: "Administrative - QI projects/research", label: "Administrative - QI projects/research" },
   { value: "Administrative - Emails", label: "Administrative - Emails" },
-  // Other
-  { value: "Other - specify in comments", label: "Other - specify in comments" }
+  { value: "Administrative - Other (please specify under comment section)", label: "Administrative - Other (please specify under comment section)" },
+  // Tracking
+  { value: "Tracking - Antimicrobial Use", label: "Tracking - Antimicrobial Use" },
+  { value: "Tracking - Antimicrobial Resistance", label: "Tracking - Antimicrobial Resistance" },
+  { value: "Tracking - Antibiotic Appropriateness", label: "Tracking - Antibiotic Appropriateness" },
+  { value: "Tracking - Intervention Acceptance", label: "Tracking - Intervention Acceptance" },
+  { value: "Tracking - Other (please specify under comment section)", label: "Tracking - Other (please specify under comment section)" },
+  // Reporting
+  { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
+  { value: "Reporting - Other (please specify under comment section)", label: "Reporting - Other (please specify under comment section)" },
+  // Education
+  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
+  { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" }
 ]
 
 export function HistoryPanel({
@@ -77,7 +79,6 @@ export function HistoryPanel({
   const [editingMinutes, setEditingMinutes] = useState('')
   const [editingComment, setEditingComment] = useState('')
 const [editingTask, setEditingTask] = useState<Activity | null>(null)
-const [editingOtherTask, setEditingOtherTask] = useState('')
 const [editingPatientCount, setEditingPatientCount] = useState('')
 const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -141,8 +142,8 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
       if (debouncedSearch) {
         const searchLower = debouncedSearch.toLowerCase()
         const commentMatch = entry.comment?.toLowerCase().includes(searchLower)
-        const otherTaskMatch = entry.otherTask?.toLowerCase().includes(searchLower)
-        if (!commentMatch && !otherTaskMatch) return false
+        const taskMatch = entry.task.toLowerCase().includes(searchLower)
+        if (!commentMatch && !taskMatch) return false
       }
 
       return true
@@ -158,8 +159,8 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
           bValue = new Date(b.occurredOn).getTime()
           break
         case 'task':
-          aValue = (a.otherTask || a.task).toLowerCase()
-          bValue = (b.otherTask || b.task).toLowerCase()
+          aValue = a.task.toLowerCase()
+          bValue = b.task.toLowerCase()
           break
         case 'minutes':
           aValue = a.minutes
@@ -219,7 +220,6 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
     setEditingMinutes('')
     setEditingComment('')
   setEditingTask(null)
-  setEditingOtherTask('')
   setEditingPatientCount('')
   setEditingIsTypicalDay(true)
   }, [])
@@ -298,7 +298,6 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
     setEditingMinutes(entry.minutes.toString())
     setEditingComment(entry.comment || '')
   setEditingTask(entry.task)
-  setEditingOtherTask(entry.otherTask || '')
   setEditingPatientCount(
     entry.patientCount !== null && entry.patientCount !== undefined
       ? entry.patientCount.toString()
@@ -333,20 +332,15 @@ const handleSaveEdit = useCallback(async () => {
         patientCountValue = parsedCount
       }
 
-      const trimmedOtherTask = editingTask === 'Other - specify in comments'
-        ? editingOtherTask.trim()
-        : ''
+      const trimmedComment = editingComment.trim()
 
-      if (editingTask === 'Other - specify in comments' && trimmedOtherTask === '') {
-        showToast('Please specify the task name', 'error')
+      if (isOtherTask(editingTask) && trimmedComment === '') {
+        showToast('Please specify the task details in the comment section', 'error')
         return
       }
 
-      const trimmedComment = editingComment.trim()
-
       await onUpdateEntry(editingId, {
         task: editingTask,
-        otherTask: editingTask === 'Other - specify in comments' ? trimmedOtherTask : undefined,
         minutes: minutesValue,
         patientCount: patientCountValue,
         isTypicalDay: editingIsTypicalDay,
@@ -369,7 +363,6 @@ const handleSaveEdit = useCallback(async () => {
   editingTask,
   editingMinutes,
   editingComment,
-  editingOtherTask,
   editingPatientCount,
   editingIsTypicalDay,
   onUpdateEntry,
@@ -715,9 +708,6 @@ const handleSaveEdit = useCallback(async () => {
                         onValueChange={(value) => {
                           const taskValue = value as Activity
                           setEditingTask(taskValue)
-                          if (taskValue !== 'Other - specify in comments') {
-                            setEditingOtherTask('')
-                          }
                           if (isPatientCareTask(taskValue)) {
                             if (editingPatientCount.trim() === '') {
                               setEditingPatientCount('0')
@@ -739,13 +729,10 @@ const handleSaveEdit = useCallback(async () => {
                         </SelectContent>
                       </Select>
 
-                      {editingTask === 'Other - specify in comments' && (
-                        <Input
-                          value={editingOtherTask}
-                          onChange={(e) => setEditingOtherTask(e.target.value)}
-                          placeholder="Specify task name"
-                          className="min-h-9 border-slate-300 dark:border-slate-600 text-sm"
-                        />
+                      {isOtherTask(editingTask) && (
+                        <div className="text-xs text-amber-600 dark:text-amber-400 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded">
+                          Please specify the task details in the comment section below.
+                        </div>
                       )}
 
                       {isPatientCareTask(editingTask) && (
@@ -792,11 +779,8 @@ const handleSaveEdit = useCallback(async () => {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
-                          {entry.task === 'Other - specify in comments' ? 'Other' : entry.task}
+                          {entry.task}
                         </Badge>
-                        {entry.otherTask && (
-                          <span className="text-slate-900 dark:text-slate-100">{entry.otherTask}</span>
-                        )}
                       </div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-4">
                         {isPatientCareTask(entry.task) && (

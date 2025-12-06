@@ -21,9 +21,10 @@ const createEmptyTotals = (): TodayTotals => ({
   'Patient Care - Participating in Clinical Rounds': 0,
   'Patient Care - Curbside ASP Questions': 0,
   'Patient Care - ASP Rounds (including "handshake" ASP)': 0,
+  'Patient Care - Other (please specify under comment section)': 0,
   'Administrative - Guidelines/EHR': 0,
-  'Tracking - AMU': 0,
-  'Tracking - AMR': 0,
+  'Tracking - Antimicrobial Use': 0,
+  'Tracking - Antimicrobial Resistance': 0,
   'Tracking - Antibiotic Appropriateness': 0,
   'Tracking - Intervention Acceptance': 0,
   'Reporting - sharing data with prescribers/decision makers': 0,
@@ -32,7 +33,10 @@ const createEmptyTotals = (): TodayTotals => ({
   'Administrative - Committee Work': 0,
   'Administrative - QI projects/research': 0,
   'Administrative - Emails': 0,
-  'Other - specify in comments': 0
+  'Administrative - Other (please specify under comment section)': 0,
+  'Tracking - Other (please specify under comment section)': 0,
+  'Reporting - Other (please specify under comment section)': 0,
+  'Education - Other (please specify under comment section)': 0
 })
 
 const DataEntryPage = () => {
