@@ -1,7 +1,4 @@
 const steeringCommitteeMembers: Array<{ name: string; organization?: string }> = [
-  { name: "Amy Kang, PharmD", organization: "Chapman School of Pharmacy" },
-  { name: "Brad Langford, PharmD", organization: "University of Toronto" },
-  { name: "Beth Leung, PharmD", organization: "University of Toronto / Unity Health" },
   { name: "Priya Nori, MD", organization: "Montefiore Health System" },
   { name: "Michael Bolaris, MD", organization: "LA County – DHS" },
   { name: "Star Cervantes, PharmD", organization: "Chicago Department of Public Health" },
@@ -23,9 +20,6 @@ const steeringCommitteeMembers: Array<{ name: string; organization?: string }> =
 ]
 
 const AboutPage = () => {
-  const highlightedMembers = steeringCommitteeMembers.slice(0, 6)
-  const additionalMembers = steeringCommitteeMembers.slice(6)
-
   const renderCommitteeMember = (member: { name: string; organization?: string }) => {
     const organizationText =
       member.organization && member.organization.trim().length > 0
@@ -79,10 +73,7 @@ const AboutPage = () => {
               </p>
             </div>
             <div className="max-w-xl lg:pl-6">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-500">
-                Funding Partner
-              </h3>
-              <div className="mt-4 flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white px-8 py-7 shadow-md sm:flex-row sm:items-center sm:gap-8">
+              <div className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white px-8 py-7 shadow-md sm:flex-row sm:items-center sm:gap-8">
                 <div className="flex items-center justify-center rounded-2xl bg-slate-50 px-6 py-4 sm:basis-44">
                   <img
                     src="/sidp-logo.png"
@@ -117,7 +108,7 @@ const AboutPage = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 text-balance">
-              Our Team
+              Core Team Members
             </h2>
             <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Led by experts in infectious diseases, antimicrobial stewardship, and healthcare administration
@@ -263,24 +254,8 @@ const AboutPage = () => {
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {highlightedMembers.map(renderCommitteeMember)}
+            {steeringCommitteeMembers.map(renderCommitteeMember)}
           </div>
-
-          {additionalMembers.length > 0 && (
-            <details className="group mt-6">
-              <summary className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#D25555] transition-colors hover:text-[#B84444] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555]/30 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-                <span className="group-open:hidden">
-                  Show all {steeringCommitteeMembers.length} members
-                </span>
-                <span className="hidden group-open:inline">
-                  Hide additional members
-                </span>
-              </summary>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {additionalMembers.map(renderCommitteeMember)}
-              </div>
-            </details>
-          )}
         </div>
       </section>
     </div>

@@ -238,11 +238,15 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
     <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 h-fit">
       <div className="space-y-6">
         {/* Header */}
-        <div>
+        <div className="space-y-3">
           <h2 className="page-title font-semibold text-slate-900 dark:text-slate-100">Quick Log</h2>
+          <p className="text-base text-slate-700 dark:text-slate-300">
+            Please log only <strong className="font-semibold">Antimicrobial Stewardship</strong> specific activities
+          </p>
         </div>
 
         <form ref={formRef} onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+
           {/* Form Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Task Selection */}
@@ -414,7 +418,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
                         onChange={() => field.onChange(false)}
                         className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                       />
-                      <span>No</span>
+                      <span>No (Please specify under comment section)</span>
                     </label>
                   </div>
                 )}
