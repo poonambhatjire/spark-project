@@ -72,27 +72,27 @@ const AboutPage = () => {
                 implementation of antimicrobial stewardship initiatives.
               </p>
             </div>
-            <div className="max-w-xl lg:pl-6">
-              <div className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white px-8 py-7 shadow-md sm:flex-row sm:items-center sm:gap-8">
-                <div className="flex items-center justify-center rounded-2xl bg-slate-50 px-6 py-4 sm:basis-44">
+            <div className="max-w-2xl lg:pl-6">
+              <div className="flex flex-col gap-8 rounded-3xl border-2 border-slate-200 bg-gradient-to-br from-white to-slate-50 px-10 py-10 shadow-lg sm:flex-row sm:items-center sm:gap-10">
+                <div className="flex items-center justify-center rounded-2xl bg-white px-10 py-8 shadow-sm border border-slate-100 sm:basis-64">
                   <img
                     src="/sidp-logo.png"
                     alt="Society of Infectious Diseases Pharmacists"
-                    className="h-16 w-auto object-contain sm:h-20"
+                    className="h-32 w-auto object-contain sm:h-40 md:h-44 lg:h-48"
                   />
                 </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <p className="text-base font-medium text-slate-700">
+                <div className="flex-1 text-center sm:text-left space-y-4">
+                  <p className="text-lg font-medium text-slate-800 leading-relaxed">
                     The SPARC calculator is made possible through generous support from the Society of Infectious Diseases Pharmacists.
                   </p>
                   <a
                     href="https://sidp.org/"
-                    className="mt-3 inline-flex items-center text-sm font-semibold text-[#D25555] transition-colors hover:text-[#B84444]"
+                    className="inline-flex items-center text-base font-semibold text-[#D25555] transition-colors hover:text-[#B84444] hover:underline"
                     target="_blank"
                     rel="noreferrer"
                   >
                     Learn more about SIDP
-                    <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7l-10 10m0-6v6h6" />
                     </svg>
                   </a>
