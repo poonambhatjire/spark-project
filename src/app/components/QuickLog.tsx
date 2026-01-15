@@ -18,7 +18,6 @@ const quickLogSchema = z.object({
     // Patient Care
     'Patient Care - Prospective Audit & Feedback', 
     'Patient Care - Authorization of Restricted Antimicrobials', 
-    'Patient Care - Participating in Clinical Rounds',
     'Patient Care - Curbside ASP Questions',
     'Patient Care - ASP Rounds (including "handshake" ASP)',
     'Patient Care - Other (please specify under comment section)',
@@ -86,9 +85,8 @@ const TASK_OPTIONS = [
   // Patient Care
   { value: "Patient Care - Prospective Audit & Feedback", label: "Patient Care - Prospective Audit & Feedback" },
   { value: "Patient Care - Authorization of Restricted Antimicrobials", label: "Patient Care - Authorization of Restricted Antimicrobials" },
-  { value: "Patient Care - Participating in Clinical Rounds", label: "Patient Care - Participating in Clinical Rounds" },
-  { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
   { value: "Patient Care - ASP Rounds (including \"handshake\" ASP)", label: "Patient Care - ASP Rounds (including \"handshake\" ASP)" },
+  { value: "Patient Care - Curbside ASP Questions", label: "Patient Care - Curbside ASP Questions" },
   { value: "Patient Care - Other (please specify under comment section)", label: "Patient Care - Other (please specify under comment section)" },
   // Administrative
   { value: "Administrative - Guidelines/EHR", label: "Administrative - Guidelines/EHR" },

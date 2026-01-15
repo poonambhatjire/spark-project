@@ -1,7 +1,28 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+
+const getSiteUrl = async (): Promise<string> => {
+  const explicitUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (explicitUrl) {
+    return explicitUrl.replace(/\/$/, "");
+  }
+
+  const requestHeaders = await headers();
+  const forwardedHost = requestHeaders.get("x-forwarded-host");
+  const forwardedProto = requestHeaders.get("x-forwarded-proto");
+  const host = forwardedHost || requestHeaders.get("host");
+  const protocol = forwardedProto || "http";
+
+  if (host) {
+    return `${protocol}://${host}`.replace(/\/$/, "");
+  }
+
+  return "http://localhost:3000";
+};
 
 export async function signUp(prevState: unknown, formData: FormData) {
   if (!formData || typeof formData.get !== 'function') {
@@ -105,8 +126,9 @@ export async function resetPassword(prevState: unknown, formData: FormData) {
 
   const supabase = await createClient();
   
+  const siteUrl = await getSiteUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password`,
+    redirectTo: `${siteUrl}/reset-password`,
   });
 
   if (error) {
