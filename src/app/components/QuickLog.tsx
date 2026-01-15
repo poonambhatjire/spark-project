@@ -9,7 +9,7 @@ import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
 
-import { Activity, CreateEntryInput, isPatientCareTask, isOtherTask } from "@/app/dashboard/data/client"
+import { CreateEntryInput, isPatientCareTask, isOtherTask } from "@/app/dashboard/data/client"
 import { telemetry } from "@/lib/telemetry"
 
 // Validation schema
@@ -143,7 +143,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
   } = useForm<QuickLogFormData>({
     resolver: zodResolver(quickLogSchema),
     defaultValues: {
-      task: "Patient Care - Prospective Audit & Feedback" as Activity, // Set a default valid task instead of empty string
+      task: "Patient Care - Prospective Audit & Feedback", // Set a default valid task instead of empty string
       minutes: 30,
       patientCount: 0,
       occurredOn: getCurrentDateTime(),
