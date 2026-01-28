@@ -30,6 +30,28 @@ type SortField = 'occurredOn' | 'task' | 'minutes'
 type SortDirection = 'asc' | 'desc'
 type DateRange = 'today' | 'week' | 'all'
 
+const toDateTimeLocalValue = (value: string): string => {
+  if (!value) return ""
+  const date = value.includes("T") ? new Date(value) : new Date(`${value}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return ""
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  const hours = String(date.getHours()).padStart(2, "0")
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+const formatEndDateTime = (startValue: string, minutesValue: number): string => {
+  if (!startValue || Number.isNaN(minutesValue)) return "—"
+  const startDate = new Date(startValue)
+  if (Number.isNaN(startDate.getTime())) return "—"
+  const endDate = new Date(startDate.getTime() + minutesValue * 60_000)
+  const dateLabel = endDate.toLocaleDateString()
+  const timeLabel = endDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  return `${dateLabel} ${timeLabel}`
+}
+
 // Task options for filtering (matching QuickLog task names)
 const TASK_OPTIONS = [
   // Patient Care
@@ -81,6 +103,7 @@ export function HistoryPanel({
 const [editingTask, setEditingTask] = useState<Activity | null>(null)
 const [editingPatientCount, setEditingPatientCount] = useState('')
 const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
+const [editingOccurredOn, setEditingOccurredOn] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
   const [showExportDropdown, setShowExportDropdown] = useState(false)
@@ -222,6 +245,7 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
   setEditingTask(null)
   setEditingPatientCount('')
   setEditingIsTypicalDay(true)
+  setEditingOccurredOn('')
   }, [])
 
   // Handle escape key to close dropdowns and cancel editing
@@ -306,6 +330,7 @@ const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
         : ''
   )
   setEditingIsTypicalDay(entry.isTypicalDay)
+  setEditingOccurredOn(toDateTimeLocalValue(entry.occurredOn))
     // Focus the minutes input after a short delay
     setTimeout(() => editingMinutesRef.current?.focus(), 100)
   }, [])
@@ -318,6 +343,17 @@ const handleSaveEdit = useCallback(async () => {
 
       if (Number.isNaN(minutesValue) || minutesValue < 1 || minutesValue > 480) {
         showToast('Please enter minutes between 1 and 480', 'error')
+        return
+      }
+
+      if (!editingOccurredOn) {
+        showToast('Please select a start date and time', 'error')
+        return
+      }
+
+      const occurredOnDate = new Date(editingOccurredOn)
+      if (Number.isNaN(occurredOnDate.getTime())) {
+        showToast('Please enter a valid start date and time', 'error')
         return
       }
 
@@ -344,6 +380,7 @@ const handleSaveEdit = useCallback(async () => {
         minutes: minutesValue,
         patientCount: patientCountValue,
         isTypicalDay: editingIsTypicalDay,
+        occurredOn: occurredOnDate.toISOString(),
         comment: trimmedComment || undefined
       })
         
@@ -365,6 +402,7 @@ const handleSaveEdit = useCallback(async () => {
   editingComment,
   editingPatientCount,
   editingIsTypicalDay,
+  editingOccurredOn,
   onUpdateEntry,
   showToast,
   filteredAndSortedEntries,
@@ -745,6 +783,22 @@ const handleSaveEdit = useCallback(async () => {
                           placeholder="# of patients"
                         />
                       )}
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                          Start Time
+                        </label>
+                        <Input
+                          type="datetime-local"
+                          value={editingOccurredOn}
+                          onChange={(e) => setEditingOccurredOn(e.target.value)}
+                          className="min-h-9 border-slate-300 dark:border-slate-600 text-sm"
+                          aria-label="Edit start date and time"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          End time: {formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10))}
+                        </p>
+                      </div>
 
                       <div
                         className="flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300"
