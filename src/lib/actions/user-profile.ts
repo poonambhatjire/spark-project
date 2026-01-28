@@ -11,6 +11,7 @@ export interface UserProfileData {
   titleOther?: string // For "Other, please specify" option
   experienceLevel: string
   institution: string
+  institutionOther?: string
 }
 
 export async function updateUserProfile(data: UserProfileData): Promise<{ success: boolean; error?: string }> {
@@ -35,7 +36,16 @@ export async function updateUserProfile(data: UserProfileData): Promise<{ succes
     const normalizedEmail = data.email.trim()
     const normalizedExperience = data.experienceLevel.trim()
     const normalizedInstitution = data.institution.trim()
+    const normalizedInstitutionOther = data.institutionOther?.trim() || ""
     const normalizedTitle = finalTitle.trim()
+    const finalInstitution =
+      normalizedInstitution === "Other" && normalizedInstitutionOther
+        ? normalizedInstitutionOther
+        : normalizedInstitution
+    const institutionNotes =
+      normalizedInstitution !== "Other" && normalizedInstitutionOther
+        ? normalizedInstitutionOther
+        : null
 
     // Update the profile
     const { error } = await supabase
@@ -45,7 +55,8 @@ export async function updateUserProfile(data: UserProfileData): Promise<{ succes
         email: normalizedEmail,
         title: normalizedTitle,
         experience_level: normalizedExperience,
-        institution: normalizedInstitution,
+        institution: finalInstitution,
+        notes: institutionNotes,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id)

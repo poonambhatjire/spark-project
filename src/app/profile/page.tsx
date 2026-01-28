@@ -5,7 +5,7 @@ import UserProfileForm from "@/app/components/UserProfileForm"
 import { Card, CardContent } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import Link from "next/link"
-import { PROFESSIONAL_TITLES } from "@/lib/constants/profile"
+import { INSTITUTIONS, PROFESSIONAL_TITLES } from "@/lib/constants/profile"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -44,7 +44,13 @@ export default async function ProfilePage() {
   const normalizedTitle = isRecognizedTitle ? rawTitle : rawTitle ? "Other, please specify" : ""
   const normalizedTitleOther = isRecognizedTitle ? "" : rawTitle
   const normalizedExperience = (profile?.experience_level as string) || (profile?.years_of_experience as string) || ""
-  const normalizedInstitution = (profile?.institution as string) || (profile?.organization as string) || ""
+  const rawInstitution = (profile?.institution as string) || (profile?.organization as string) || ""
+  const isRecognizedInstitution =
+    rawInstitution !== "" && INSTITUTIONS.includes(rawInstitution as typeof INSTITUTIONS[number])
+  const normalizedInstitution = isRecognizedInstitution ? rawInstitution : rawInstitution ? "Other" : ""
+  const normalizedInstitutionOther = isRecognizedInstitution
+    ? ((profile?.notes as string) || "")
+    : rawInstitution
   const normalizedFullName = (profile?.name as string) || ""
   const normalizedEmail = (profile?.email as string) || user.email || ""
 
@@ -72,7 +78,8 @@ export default async function ProfilePage() {
             title: normalizedTitle,
             titleOther: normalizedTitleOther,
             experienceLevel: normalizedExperience,
-            institution: normalizedInstitution
+            institution: normalizedInstitution,
+            institutionOther: normalizedInstitutionOther
           }}
           isEditing={true}
         />

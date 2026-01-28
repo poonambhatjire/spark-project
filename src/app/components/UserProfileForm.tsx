@@ -7,9 +7,9 @@ import { z } from "zod"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
-// Textarea no longer needed
+import { Textarea } from "@/app/components/ui/textarea"
 
-import { PROFESSIONAL_TITLES, EXPERIENCE_LEVELS } from "@/lib/constants/profile"
+import { PROFESSIONAL_TITLES, EXPERIENCE_LEVELS, INSTITUTIONS } from "@/lib/constants/profile"
 
 // Validation schema for user profile
 const userProfileSchema = z.object({
@@ -18,7 +18,8 @@ const userProfileSchema = z.object({
   title: z.string().min(1, "Professional title is required"),
   titleOther: z.string().optional(),
   experienceLevel: z.string().min(1, "Experience level is required"),
-  institution: z.string().min(2, "Institution is required"),
+  institution: z.string().min(1, "Institution is required"),
+  institutionOther: z.string().optional(),
 }).refine((data) => {
   // If "Other" is selected, titleOther must be provided
   if (data.title === 'Other, please specify') {
@@ -28,6 +29,14 @@ const userProfileSchema = z.object({
 }, {
   message: "Please specify your title",
   path: ["titleOther"]
+}).refine((data) => {
+  if (data.institution === "Other") {
+    return data.institutionOther && data.institutionOther.trim().length >= 2
+  }
+  return true
+}, {
+  message: "Please specify your institution",
+  path: ["institutionOther"]
 })
 
 type UserProfileFormData = z.infer<typeof userProfileSchema>
@@ -57,7 +66,8 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       title: initialData?.title || "",
       titleOther: initialData?.titleOther || "",
       experienceLevel: initialData?.experienceLevel || "",
-      institution: initialData?.institution || ""
+      institution: initialData?.institution || "",
+      institutionOther: initialData?.institutionOther || ""
     }
   })
 
@@ -69,13 +79,15 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
         title: initialData.title || "",
         titleOther: initialData.titleOther || "",
         experienceLevel: initialData.experienceLevel || "",
-        institution: initialData.institution || ""
+        institution: initialData.institution || "",
+        institutionOther: initialData.institutionOther || ""
       })
     }
   }, [initialData, reset])
 
-  // Watch title field to show/hide "Other" input
-  const watchedTitle = watch('title')
+  // Watch fields to show/hide conditional inputs
+  const watchedTitle = watch("title")
+  const watchedInstitution = watch("institution")
 
   const handleFormSubmit = async (data: UserProfileFormData) => {
     setIsSubmitting(true)
@@ -222,15 +234,45 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
             name="institution"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Enter your institution"
-                className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              />
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectValue placeholder="Select your institution" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {INSTITUTIONS.map((institution) => (
+                    <SelectItem key={institution} value={institution}>
+                      {institution}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
           {errors.institution && (
             <p className="text-sm text-red-600">{errors.institution.message}</p>
+          )}
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm font-medium text-slate-700">
+            Institution comments {watchedInstitution === "Other" ? "*" : "(optional)"}
+          </label>
+          <p className="text-xs text-slate-500">
+            If &quot;Other&quot; is selected, or if only your umbrella health system is listed and not your specific hospital,
+            please specify the name of your individual hospital here:
+          </p>
+          <Controller
+            name="institutionOther"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                placeholder="Enter your hospital or institution details"
+                className="min-h-[90px] border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            )}
+          />
+          {errors.institutionOther && (
+            <p className="text-sm text-red-600">{errors.institutionOther.message}</p>
           )}
         </div>
       </div>
