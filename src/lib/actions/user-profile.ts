@@ -47,18 +47,50 @@ export async function updateUserProfile(data: UserProfileData): Promise<{ succes
         ? normalizedInstitutionOther
         : null
 
+    // Get institution_id from institution name
+    let institutionId: string | null = null
+    if (normalizedInstitution && normalizedInstitution !== "Other") {
+      const { data: institution } = await supabase
+        .from('institutions')
+        .select('id')
+        .eq('name', normalizedInstitution)
+        .single()
+      
+      if (institution) {
+        institutionId = institution.id
+      }
+    } else if (normalizedInstitution === "Other") {
+      // Use "Other" institution
+      const { data: otherInst } = await supabase
+        .from('institutions')
+        .select('id')
+        .eq('name', 'Other')
+        .single()
+      
+      if (otherInst) {
+        institutionId = otherInst.id
+      }
+    }
+
     // Update the profile
+    const updateData: Record<string, unknown> = {
+      name: normalizedName,
+      email: normalizedEmail,
+      title: normalizedTitle,
+      experience_level: normalizedExperience,
+      institution: finalInstitution, // Keep for backward compatibility
+      notes: institutionNotes,
+      updated_at: new Date().toISOString()
+    }
+    
+    // Add institution_id if found
+    if (institutionId) {
+      updateData.institution_id = institutionId
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update({
-        name: normalizedName,
-        email: normalizedEmail,
-        title: normalizedTitle,
-        experience_level: normalizedExperience,
-        institution: finalInstitution,
-        notes: institutionNotes,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', user.id)
 
     if (error) {
@@ -95,10 +127,16 @@ export async function getUserProfile(): Promise<{ success: boolean; data?: Recor
       }
     }
 
-    // Get the profile
+    // Get the profile with institution join
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        institutions:institution_id (
+          id,
+          name
+        )
+      `)
       .eq('id', user.id)
       .single()
 
@@ -130,10 +168,16 @@ export async function checkProfileCompletion(): Promise<{ isComplete: boolean; m
       return { isComplete: false, missingFields: [] }
     }
 
-    // Get the profile
+    // Get the profile with institution join
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        institutions:institution_id (
+          id,
+          name
+        )
+      `)
       .eq('id', user.id)
       .single()
 
@@ -141,13 +185,13 @@ export async function checkProfileCompletion(): Promise<{ isComplete: boolean; m
       return { isComplete: false, missingFields: [] }
     }
 
-    // Check required fields
+    // Check required fields (institution_id is now required, but keep institution check for backward compatibility)
     const requiredFields = [
       'name',
       'email',
       'title',
       'experience_level',
-      'institution'
+      'institution_id' // Now checking institution_id instead of institution
     ]
 
     const missingFields = requiredFields.filter(field => {
