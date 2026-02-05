@@ -9,33 +9,22 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Helper function to convert Supabase row to TimeEntry
 const mapSupabaseRowToTimeEntry = (row: Record<string, unknown>): TimeEntry => {
-  // Support both old (task string) and new (activity_id with join) structure
-  let task = row.task as string;
+  // Task is always set (we set it in create/update)
+  const task = (row.task as string) || '';
   
-  // If task is not present, try to get it from joined activities
-  if (!task && row.activities) {
-    const activities = row.activities as { name?: string } | { name?: string }[];
-    if (Array.isArray(activities) && activities[0]?.name) {
-      task = activities[0].name;
-    } else if (!Array.isArray(activities) && activities.name) {
-      task = activities.name;
-    }
-  }
-  
-  if (!task) task = '';
-  
+  // Create clean object for React serialization
   return {
-    id: row.id as string,
+    id: String(row.id || ''),
     task: task as Activity,
-    otherTask: (row.other_task as string) || undefined,
-    minutes: row.minutes as number,
-    patientCount: (row.patient_count as number) ?? null,
-    isTypicalDay: (row.is_typical_day as boolean) ?? true,
-    occurredOn: row.occurred_on as string,
-    comment: (row.comment as string) || undefined,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
-    deletedAt: (row.deleted_at as string) || undefined
+    otherTask: row.other_task ? String(row.other_task) : undefined,
+    minutes: Number(row.minutes || 0),
+    patientCount: row.patient_count !== null && row.patient_count !== undefined ? Number(row.patient_count) : null,
+    isTypicalDay: Boolean(row.is_typical_day ?? true),
+    occurredOn: String(row.occurred_on || ''),
+    comment: row.comment ? String(row.comment) : undefined,
+    createdAt: String(row.created_at || ''),
+    updatedAt: String(row.updated_at || ''),
+    deletedAt: row.deleted_at ? String(row.deleted_at) : undefined
   };
 };
 
@@ -59,14 +48,12 @@ async function getActivityIdFromTask(supabase: SupabaseClient, taskName: string)
 async function mapTimeEntryToSupabaseRow(supabase: SupabaseClient, entry: CreateEntryInput | UpdateEntryInput) {
   const row: Record<string, unknown> = {};
   
-  // If task is provided, look up activity_id
+  // If task is provided, look up activity_id and always set task (required by DB constraint)
   if ('task' in entry && entry.task) {
+    row.task = entry.task; // Always set task (required by DB constraint, will be removed later)
     const activityId = await getActivityIdFromTask(supabase, entry.task);
     if (activityId) {
-      row.activity_id = activityId;
-    } else {
-      // Fallback to old task column for backward compatibility
-      row.task = entry.task;
+      row.activity_id = activityId; // Also set activity_id (normalized structure)
     }
   }
   
@@ -99,6 +86,7 @@ export async function createTimeEntry(input: CreateEntryInput): Promise<{ succes
     
     const insertData: Record<string, unknown> = {
       user_id: user.id,
+      task: input.task, // Always set task (required by DB constraint, will be removed later)
       other_task: input.otherTask,
       minutes: input.minutes,
       patient_count: input.patientCount ?? null,
@@ -107,22 +95,15 @@ export async function createTimeEntry(input: CreateEntryInput): Promise<{ succes
       comment: input.comment
     };
     
-    // Use activity_id if found, otherwise fallback to task string
+    // Also set activity_id if found (normalized structure)
     if (activityId) {
       insertData.activity_id = activityId;
-    } else {
-      insertData.task = input.task; // Fallback for backward compatibility
     }
     
     const { data, error } = await supabase
       .from('time_entries')
       .insert(insertData)
-      .select(`
-        *,
-        activities:activity_id (
-          name
-        )
-      `)
+      .select('*')
       .single();
 
     if (error) {
@@ -167,12 +148,7 @@ export async function updateTimeEntry(id: string, patch: UpdateEntryInput): Prom
       .update(updateData)
       .eq('id', id)
       .eq('user_id', user.id) // Ensure user can only update their own entries
-      .select(`
-        *,
-        activities:activity_id (
-          name
-        )
-      `)
+      .select('*')
       .single();
 
     if (error) {
@@ -250,16 +226,10 @@ export async function listTimeEntries(options: { range?: 'today' | 'week' | 'all
 
   const { range = 'all', task, includeDeleted = false } = options;
     
-    // Join with activities table to get activity name
+    // Select all columns (task is already set, no need for join)
     let query = supabase
       .from('time_entries')
-      .select(`
-        *,
-        activities:activity_id (
-          id,
-          name
-        )
-      `)
+      .select('*')
       .eq('user_id', user.id) // Only show entries for current user
       .order('occurred_on', { ascending: false });
 

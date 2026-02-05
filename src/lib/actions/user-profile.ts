@@ -127,16 +127,10 @@ export async function getUserProfile(): Promise<{ success: boolean; data?: Recor
       }
     }
 
-    // Get the profile with institution join
+    // Get the profile (institution is already in the profile, no need for join)
     const { data, error } = await supabase
       .from('profiles')
-      .select(`
-        *,
-        institutions:institution_id (
-          id,
-          name
-        )
-      `)
+      .select('*')
       .eq('id', user.id)
       .single()
 
@@ -168,16 +162,10 @@ export async function checkProfileCompletion(): Promise<{ isComplete: boolean; m
       return { isComplete: false, missingFields: [] }
     }
 
-    // Get the profile with institution join
+    // Get the profile (institution is already in the profile, no need for join)
     const { data, error } = await supabase
       .from('profiles')
-      .select(`
-        *,
-        institutions:institution_id (
-          id,
-          name
-        )
-      `)
+      .select('*')
       .eq('id', user.id)
       .single()
 
