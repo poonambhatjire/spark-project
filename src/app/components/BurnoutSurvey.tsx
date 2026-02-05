@@ -91,13 +91,35 @@ export default function BurnoutSurvey() {
     }
   }
 
-  const handleResponseChange = (questionNumber: number, value: string) => {
+  const handleResponseChange = async (questionNumber: number, value: string) => {
     const responseValue = parseInt(value, 10)
-    setResponses(prev => ({
-      ...prev,
+    const updatedResponses = {
+      ...responses,
       [questionNumber]: responseValue
-    }))
+    }
+    setResponses(updatedResponses)
     setSaveMessage(null)
+    
+    // Auto-calculate scores if all 12 questions are answered
+    const allAnswered = Array.from({ length: 12 }, (_, i) => i + 1).every(
+      qNum => updatedResponses[qNum] !== undefined && updatedResponses[qNum] >= 1 && updatedResponses[qNum] <= 4
+    )
+    
+    if (allAnswered) {
+      const surveyResponses: BurnoutSurveyResponse[] = Array.from({ length: 12 }, (_, i) => ({
+        questionNumber: i + 1,
+        responseValue: updatedResponses[i + 1]
+      }))
+      
+      // Calculate scores in real-time
+      const calculatedScores = await calculateBurnoutScores(surveyResponses)
+      setScores(calculatedScores)
+      setShowResults(true)
+    } else if (showResults) {
+      // Hide results if not all questions are answered
+      setShowResults(false)
+      setScores(null)
+    }
   }
 
   const handleSubmit = async () => {
@@ -125,8 +147,14 @@ export default function BurnoutSurvey() {
       if (result.success) {
         setSaveMessage({ type: "success", text: "Survey responses saved successfully!" })
         
-        // Calculate and display scores
-        const calculatedScores = await calculateBurnoutScores(surveyResponses)
+        // Calculate and display scores from the saved responses
+        // Use the current responses state to ensure we have the latest values
+        const currentSurveyResponses: BurnoutSurveyResponse[] = Array.from({ length: 12 }, (_, i) => ({
+          questionNumber: i + 1,
+          responseValue: responses[i + 1]
+        }))
+        
+        const calculatedScores = await calculateBurnoutScores(currentSurveyResponses)
         setScores(calculatedScores)
         setShowResults(true)
       } else {

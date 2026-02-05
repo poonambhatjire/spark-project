@@ -73,37 +73,28 @@ export async function saveBurnoutSurvey(
       }
     }
 
-    // Delete existing responses for this user
-    const { error: deleteError } = await supabase
-      .from('burnout_survey_responses')
-      .delete()
-      .eq('user_id', user.id)
-
-    if (deleteError) {
-      console.error('Error deleting existing responses:', deleteError)
-      return {
-        success: false,
-        error: 'Failed to clear previous responses'
-      }
-    }
-
-    // Insert new responses
-    const insertData = responses.map(response => ({
-      user_id: user.id,
-      question_number: response.questionNumber,
-      response_value: response.responseValue,
-      completed_at: new Date().toISOString()
-    }))
-
-    const { error: insertError } = await supabase
-      .from('burnout_survey_responses')
-      .insert(insertData)
-
-    if (insertError) {
-      console.error('Error saving survey responses:', insertError)
-      return {
-        success: false,
-        error: 'Failed to save survey responses'
+    // Use individual upserts for each question to handle the unique constraint properly
+    // This ensures each question is inserted or updated correctly
+    const completedAt = new Date().toISOString()
+    
+    for (const response of responses) {
+      const { error: upsertError } = await supabase
+        .from('burnout_survey_responses')
+        .upsert({
+          user_id: user.id,
+          question_number: response.questionNumber,
+          response_value: response.responseValue,
+          completed_at: completedAt
+        }, {
+          onConflict: 'user_id,question_number'
+        })
+      
+      if (upsertError) {
+        console.error(`Error saving question ${response.questionNumber}:`, upsertError)
+        return {
+          success: false,
+          error: `Failed to save question ${response.questionNumber}: ${upsertError.message}`
+        }
       }
     }
 
