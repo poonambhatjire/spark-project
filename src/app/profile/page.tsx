@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getUserProfile } from "@/lib/actions/user-profile"
 import UserProfileForm from "@/app/components/UserProfileForm"
+import BurnoutSurvey from "@/app/components/BurnoutSurvey"
 import { Card, CardContent } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
 import Link from "next/link"
@@ -83,6 +84,11 @@ export default async function ProfilePage() {
           }}
           isEditing={true}
         />
+
+        {/* Burnout Survey */}
+        <div className="mt-8">
+          <BurnoutSurvey />
+        </div>
 
         {/* Back to Data Entry */}
         <div className="mt-8 text-center">
