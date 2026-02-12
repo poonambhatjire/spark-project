@@ -239,6 +239,42 @@ p {
   }
 }
 
+/* docx-preview (Appendices page) - override library's gray bg and dark box-shadow */
+.docx-wrapper {
+  padding: 1.5rem 0;
+}
+
+/* Remove docx-preview's gray wrapper background and dark "selected" shadow overlay */
+.docx-wrapper .docx-wrapper {
+  background: transparent !important;
+}
+
+.docx-wrapper section.docx,
+.docx-wrapper .docx,
+.docx-wrapper [class*="docx"] {
+  background: white !important;
+  box-shadow: none !important;
+}
+
+.docx-wrapper table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.docx-wrapper th,
+.docx-wrapper td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.docx-wrapper th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #334155;
+}
+
 /* Print styles */
 @media print {
   .no-print {

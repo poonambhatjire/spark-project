@@ -247,6 +247,17 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
 
           {/* Form Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Appendices Link */}
+            <div className="md:col-span-2">
+              <a
+                href="/appendices"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Antimicrobial Stewardship Program Activity Definitions
+              </a>
+            </div>
             {/* Task Selection */}
             <div className="space-y-2 md:col-span-2">
               <label htmlFor="task-select" className="text-sm font-medium text-slate-700 dark:text-slate-300">

@@ -34,7 +34,7 @@ const RESPONSE_OPTIONS = [
   { value: "4", label: "Strongly Disagree (+4)" }
 ]
 
-type TabType = "purpose" | "keyFacts" | "contents"
+type TabType = "purpose" | "keyFacts"
 
 export default function BurnoutSurvey() {
   const [responses, setResponses] = useState<Record<number, number>>({})
@@ -45,6 +45,7 @@ export default function BurnoutSurvey() {
   const [showResults, setShowResults] = useState(false)
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [isSurveyCompleted, setIsSurveyCompleted] = useState(false)
 
   useEffect(() => {
     loadSurveyData()
@@ -69,6 +70,7 @@ export default function BurnoutSurvey() {
             const calculatedScores = await calculateBurnoutScores(result.data.responses)
             setScores(calculatedScores)
             setShowResults(true)
+            setIsSurveyCompleted(true)
           }
         } else {
           // No data yet, but that's okay - show empty form
@@ -148,7 +150,6 @@ export default function BurnoutSurvey() {
         setSaveMessage({ type: "success", text: "Survey responses saved successfully!" })
         
         // Calculate and display scores from the saved responses
-        // Use the current responses state to ensure we have the latest values
         const currentSurveyResponses: BurnoutSurveyResponse[] = Array.from({ length: 12 }, (_, i) => ({
           questionNumber: i + 1,
           responseValue: responses[i + 1]
@@ -157,6 +158,7 @@ export default function BurnoutSurvey() {
         const calculatedScores = await calculateBurnoutScores(currentSurveyResponses)
         setScores(calculatedScores)
         setShowResults(true)
+        setIsSurveyCompleted(true)
       } else {
         setSaveMessage({ type: "error", text: result.error || "Failed to save survey responses." })
       }
@@ -223,10 +225,14 @@ export default function BurnoutSurvey() {
         <p className="text-slate-600 text-sm">
           Helps evaluate burnout severity based on exhaustion and disengagement statements.
         </p>
+        <p className="text-slate-500 text-sm mt-1 italic">
+          This is a one-time survey. Once submitted, your responses cannot be changed.
+        </p>
 
         {/* Tabs */}
         <div className="flex gap-2 mt-4 border-b border-slate-200">
           <button
+            type="button"
             onClick={() => setActiveTab("purpose")}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === "purpose"
@@ -237,6 +243,7 @@ export default function BurnoutSurvey() {
             Purpose
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("keyFacts")}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === "keyFacts"
@@ -245,16 +252,6 @@ export default function BurnoutSurvey() {
             }`}
           >
             Key Facts
-          </button>
-          <button
-            onClick={() => setActiveTab("contents")}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === "contents"
-                ? "text-slate-900 border-b-2 border-slate-900"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            Contents
           </button>
         </div>
 
@@ -274,17 +271,7 @@ export default function BurnoutSurvey() {
               <p><strong>• Higher Scores:</strong> Indicate higher levels of burnout</p>
               <p><strong>• Reverse Scoring:</strong> Some positive statements are reverse-scored</p>
               <p><strong>• Completion Time:</strong> Approximately 5-10 minutes</p>
-            </div>
-          )}
-          {activeTab === "contents" && (
-            <div className="space-y-2">
-              <p><strong>Survey Structure:</strong></p>
-              <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>12 statements about work-related feelings and experiences</li>
-                <li>4-point Likert scale response options</li>
-                <li>Automatic calculation of exhaustion and disengagement scores</li>
-                <li>Results interpretation based on validated thresholds</li>
-              </ul>
+              <p><strong>• One-Time Survey:</strong> Responses cannot be changed after submission</p>
             </div>
           )}
         </div>
@@ -307,45 +294,8 @@ export default function BurnoutSurvey() {
           </div>
         )}
 
-        {/* Results Section */}
-        {showResults && scores && (
-          <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Burnout Assessment Results</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="p-3 bg-white rounded border border-slate-200">
-                <p className="text-sm text-slate-600 mb-1">Exhaustion Score</p>
-                <p className="text-2xl font-bold text-slate-900">{scores.exhaustionAverage}</p>
-                <p className={`text-sm font-medium ${getScoreInterpretation(scores.exhaustionAverage).color}`}>
-                  {getScoreInterpretation(scores.exhaustionAverage).level} - {getScoreInterpretation(scores.exhaustionAverage).description}
-                </p>
-              </div>
-              
-              <div className="p-3 bg-white rounded border border-slate-200">
-                <p className="text-sm text-slate-600 mb-1">Disengagement Score</p>
-                <p className="text-2xl font-bold text-slate-900">{scores.disengagementAverage}</p>
-                <p className={`text-sm font-medium ${getScoreInterpretation(scores.disengagementAverage).color}`}>
-                  {getScoreInterpretation(scores.disengagementAverage).level} - {getScoreInterpretation(scores.disengagementAverage).description}
-                </p>
-              </div>
-              
-              <div className="p-3 bg-white rounded border border-slate-200">
-                <p className="text-sm text-slate-600 mb-1">Overall Average</p>
-                <p className="text-2xl font-bold text-slate-900">{scores.totalAverage}</p>
-                <p className={`text-sm font-medium ${getScoreInterpretation(scores.totalAverage).color}`}>
-                  {getScoreInterpretation(scores.totalAverage).level} - {getScoreInterpretation(scores.totalAverage).description}
-                </p>
-              </div>
-            </div>
-            
-            <p className="text-xs text-slate-600 italic">
-              Note: These scores are for informational purposes only and should not replace professional medical advice.
-            </p>
-          </div>
-        )}
-
         {/* Survey Questions */}
-        <div className="space-y-4">
+        <div className={`space-y-4 ${isSurveyCompleted ? "opacity-60 pointer-events-none" : ""}`}>
           {OLBI_QUESTIONS.map((question, index) => {
             const questionNumber = index + 1
             const currentValue = responses[questionNumber]?.toString() || ""
@@ -360,6 +310,7 @@ export default function BurnoutSurvey() {
                   <Select
                     value={currentValue}
                     onValueChange={(value) => handleResponseChange(questionNumber, value)}
+                    disabled={isSurveyCompleted}
                   >
                     <SelectTrigger className="w-full max-w-xs border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                       <SelectValue placeholder="Select" />
@@ -394,12 +345,50 @@ export default function BurnoutSurvey() {
         <div className="mt-6 flex justify-end">
           <Button
             onClick={handleSubmit}
-            disabled={isSaving}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            disabled={isSaving || isSurveyCompleted}
+            className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Saving..." : "Save Survey Responses"}
+            {isSaving ? "Saving..." : isSurveyCompleted ? "Survey Completed" : "Save Survey Responses"}
           </Button>
         </div>
+
+        {/* Results Section - moved to bottom */}
+        {showResults && scores && (
+          <div className="mt-8 pt-8 border-t border-slate-200">
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <h4 className="font-semibold text-slate-900 mb-4">Your Burnout Assessment Results</h4>
+              <div className="grid gap-4 sm:grid-cols-3 mb-4">
+                <div className="p-3 bg-white rounded border border-slate-200">
+                  <p className="text-sm text-slate-600 mb-1">Exhaustion Score</p>
+                  <p className="text-2xl font-bold text-slate-900">{scores.exhaustionAverage}</p>
+                  <p className={`text-sm font-medium ${getScoreInterpretation(scores.exhaustionAverage).color}`}>
+                    {getScoreInterpretation(scores.exhaustionAverage).level} - {getScoreInterpretation(scores.exhaustionAverage).description}
+                  </p>
+                </div>
+                
+                <div className="p-3 bg-white rounded border border-slate-200">
+                  <p className="text-sm text-slate-600 mb-1">Disengagement Score</p>
+                  <p className="text-2xl font-bold text-slate-900">{scores.disengagementAverage}</p>
+                  <p className={`text-sm font-medium ${getScoreInterpretation(scores.disengagementAverage).color}`}>
+                    {getScoreInterpretation(scores.disengagementAverage).level} - {getScoreInterpretation(scores.disengagementAverage).description}
+                  </p>
+                </div>
+                
+                <div className="p-3 bg-white rounded border border-slate-200">
+                  <p className="text-sm text-slate-600 mb-1">Overall Average</p>
+                  <p className="text-2xl font-bold text-slate-900">{scores.totalAverage}</p>
+                  <p className={`text-sm font-medium ${getScoreInterpretation(scores.totalAverage).color}`}>
+                    {getScoreInterpretation(scores.totalAverage).level} - {getScoreInterpretation(scores.totalAverage).description}
+                  </p>
+                </div>
+              </div>
+              
+              <p className="text-xs text-slate-600 italic">
+                Note: These scores are for informational purposes only and should not replace professional medical advice.
+              </p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -8,6 +8,7 @@ interface SelectProps {
   value?: string
   onValueChange?: (value: string) => void
   className?: string
+  disabled?: boolean
 }
 
 interface SelectTriggerProps {
@@ -15,6 +16,7 @@ interface SelectTriggerProps {
   className?: string
   id?: string
   ref?: React.RefObject<HTMLButtonElement | null>
+  disabled?: boolean
 }
 
 interface SelectContentProps {
@@ -39,9 +41,10 @@ const SelectContext = React.createContext<{
   selectedValue: string
   onToggle: () => void
   onSelect: (value: string) => void
+  disabled?: boolean
 } | null>(null)
 
-export function Select({ children, value, onValueChange, className }: SelectProps) {
+export function Select({ children, value, onValueChange, className, disabled }: SelectProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [internalValue, setInternalValue] = React.useState(value || "")
   const selectRef = React.useRef<HTMLDivElement>(null)
@@ -99,6 +102,7 @@ export function Select({ children, value, onValueChange, className }: SelectProp
   }
 
   const handleToggle = () => {
+    if (disabled) return
     console.log('Toggling dropdown, current state:', isOpen)
     setIsOpen(!isOpen)
   }
@@ -108,6 +112,7 @@ export function Select({ children, value, onValueChange, className }: SelectProp
     selectedValue: internalValue,
     onToggle: handleToggle,
     onSelect: handleSelect,
+    disabled,
   }
 
   return (
@@ -119,17 +124,20 @@ export function Select({ children, value, onValueChange, className }: SelectProp
   )
 }
 
-export function SelectTrigger({ children, className, ref, ...props }: SelectTriggerProps) {
+export function SelectTrigger({ children, className, ref, disabled, ...props }: SelectTriggerProps) {
   const context = React.useContext(SelectContext)
   if (!context) {
     throw new Error("SelectTrigger must be used within a Select component")
   }
 
+  const isDisabled = disabled ?? context.disabled
+
   return (
     <button
       ref={ref}
       type="button"
-      className={`flex items-center justify-between w-full px-3 py-2 text-left border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 focus-ring ${className}`}
+      disabled={isDisabled}
+      className={`flex items-center justify-between w-full px-3 py-2 text-left border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 focus-ring disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-800 ${className}`}
       onClick={context.onToggle}
       {...props}
     >
