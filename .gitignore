@@ -22,6 +22,7 @@
 
 # misc
 .DS_Store
+SPARC_Database_Export_*.xlsx
 *.pem
 
 # debug

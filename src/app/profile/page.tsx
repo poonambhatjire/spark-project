@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getUserProfile } from "@/lib/actions/user-profile"
 import UserProfileForm from "@/app/components/UserProfileForm"
+import AdditionalSurvey from "@/app/components/AdditionalSurvey"
 import BurnoutSurvey from "@/app/components/BurnoutSurvey"
 import { Card, CardContent } from "@/app/components/ui/card"
 import { Button } from "@/app/components/ui/button"
@@ -84,6 +85,9 @@ export default async function ProfilePage() {
           }}
           isEditing={true}
         />
+
+        {/* Additional Survey (Time-in-motion) */}
+        <AdditionalSurvey />
 
         {/* Burnout Survey */}
         <div className="mt-8">

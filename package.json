@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
-    "db:setup": "echo 'Database setup complete. See database/schema.sql and database/setup-instructions.md'"
+    "db:setup": "echo 'Database setup complete. See database/schema.sql and database/setup-instructions.md'",
+    "db:migrate:additional-survey": "node scripts/run-additional-survey-migration.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -36,6 +37,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.8",
+    "pg": "^8.18.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
