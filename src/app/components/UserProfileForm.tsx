@@ -157,6 +157,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       if (result.success && result.data) {
         const d = result.data
         setOccupiedMode(d.occupiedBedsPercent != null ? "percent" : "exact")
+        setDecimalRawInput({})
         reset((prev) => ({
           ...prev,
           licensedBeds: d.licensedBeds ?? null,
@@ -188,31 +189,35 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
   const watchedInstitution = watch("institution")
   const watchedEffectiveness = watch("effectivenessOptions") ?? []
 
-  const QuestionBlock = ({
-    title,
-    children,
-  }: {
-    title: string
-    children: React.ReactNode
-  }) => (
-    <div className="flex gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
-      <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">{title}</h3>
-        {children}
-      </div>
-    </div>
-  )
-
   const handleIntegerInput = (value: string) => {
     const filtered = value.replace(/[^0-9]/g, "")
     return filtered === "" ? null : parseInt(filtered, 10)
   }
 
-  const handleDecimalInput = (value: string) => {
+  const [decimalRawInput, setDecimalRawInput] = useState<Record<string, string>>({})
+
+  const handleDecimalInput = (
+    value: string,
+    fieldName: string,
+    onChange: (v: number | null) => void
+  ) => {
     const filtered = value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1")
-    if (filtered === "" || filtered === ".") return null
+    setDecimalRawInput((prev) => ({ ...prev, [fieldName]: filtered }))
+    if (filtered === "" || filtered === ".") {
+      onChange(null)
+      return
+    }
+    if (filtered.endsWith(".")) {
+      return
+    }
     const num = parseFloat(filtered)
-    return isNaN(num) ? null : num
+    onChange(isNaN(num) ? null : num)
+  }
+
+  const getDecimalDisplayValue = (fieldName: string, fieldValue: number | null | undefined): string => {
+    const raw = decimalRawInput[fieldName]
+    if (raw !== undefined && raw !== "") return raw
+    return fieldValue != null ? String(fieldValue) : ""
   }
 
   const handleFormSubmit = async (data: UserProfileFormData) => {
@@ -434,14 +439,13 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
         </div>
       </div>
 
-      {/* Additional survey questions */}
+      {/* Additional survey questions - same styling as profile */}
       {surveyLoaded && (
-        <div className="space-y-6 pt-6 border-t border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Time-in-Motion Information
-          </h2>
-
-          <QuestionBlock title="How many licensed beds does your hospital have?">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              How many licensed beds does your hospital have?
+            </label>
             <div className="flex items-center gap-2">
               <Controller
                 name="licensedBeds"
@@ -459,9 +463,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
               />
               <span className="text-slate-500 text-sm">beds</span>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock title="On a typical day in your hospital, how many beds are occupied?">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              On a typical day in your hospital, how many beds are occupied?
+            </label>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-slate-500 mb-2">If you know the exact number:</p>
@@ -498,12 +505,13 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                         type="text"
                         inputMode="decimal"
                         placeholder="0"
-                        value={occupiedMode === "percent" ? (field.value ?? "") : ""}
+                        value={occupiedMode === "percent" ? getDecimalDisplayValue("occupiedBedsPercent", field.value ?? null) : ""}
                         onChange={(e) => {
                           setOccupiedMode("percent")
-                          field.onChange(handleDecimalInput(e.target.value))
+                          handleDecimalInput(e.target.value, "occupiedBedsPercent", field.onChange)
                           setValue("occupiedBedsCount", null)
                         }}
+                        onBlur={() => setDecimalRawInput((prev) => ({ ...prev, occupiedBedsPercent: "" }))}
                         className="w-28"
                       />
                     )}
@@ -512,9 +520,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                 </div>
               </div>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock title="How many ICU beds does your hospital have?">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              How many ICU beds does your hospital have?
+            </label>
             <div className="flex items-center gap-2">
               <Controller
                 name="icuBeds"
@@ -532,11 +543,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
               />
               <span className="text-slate-500 text-sm">beds</span>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock
-            title="What is your current FTE (full‑time equivalent) dedicated to antimicrobial stewardship? (Enter a number between 0 and 1)"
-          >
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              What is your current FTE (full‑time equivalent) dedicated to antimicrobial stewardship? (Enter a number between 0 and 1)
+            </label>
             <div className="flex items-center gap-2">
               <Controller
                 name="aspFte"
@@ -546,19 +558,21 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                     type="text"
                     inputMode="decimal"
                     placeholder="e.g. 0.5"
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(handleDecimalInput(e.target.value))}
+                    value={getDecimalDisplayValue("aspFte", field.value)}
+                    onChange={(e) => handleDecimalInput(e.target.value, "aspFte", field.onChange)}
+                    onBlur={() => setDecimalRawInput((prev) => ({ ...prev, aspFte: "" }))}
                     className="w-28"
                   />
                 )}
               />
               <span className="text-slate-500 text-sm">FTE</span>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock
-            title="What are the TOTAL current FTEs for each position dedicated to antimicrobial stewardship in your hospital (including yourself)?"
-          >
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              What are the TOTAL current FTEs for each position dedicated to antimicrobial stewardship in your hospital (including yourself)?
+            </label>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[400px] border-collapse">
                 <thead>
@@ -579,10 +593,9 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                             type="text"
                             inputMode="decimal"
                             placeholder="0"
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(handleDecimalInput(e.target.value))
-                            }
+                            value={getDecimalDisplayValue("pharmacistFte", field.value)}
+                            onChange={(e) => handleDecimalInput(e.target.value, "pharmacistFte", field.onChange)}
+                            onBlur={() => setDecimalRawInput((prev) => ({ ...prev, pharmacistFte: "" }))}
                             className="w-full"
                           />
                         )}
@@ -600,10 +613,9 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                             type="text"
                             inputMode="decimal"
                             placeholder="0"
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(handleDecimalInput(e.target.value))
-                            }
+                            value={getDecimalDisplayValue("physicianFte", field.value)}
+                            onChange={(e) => handleDecimalInput(e.target.value, "physicianFte", field.onChange)}
+                            onBlur={() => setDecimalRawInput((prev) => ({ ...prev, physicianFte: "" }))}
                             className="w-full"
                           />
                         )}
@@ -635,10 +647,9 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                               type="text"
                               inputMode="decimal"
                               placeholder="0"
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(handleDecimalInput(e.target.value))
-                              }
+                              value={getDecimalDisplayValue(`other${i}Fte`, field.value)}
+                              onChange={(e) => handleDecimalInput(e.target.value, `other${i}Fte`, field.onChange)}
+                              onBlur={() => setDecimalRawInput((prev) => ({ ...prev, [`other${i}Fte`]: "" }))}
                               className="w-full"
                             />
                           )}
@@ -649,11 +660,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                 </tbody>
               </table>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock
-            title="Considering your hospital's overall inpatient antibacterial use (all antibacterial agents)"
-          >
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Considering your hospital&apos;s overall inpatient antibacterial use (all antibacterial agents)
+            </label>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-slate-500 mb-2">If you have your most recent SAAR value:</p>
@@ -665,11 +677,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                       type="text"
                       inputMode="decimal"
                       placeholder="Enter SAAR value"
-                      value={field.value ?? ""}
+                      value={getDecimalDisplayValue("saarValue", field.value)}
                       onChange={(e) => {
-                        field.onChange(handleDecimalInput(e.target.value))
+                        handleDecimalInput(e.target.value, "saarValue", field.onChange)
                         if (e.target.value) setValue("saarCategory", null)
                       }}
+                      onBlur={() => setDecimalRawInput((prev) => ({ ...prev, saarValue: "" }))}
                       className="w-40"
                     />
                   )}
@@ -710,11 +723,12 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                 />
               </div>
             </div>
-          </QuestionBlock>
+          </div>
 
-          <QuestionBlock
-            title="In the past two years, has your program demonstrated effectiveness in any of the following areas? (Select all that apply)"
-          >
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              In the past two years, has your program demonstrated effectiveness in any of the following areas? (Select all that apply)
+            </label>
             <div className="space-y-2">
               {EFFECTIVENESS_OPTIONS.map((opt) => (
                 <label
@@ -757,7 +771,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                 </div>
               )}
             </div>
-          </QuestionBlock>
+          </div>
         </div>
       )}
     </div>

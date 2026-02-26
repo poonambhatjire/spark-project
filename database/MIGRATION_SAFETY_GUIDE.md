@@ -8,9 +8,10 @@ This guide provides a comprehensive strategy for safely migrating your database 
 ### Phase 1: Pre-Migration Safety (DO THIS FIRST)
 
 #### 1.1 Create Full Backup
-```sql
--- Run this FIRST before any migration
--- File: database/backup-strategy.sql
+```bash
+# Use export script or Supabase Dashboard backup
+SUPABASE_SERVICE_KEY='your_key' ./database/export-with-api-keys.sh
+# Or: Use Supabase Dashboard → Database → Backups
 ```
 
 #### 1.2 Verify Backup Integrity
@@ -19,10 +20,8 @@ This guide provides a comprehensive strategy for safely migrating your database 
 - Review sample data in backup tables
 
 #### 1.3 Test Restore Process (Optional but Recommended)
-```sql
--- Test restore on a copy of your database first
--- File: database/restore-from-backup.sql
-```
+- Use Supabase Dashboard point-in-time recovery on a project copy
+- Or restore a pg_dump backup to a test database
 
 ### Phase 2: Migration Execution
 
@@ -95,16 +94,12 @@ app.post('/admin/backup', async (req, res) => {
 ## 🔄 Migration Rollback Procedures
 
 ### Immediate Rollback (if migration fails)
-```sql
--- File: database/restore-from-backup.sql
--- Use this if migration fails immediately
-```
+- Restore from your pre-migration backup (Supabase Dashboard or pg_dump restore)
+- Use Supabase point-in-time recovery if available
 
 ### Partial Rollback (if issues discovered later)
-```sql
--- File: database/rollback-datetime-timezone-support.sql
--- Use this to revert the schema changes
-```
+- Revert schema changes manually or restore from backup
+- Document rollback steps for your specific migration
 
 ### Application Rollback
 - Revert code changes to previous version
@@ -177,7 +172,7 @@ FROM time_entries;
 
 ### If Migration Fails Immediately
 1. Stop the migration process
-2. Run restore-from-backup.sql
+2. Restore from your pre-migration backup
 3. Verify data integrity
 4. Investigate failure cause
 5. Fix issues and retry

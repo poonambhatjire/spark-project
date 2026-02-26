@@ -53,8 +53,9 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ### Database Setup
 
 1. **Run the database scripts** in Supabase SQL Editor:
-   - `database/fix-user-profile-creation.sql` - Fixes user profile creation
-   - `database/secure-rls-policies.sql` - Implements secure access policies
+   - `database/add-datetime-timezone-support.sql` - Timezone and datetime support
+   - `database/add-additional-survey-table.sql` - Time-in-motion survey
+   - `database/add-burnout-survey-table.sql` - Burnout survey
 
 2. **Set up your admin user** by updating the role in the profiles table
 
@@ -121,7 +122,6 @@ src/
 
 - `PRODUCTION_CONFIG.md` - Production deployment guide
 - `DISABLE_EMAIL_VERIFICATION.md` - Email verification configuration
-- `database/SAMPLE_DATA_README.md` - Sample data documentation
 
 ## 🛠️ Development
 

@@ -79,12 +79,14 @@ ls -lh database/complete_backup_*.sql
 
 ## 🔄 Restore Instructions
 
-To restore from backup, use the `restore-from-backup.sql` script:
+To restore from a SQL backup created by `export-database.sh`:
 
 ```bash
-# Run in Supabase SQL Editor
+# Restore from pg_dump backup (replace with your backup filename)
 psql -h your-db-host -U postgres -d postgres < database/complete_backup_*.sql
 ```
+
+**Note:** For Supabase projects, use the [Supabase Dashboard](https://supabase.com/dashboard) backup and point-in-time recovery features for production restores.
 
 ## 🆘 Emergency Procedures
 
