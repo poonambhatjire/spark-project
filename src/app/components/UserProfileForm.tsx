@@ -8,11 +8,38 @@ import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
+import { Checkbox } from "@/app/components/ui/checkbox"
 
 import { PROFESSIONAL_TITLES, EXPERIENCE_LEVELS, INSTITUTIONS } from "@/lib/constants/profile"
+import {
+  getAdditionalSurvey,
+  saveAdditionalSurvey,
+  type AdditionalSurveyData,
+} from "@/lib/actions/additional-survey"
+import type { UserProfileData } from "@/lib/actions/user-profile"
 
-// Validation schema for user profile
+const SAAR_OPTIONS = [
+  { value: "much_lower", label: "Much lower than predicted (<0.7)" },
+  { value: "slightly_lower", label: "Slightly lower than predicted (0.7 to <1)" },
+  { value: "about_predicted", label: "About as predicted (around 1.0)" },
+  { value: "slightly_higher", label: "Slightly higher than predicted (>1 to 1.3)" },
+  { value: "much_higher", label: "Much higher than predicted (>1.3)" },
+  { value: "dont_know", label: "Don't know" },
+  { value: "not_available", label: "SAAR not available" },
+]
+
+const EFFECTIVENESS_OPTIONS = [
+  { value: "cost_savings", label: "Cost savings/cost avoidance" },
+  { value: "decreased_utilization", label: "Decreased antibiotic utilization" },
+  { value: "decreased_cdiff", label: "Decreased Clostridium difficile infection" },
+  { value: "decreased_resistance", label: "Decreased rate of drug-resistant organisms" },
+  { value: "none", label: "Our ASP has not demonstrated any of the above" },
+  { value: "other", label: "Other (please specify)" },
+]
+
+// Validation schema for user profile + additional survey
 const userProfileSchema = z.object({
+  // Profile
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   email: z.string().trim().email("Enter a valid email address"),
   title: z.string().min(1, "Professional title is required"),
@@ -20,8 +47,25 @@ const userProfileSchema = z.object({
   experienceLevel: z.string().min(1, "Experience level is required"),
   institution: z.string().min(1, "Institution is required"),
   institutionOther: z.string().optional(),
+  // Additional survey (all optional)
+  licensedBeds: z.number().optional().nullable(),
+  occupiedBedsCount: z.number().optional().nullable(),
+  occupiedBedsPercent: z.number().optional().nullable(),
+  icuBeds: z.number().optional().nullable(),
+  aspFte: z.number().optional().nullable(),
+  pharmacistFte: z.number().optional().nullable(),
+  physicianFte: z.number().optional().nullable(),
+  other1Specify: z.string().optional().nullable(),
+  other1Fte: z.number().optional().nullable(),
+  other2Specify: z.string().optional().nullable(),
+  other2Fte: z.number().optional().nullable(),
+  other3Specify: z.string().optional().nullable(),
+  other3Fte: z.number().optional().nullable(),
+  saarValue: z.number().optional().nullable(),
+  saarCategory: z.string().optional().nullable(),
+  effectivenessOptions: z.array(z.string()).optional(),
+  effectivenessOther: z.string().optional().nullable(),
 }).refine((data) => {
-  // If "Other" is selected, titleOther must be provided
   if (data.title === 'Other, please specify') {
     return data.titleOther && data.titleOther.length >= 2
   }
@@ -42,7 +86,7 @@ const userProfileSchema = z.object({
 type UserProfileFormData = z.infer<typeof userProfileSchema>
 
 interface UserProfileFormProps {
-  onSubmit: (data: UserProfileFormData) => Promise<{ success: boolean; error?: string }>
+  onSubmit: (data: UserProfileData) => Promise<{ success: boolean; error?: string }>
   initialData?: Partial<UserProfileFormData>
   isEditing?: boolean
 }
@@ -51,12 +95,15 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [surveyLoaded, setSurveyLoaded] = useState(false)
+  const [occupiedMode, setOccupiedMode] = useState<"exact" | "percent">("exact")
 
   const {
     control,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors }
   } = useForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
@@ -67,45 +114,155 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       titleOther: initialData?.titleOther || "",
       experienceLevel: initialData?.experienceLevel || "",
       institution: initialData?.institution || "",
-      institutionOther: initialData?.institutionOther || ""
+      institutionOther: initialData?.institutionOther || "",
+      licensedBeds: null,
+      occupiedBedsCount: null,
+      occupiedBedsPercent: null,
+      icuBeds: null,
+      aspFte: null,
+      pharmacistFte: null,
+      physicianFte: null,
+      other1Specify: null,
+      other1Fte: null,
+      other2Specify: null,
+      other2Fte: null,
+      other3Specify: null,
+      other3Fte: null,
+      saarValue: null,
+      saarCategory: null,
+      effectivenessOptions: [],
+      effectivenessOther: null,
     }
   })
 
   useEffect(() => {
     if (initialData) {
-      reset({
+      reset((prev) => ({
+        ...prev,
         fullName: initialData.fullName || "",
         email: initialData.email || "",
         title: initialData.title || "",
         titleOther: initialData.titleOther || "",
         experienceLevel: initialData.experienceLevel || "",
         institution: initialData.institution || "",
-        institutionOther: initialData.institutionOther || ""
-      })
+        institutionOther: initialData.institutionOther || "",
+      }))
     }
   }, [initialData, reset])
+
+  useEffect(() => {
+    let mounted = true
+    getAdditionalSurvey().then((result) => {
+      if (!mounted) return
+      if (result.success && result.data) {
+        const d = result.data
+        setOccupiedMode(d.occupiedBedsPercent != null ? "percent" : "exact")
+        reset((prev) => ({
+          ...prev,
+          licensedBeds: d.licensedBeds ?? null,
+          occupiedBedsCount: d.occupiedBedsCount ?? null,
+          occupiedBedsPercent: d.occupiedBedsPercent ?? null,
+          icuBeds: d.icuBeds ?? null,
+          aspFte: d.aspFte ?? null,
+          pharmacistFte: d.pharmacistFte ?? null,
+          physicianFte: d.physicianFte ?? null,
+          other1Specify: d.other1Specify ?? null,
+          other1Fte: d.other1Fte ?? null,
+          other2Specify: d.other2Specify ?? null,
+          other2Fte: d.other2Fte ?? null,
+          other3Specify: d.other3Specify ?? null,
+          other3Fte: d.other3Fte ?? null,
+          saarValue: d.saarValue ?? null,
+          saarCategory: d.saarCategory ?? null,
+          effectivenessOptions: d.effectivenessOptions ?? [],
+          effectivenessOther: d.effectivenessOther ?? null,
+        }))
+      }
+      setSurveyLoaded(true)
+    })
+    return () => { mounted = false }
+  }, [reset])
 
   // Watch fields to show/hide conditional inputs
   const watchedTitle = watch("title")
   const watchedInstitution = watch("institution")
+  const watchedEffectiveness = watch("effectivenessOptions") ?? []
+
+  const QuestionBlock = ({
+    title,
+    children,
+  }: {
+    title: string
+    children: React.ReactNode
+  }) => (
+    <div className="flex gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">{title}</h3>
+        {children}
+      </div>
+    </div>
+  )
+
+  const handleIntegerInput = (value: string) => {
+    const filtered = value.replace(/[^0-9]/g, "")
+    return filtered === "" ? null : parseInt(filtered, 10)
+  }
+
+  const handleDecimalInput = (value: string) => {
+    const filtered = value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1")
+    if (filtered === "" || filtered === ".") return null
+    const num = parseFloat(filtered)
+    return isNaN(num) ? null : num
+  }
 
   const handleFormSubmit = async (data: UserProfileFormData) => {
     setIsSubmitting(true)
     setSubmitError(null)
     setSubmitSuccess(false)
-    
+
+    const profileData = {
+      fullName: data.fullName,
+      email: data.email,
+      title: data.title,
+      titleOther: data.titleOther,
+      experienceLevel: data.experienceLevel,
+      institution: data.institution,
+      institutionOther: data.institutionOther,
+    }
+    const surveyData: AdditionalSurveyData = {
+      licensedBeds: data.licensedBeds ?? null,
+      occupiedBedsCount: occupiedMode === "exact" ? data.occupiedBedsCount ?? null : null,
+      occupiedBedsPercent: occupiedMode === "percent" ? data.occupiedBedsPercent ?? null : null,
+      icuBeds: data.icuBeds ?? null,
+      aspFte: data.aspFte ?? null,
+      pharmacistFte: data.pharmacistFte ?? null,
+      physicianFte: data.physicianFte ?? null,
+      other1Specify: data.other1Specify ?? null,
+      other1Fte: data.other1Fte ?? null,
+      other2Specify: data.other2Specify ?? null,
+      other2Fte: data.other2Fte ?? null,
+      other3Specify: data.other3Specify ?? null,
+      other3Fte: data.other3Fte ?? null,
+      saarValue: data.saarValue ?? null,
+      saarCategory: data.saarCategory ?? null,
+      effectivenessOptions: data.effectivenessOptions ?? [],
+      effectivenessOther: data.effectivenessOther ?? null,
+    }
+
     try {
-      const result = await onSubmit(data)
-      
-      if (result?.success) {
+      const [profileResult, surveyResult] = await Promise.all([
+        onSubmit(profileData),
+        saveAdditionalSurvey(surveyData),
+      ])
+
+      if (profileResult?.success && surveyResult?.success) {
         setSubmitSuccess(true)
-        // Auto-hide success message after 3 seconds
         setTimeout(() => setSubmitSuccess(false), 3000)
       } else {
-        setSubmitError(result?.error || 'Failed to update profile')
+        setSubmitError(profileResult?.error || surveyResult?.error || "Failed to save")
       }
     } catch (error) {
-      setSubmitError('An unexpected error occurred')
+      setSubmitError("An unexpected error occurred")
       console.error("Failed to save profile:", error)
     } finally {
       setIsSubmitting(false)
@@ -276,6 +433,333 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
           )}
         </div>
       </div>
+
+      {/* Additional survey questions */}
+      {surveyLoaded && (
+        <div className="space-y-6 pt-6 border-t border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Time-in-Motion Information
+          </h2>
+
+          <QuestionBlock title="How many licensed beds does your hospital have?">
+            <div className="flex items-center gap-2">
+              <Controller
+                name="licensedBeds"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Enter number"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(handleIntegerInput(e.target.value))}
+                    className="w-28"
+                  />
+                )}
+              />
+              <span className="text-slate-500 text-sm">beds</span>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock title="On a typical day in your hospital, how many beds are occupied?">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-slate-500 mb-2">If you know the exact number:</p>
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="occupiedBedsCount"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="0"
+                        value={occupiedMode === "exact" ? (field.value ?? "") : ""}
+                        onChange={(e) => {
+                          setOccupiedMode("exact")
+                          field.onChange(handleIntegerInput(e.target.value))
+                          setValue("occupiedBedsPercent", null)
+                        }}
+                        className="w-28"
+                      />
+                    )}
+                  />
+                  <span className="text-slate-500 text-sm">beds</span>
+                </div>
+              </div>
+              <div className="border-t border-slate-200 dark:border-slate-600 pt-4">
+                <p className="text-xs text-slate-500 mb-2">Or, if you don&apos;t know the exact number, enter your best estimate:</p>
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="occupiedBedsPercent"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0"
+                        value={occupiedMode === "percent" ? (field.value ?? "") : ""}
+                        onChange={(e) => {
+                          setOccupiedMode("percent")
+                          field.onChange(handleDecimalInput(e.target.value))
+                          setValue("occupiedBedsCount", null)
+                        }}
+                        className="w-28"
+                      />
+                    )}
+                  />
+                  <span className="text-slate-500 text-sm">% of licensed beds</span>
+                </div>
+              </div>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock title="How many ICU beds does your hospital have?">
+            <div className="flex items-center gap-2">
+              <Controller
+                name="icuBeds"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Enter number"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(handleIntegerInput(e.target.value))}
+                    className="w-28"
+                  />
+                )}
+              />
+              <span className="text-slate-500 text-sm">beds</span>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock
+            title="What is your current FTE (full‑time equivalent) dedicated to antimicrobial stewardship? (Enter a number between 0 and 1)"
+          >
+            <div className="flex items-center gap-2">
+              <Controller
+                name="aspFte"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="e.g. 0.5"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(handleDecimalInput(e.target.value))}
+                    className="w-28"
+                  />
+                )}
+              />
+              <span className="text-slate-500 text-sm">FTE</span>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock
+            title="What are the TOTAL current FTEs for each position dedicated to antimicrobial stewardship in your hospital (including yourself)?"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[400px] border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-600">
+                    <th className="text-left py-2 pr-4 text-xs font-medium text-slate-500 uppercase tracking-wider">Position</th>
+                    <th className="text-left py-2 pr-2 text-xs font-medium text-slate-500 uppercase tracking-wider w-24">FTE</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  <tr>
+                    <td className="py-2 pr-4 text-slate-700 dark:text-slate-300">Pharmacist</td>
+                    <td className="py-2">
+                      <Controller
+                        name="pharmacistFte"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(handleDecimalInput(e.target.value))
+                            }
+                            className="w-full"
+                          />
+                        )}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 text-slate-700 dark:text-slate-300">Physician</td>
+                    <td className="py-2">
+                      <Controller
+                        name="physicianFte"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(handleDecimalInput(e.target.value))
+                            }
+                            className="w-full"
+                          />
+                        )}
+                      />
+                    </td>
+                  </tr>
+                  {[1, 2, 3].map((i) => (
+                    <tr key={i}>
+                      <td className="py-2 pr-4">
+                        <Controller
+                          name={i === 1 ? "other1Specify" : i === 2 ? "other2Specify" : "other3Specify"}
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              value={field.value ?? ""}
+                              placeholder="Other (specify)"
+                              className="w-full placeholder:text-slate-400"
+                            />
+                          )}
+                        />
+                      </td>
+                      <td className="py-2">
+                        <Controller
+                          name={i === 1 ? "other1Fte" : i === 2 ? "other2Fte" : "other3Fte"}
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              inputMode="decimal"
+                              placeholder="0"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(handleDecimalInput(e.target.value))
+                              }
+                              className="w-full"
+                            />
+                          )}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock
+            title="Considering your hospital's overall inpatient antibacterial use (all antibacterial agents)"
+          >
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-slate-500 mb-2">If you have your most recent SAAR value:</p>
+                <Controller
+                  name="saarValue"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="Enter SAAR value"
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        field.onChange(handleDecimalInput(e.target.value))
+                        if (e.target.value) setValue("saarCategory", null)
+                      }}
+                      className="w-40"
+                    />
+                  )}
+                />
+              </div>
+              <div className="border-t border-slate-200 dark:border-slate-600 pt-4">
+                <p className="text-xs text-slate-500 mb-2">
+                  If you do not know the exact SAAR number then select from the dropdown:
+                </p>
+                <Controller
+                  name="saarCategory"
+                  control={control}
+                  render={({ field }) => {
+                    const selectedOption = SAAR_OPTIONS.find((opt) => opt.value === (field.value ?? ""))
+                    return (
+                      <Select
+                        value={field.value ?? ""}
+                        onValueChange={(v) => {
+                          field.onChange(v || null)
+                          if (v) setValue("saarValue", null)
+                        }}
+                      >
+                        <SelectTrigger className="w-full max-w-md">
+                          <span className={field.value ? "text-slate-900 dark:text-slate-100" : "text-slate-400"}>
+                            {selectedOption ? selectedOption.label : "Select option"}
+                          </span>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SAAR_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )
+                  }}
+                />
+              </div>
+            </div>
+          </QuestionBlock>
+
+          <QuestionBlock
+            title="In the past two years, has your program demonstrated effectiveness in any of the following areas? (Select all that apply)"
+          >
+            <div className="space-y-2">
+              {EFFECTIVENESS_OPTIONS.map((opt) => (
+                <label
+                  key={opt.value}
+                  className="flex items-center gap-3 py-1.5 px-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 cursor-pointer"
+                >
+                  <Controller
+                    name="effectivenessOptions"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id={`eff-${opt.value}`}
+                        checked={watchedEffectiveness.includes(opt.value)}
+                        onCheckedChange={(checked) => {
+                          const next = checked
+                            ? [...watchedEffectiveness, opt.value]
+                            : watchedEffectiveness.filter((v) => v !== opt.value)
+                          field.onChange(next)
+                        }}
+                      />
+                    )}
+                  />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{opt.label}</span>
+                </label>
+              ))}
+              {watchedEffectiveness.includes("other") && (
+                <div className="mt-3 ml-1">
+                  <Controller
+                    name="effectivenessOther"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        value={field.value ?? ""}
+                        placeholder="Please specify..."
+                        className="w-full max-w-md"
+                      />
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          </QuestionBlock>
+        </div>
+      )}
     </div>
   )
 
@@ -295,6 +779,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                   : "Help us personalize your SPARC experience with professional information"
                 }
               </p>
+              <p className="text-slate-500 text-sm mt-1">* indicates required field</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">

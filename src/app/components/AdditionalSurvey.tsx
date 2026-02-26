@@ -132,12 +132,6 @@ export default function AdditionalSurvey() {
 
   return (
     <Card className="mt-8 shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl">Time-in-motion Study: Additional Survey Items</CardTitle>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-          Please complete the following questions about your hospital and ASP.
-        </p>
-      </CardHeader>
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Q1 */}
