@@ -18,6 +18,18 @@ export const csvUtils = {
     return stringValue
   },
 
+  // Get end datetime: prefer entry.endedAt from DB, else compute from occurredOn + minutes
+  getEndedAt: (entry: TimeEntry): string => {
+    if (entry.endedAt) return entry.endedAt
+    try {
+      const start = new Date(entry.occurredOn.includes('T') ? entry.occurredOn : `${entry.occurredOn}T00:00:00`)
+      const end = new Date(start.getTime() + entry.minutes * 60_000)
+      return end.toISOString()
+    } catch {
+      return ''
+    }
+  },
+
   // Convert TimeEntry to CSV row
   entryToCsvRow: (entry: TimeEntry): string => {
     const fields = [
@@ -25,6 +37,7 @@ export const csvUtils = {
       entry.task,
       entry.otherTask || '',
       entry.minutes,
+      csvUtils.getEndedAt(entry),
       entry.patientCount ?? '',
       entry.isTypicalDay ? 'Yes' : 'No',
       entry.comment || '',
@@ -42,6 +55,7 @@ export const csvUtils = {
       'Task',
       'Other Task',
       'Minutes',
+      'End Date & Time',
       'Patient Count',
       'Typical Day',
       'Comment',

@@ -21,6 +21,7 @@ const mapSupabaseRowToTimeEntry = (row: Record<string, unknown>): TimeEntry => {
     patientCount: row.patient_count !== null && row.patient_count !== undefined ? Number(row.patient_count) : null,
     isTypicalDay: Boolean(row.is_typical_day ?? true),
     occurredOn: String(row.occurred_on || ''),
+    endedAt: row.ended_at ? String(row.ended_at) : undefined,
     comment: row.comment ? String(row.comment) : undefined,
     createdAt: String(row.created_at || ''),
     updatedAt: String(row.updated_at || ''),

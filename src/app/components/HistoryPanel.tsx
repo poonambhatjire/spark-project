@@ -54,6 +54,17 @@ const formatEndDateTime = (startValue: string, minutesValue: number): string => 
   return `${dateLabel} ${timeLabel}`
 }
 
+/** Use DB endedAt when available, otherwise compute from occurredOn + minutes */
+const getEndDateTimeDisplay = (entry: TimeEntry): string => {
+  if (entry.endedAt) {
+    const d = new Date(entry.endedAt)
+    if (!Number.isNaN(d.getTime())) {
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    }
+  }
+  return formatEndDateTime(entry.occurredOn, entry.minutes)
+}
+
 // Task options for filtering (matching QuickLog task names)
 const TASK_OPTIONS = [
   // Patient Care
@@ -799,7 +810,7 @@ const handleSaveEdit = useCallback(async () => {
                           aria-label="Edit start date and time"
                         />
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          End time: {formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10))}
+                          End time: {formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10) || 0)}
                         </p>
                       </div>
 
@@ -868,7 +879,7 @@ const handleSaveEdit = useCallback(async () => {
                     <td className="py-2 px-2 text-slate-600 dark:text-slate-300">
                       {editingId === entry.id
                         ? formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10) || 0)
-                        : formatEndDateTime(entry.occurredOn, entry.minutes)}
+                        : getEndDateTimeDisplay(entry)}
                     </td>
                     <td className="py-2 px-2">
                       {editingId === entry.id ? (

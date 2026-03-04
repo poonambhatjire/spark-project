@@ -59,6 +59,7 @@ export interface TimeEntry {
   patientCount?: number | null;
   isTypicalDay: boolean;
   occurredOn: string;       // ISO datetime (YYYY-MM-DDTHH:mm:ssZ)
+  endedAt?: string;         // ISO datetime - computed from occurredOn + minutes (from DB)
   comment?: string;
   createdAt: string;        // ISO datetime
   updatedAt: string;        // ISO datetime

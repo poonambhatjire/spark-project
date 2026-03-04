@@ -2,13 +2,24 @@ import { TimeEntry } from "@/app/dashboard/data/client"
 
 // Excel export utilities
 export const excelUtils = {
+  // Get end datetime: prefer entry.endedAt from DB, else compute from occurredOn + minutes
+  getEndedAt: (entry: TimeEntry): string => {
+    if (entry.endedAt) return entry.endedAt
+    try {
+      const start = new Date(entry.occurredOn.includes('T') ? entry.occurredOn : `${entry.occurredOn}T00:00:00`)
+      const end = new Date(start.getTime() + entry.minutes * 60_000)
+      return end.toISOString()
+    } catch {
+      return ''
+    }
+  },
+
   // Convert TimeEntry to Excel row
   entryToExcelRow: (entry: TimeEntry): Record<string, string | number> => {
     // Format date only (no time) in browser's timezone
     const formatDateForExcel = (dateString: string): string => {
       try {
         const date = new Date(dateString)
-        // Use browser's timezone for display, date only
         return date.toLocaleDateString(undefined, {
           year: 'numeric',
           month: '2-digit',
@@ -23,7 +34,6 @@ export const excelUtils = {
     const formatDateTimeForExcel = (dateString: string): string => {
       try {
         const date = new Date(dateString)
-        // Use browser's timezone for display
         return date.toLocaleString(undefined, {
           year: 'numeric',
           month: '2-digit',
@@ -38,11 +48,14 @@ export const excelUtils = {
       }
     }
 
+    const endedAt = excelUtils.getEndedAt(entry)
+
     return {
-      'Date': formatDateForExcel(entry.createdAt),
+      'Date': formatDateForExcel(entry.occurredOn),
       'Task': entry.task,
       'Other Task': entry.otherTask || '',
       'Minutes': entry.minutes,
+      'End Date & Time': endedAt ? formatDateTimeForExcel(endedAt) : '',
       'Patient Count': entry.patientCount ?? '',
       'Typical Day': entry.isTypicalDay ? 'Yes' : 'No',
       'Comment': entry.comment || '',
@@ -103,10 +116,11 @@ export const exportEntriesToExcel = async (
     
     // Set column widths
     const columnWidths = [
-      { wch: 12 }, // Date (date only, shorter)
+      { wch: 12 }, // Date
       { wch: 20 }, // Task
       { wch: 20 }, // Other Task
       { wch: 10 }, // Minutes
+      { wch: 20 }, // End Date & Time
       { wch: 14 }, // Patient Count
       { wch: 14 }, // Typical Day
       { wch: 30 }, // Comment
