@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/app/components/ui/card"
 import { checkProfileCompletion, updateUserProfile, getUserProfile, UserProfileData } from "@/lib/actions/user-profile"
 import { PROFESSIONAL_TITLES } from "@/lib/constants/profile"
 import UserProfileForm from "./UserProfileForm"
+import BurnoutSurvey from "./BurnoutSurvey"
 
 interface ProfileCompletionPromptProps {
   onComplete?: () => void
@@ -142,6 +143,10 @@ export default function ProfileCompletionPrompt({ onComplete }: ProfileCompletio
         initialData={profileInitialData}
         isEditing={false}
       />
+
+      <div className="mt-8">
+        <BurnoutSurvey />
+      </div>
     </div>
   )
 }

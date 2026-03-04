@@ -89,15 +89,6 @@ export default async function ProfilePage() {
         <div className="mt-8">
           <BurnoutSurvey />
         </div>
-
-        {/* Back to Data Entry */}
-        <div className="mt-8 text-center">
-          <Link href="/dashboard">
-            <Button variant="outline" className="border-slate-300">
-              Back to Data Entry
-            </Button>
-          </Link>
-        </div>
       </div>
     </div>
   )

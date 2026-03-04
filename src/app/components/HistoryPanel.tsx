@@ -44,7 +44,9 @@ const toDateTimeLocalValue = (value: string): string => {
 
 const formatEndDateTime = (startValue: string, minutesValue: number): string => {
   if (!startValue || Number.isNaN(minutesValue)) return "—"
-  const startDate = new Date(startValue)
+  const startDate = startValue.includes("T")
+    ? new Date(startValue)
+    : new Date(`${startValue}T00:00:00`)
   if (Number.isNaN(startDate.getTime())) return "—"
   const endDate = new Date(startDate.getTime() + minutesValue * 60_000)
   const dateLabel = endDate.toLocaleDateString()
@@ -694,6 +696,7 @@ const handleSaveEdit = useCallback(async () => {
                       Minutes {getSortIcon('minutes')}
                     </Button>
                   </th>
+                  <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">End Date & Time</th>
                   <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">Comment</th>
                   <th className="text-right py-2 px-2 font-medium text-slate-700 dark:text-slate-300">Actions</th>
                 </tr>
@@ -861,6 +864,11 @@ const handleSaveEdit = useCallback(async () => {
                       ) : (
                         <span className="text-slate-600 dark:text-slate-300">{entry.minutes}</span>
                       )}
+                    </td>
+                    <td className="py-2 px-2 text-slate-600 dark:text-slate-300">
+                      {editingId === entry.id
+                        ? formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10) || 0)
+                        : formatEndDateTime(entry.occurredOn, entry.minutes)}
                     </td>
                     <td className="py-2 px-2">
                       {editingId === entry.id ? (
