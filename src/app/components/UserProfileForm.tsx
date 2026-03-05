@@ -664,11 +664,11 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
-              Considering your hospital&apos;s overall inpatient antibacterial use (all antibacterial agents)
+              Considering your hospital&apos;s overall inpatient antibacterial use (all antibacterial agents):
             </label>
+            <p className="text-xs text-slate-500 mb-2">If you know your most recent SAAR value, please select the applicable range below.</p>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-slate-500 mb-2">If you have your most recent SAAR value:</p>
                 <Controller
                   name="saarValue"
                   control={control}
