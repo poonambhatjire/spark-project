@@ -31,7 +31,7 @@ const quickLogSchema = z.object({
     // Reporting
     'Reporting - sharing data with prescribers/decision makers',
     // Education
-    'Education - Providing Education',
+    'Education - Providing Education/Teaching',
     'Education - Receiving Education (e.g. CE)',
     // Administrative
     'Administrative - Committee Work',
@@ -43,7 +43,9 @@ const quickLogSchema = z.object({
     // Reporting
     'Reporting - Other (please specify under comment section)',
     // Education
-    'Education - Other (please specify under comment section)'
+    'Education - Other (please specify under comment section)',
+    // Work Interruptions
+    'Work Interruptions/ Miscellaneous/ Non-ASP time'
   ] as const, {
     required_error: "Please select a task type",
     invalid_type_error: "Please select a valid task type"
@@ -104,9 +106,11 @@ const TASK_OPTIONS = [
   { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
   { value: "Reporting - Other (please specify under comment section)", label: "Reporting - Other (please specify under comment section)" },
   // Education
-  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Providing Education/Teaching", label: "Education - Providing Education/Teaching" },
   { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
   { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" },
+  // Work Interruptions
+  { value: "Work Interruptions/ Miscellaneous/ Non-ASP time", label: "Work Interruptions/ Miscellaneous/ Non-ASP time" },
 ]
 
 // Minutes presets

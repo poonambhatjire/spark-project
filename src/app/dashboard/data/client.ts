@@ -17,7 +17,7 @@ export type Activity =
   // Reporting
   | 'Reporting - sharing data with prescribers/decision makers'
   // Education
-  | 'Education - Providing Education'
+  | 'Education - Providing Education/Teaching'
   | 'Education - Receiving Education (e.g. CE)'
   // Administrative
   | 'Administrative - Committee Work'
@@ -29,7 +29,9 @@ export type Activity =
   // Reporting
   | 'Reporting - Other (please specify under comment section)'
   // Education
-  | 'Education - Other (please specify under comment section)';
+  | 'Education - Other (please specify under comment section)'
+  // Work Interruptions
+  | 'Work Interruptions/ Miscellaneous/ Non-ASP time';
 
 export const PATIENT_CARE_ACTIVITIES: Activity[] = [
   'Patient Care - Prospective Audit & Feedback',
@@ -111,7 +113,7 @@ export interface TodayTotals {
   // Reporting
   'Reporting - sharing data with prescribers/decision makers': number;
   // Education
-  'Education - Providing Education': number;
+  'Education - Providing Education/Teaching': number;
   'Education - Receiving Education (e.g. CE)': number;
   // Administrative
   'Administrative - Committee Work': number;
@@ -124,6 +126,8 @@ export interface TodayTotals {
   'Reporting - Other (please specify under comment section)': number;
   // Education
   'Education - Other (please specify under comment section)': number;
+  // Work Interruptions
+  'Work Interruptions/ Miscellaneous/ Non-ASP time': number;
 }
 
 
@@ -346,14 +350,16 @@ class TimeEntryClient {
       'Reporting - sharing data with prescribers/decision makers': 0,
       'Reporting - Other (please specify under comment section)': 0,
       // Education
-      'Education - Providing Education': 0,
+      'Education - Providing Education/Teaching': 0,
       'Education - Receiving Education (e.g. CE)': 0,
       'Education - Other (please specify under comment section)': 0,
       // Administrative
       'Administrative - Committee Work': 0,
       'Administrative - QI projects/research': 0,
       'Administrative - Emails': 0,
-      'Administrative - Other (please specify under comment section)': 0
+      'Administrative - Other (please specify under comment section)': 0,
+      // Work Interruptions
+      'Work Interruptions/ Miscellaneous/ Non-ASP time': 0
     };
 
     todayEntries.forEach(entry => {

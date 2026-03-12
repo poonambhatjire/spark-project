@@ -61,6 +61,7 @@ const userProfileSchema = z.object({
   other2Fte: z.number().optional().nullable(),
   other3Specify: z.string().optional().nullable(),
   other3Fte: z.number().optional().nullable(),
+  telehealthAsp: z.string().optional().nullable(),
   saarValue: z.number().optional().nullable(),
   saarCategory: z.string().optional().nullable(),
   effectivenessOptions: z.array(z.string()).optional(),
@@ -128,6 +129,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       other2Fte: null,
       other3Specify: null,
       other3Fte: null,
+      telehealthAsp: null,
       saarValue: null,
       saarCategory: null,
       effectivenessOptions: [],
@@ -173,6 +175,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
           other2Fte: d.other2Fte ?? null,
           other3Specify: d.other3Specify ?? null,
           other3Fte: d.other3Fte ?? null,
+          telehealthAsp: d.telehealthAsp ?? null,
           saarValue: d.saarValue ?? null,
           saarCategory: d.saarCategory ?? null,
           effectivenessOptions: d.effectivenessOptions ?? [],
@@ -248,6 +251,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       other2Fte: data.other2Fte ?? null,
       other3Specify: data.other3Specify ?? null,
       other3Fte: data.other3Fte ?? null,
+      telehealthAsp: data.telehealthAsp ?? null,
       saarValue: data.saarValue ?? null,
       saarCategory: data.saarCategory ?? null,
       effectivenessOptions: data.effectivenessOptions ?? [],
@@ -659,6 +663,62 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Considering your hospital, what is your utilization of telehealth services for your ASP? (choose one)
+            </label>
+            <div className="space-y-2 pt-1" role="radiogroup" aria-label="Telehealth ASP utilization">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Controller
+                  name="telehealthAsp"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="radio"
+                      value="provides"
+                      checked={field.value === "provides"}
+                      onChange={() => field.onChange("provides")}
+                      className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                    />
+                  )}
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">My hospital provides telehealth ASP</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Controller
+                  name="telehealthAsp"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="radio"
+                      value="receives"
+                      checked={field.value === "receives"}
+                      onChange={() => field.onChange("receives")}
+                      className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                    />
+                  )}
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">My hospital receives telehealth ASP</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Controller
+                  name="telehealthAsp"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="radio"
+                      value="none"
+                      checked={field.value === "none"}
+                      onChange={() => field.onChange("none")}
+                      className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                    />
+                  )}
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">None of the above</span>
+              </label>
             </div>
           </div>
 

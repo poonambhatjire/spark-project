@@ -13,7 +13,7 @@ export default function AppendicesPage() {
       if (!containerRef.current) return
 
       try {
-        const res = await fetch("/Appendices%20List.docx")
+        const res = await fetch("/Appendices%20List.docx", { cache: "no-store" })
         if (!res.ok) throw new Error("Failed to load document")
         const blob = await res.blob()
 

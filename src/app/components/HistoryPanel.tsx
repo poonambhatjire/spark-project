@@ -90,9 +90,11 @@ const TASK_OPTIONS = [
   { value: "Reporting - sharing data with prescribers/decision makers", label: "Reporting - sharing data with prescribers/decision makers" },
   { value: "Reporting - Other (please specify under comment section)", label: "Reporting - Other (please specify under comment section)" },
   // Education
-  { value: "Education - Providing Education", label: "Education - Providing Education" },
+  { value: "Education - Providing Education/Teaching", label: "Education - Providing Education/Teaching" },
   { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
-  { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" }
+  { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" },
+  // Work Interruptions
+  { value: "Work Interruptions/ Miscellaneous/ Non-ASP time", label: "Work Interruptions/ Miscellaneous/ Non-ASP time" }
 ]
 
 export function HistoryPanel({

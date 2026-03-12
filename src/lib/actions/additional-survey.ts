@@ -16,6 +16,7 @@ export interface AdditionalSurveyData {
   other2Fte?: number | null
   other3Specify?: string | null
   other3Fte?: number | null
+  telehealthAsp?: string | null
   saarValue?: number | null
   saarCategory?: string | null
   effectivenessOptions?: string[]
@@ -65,6 +66,7 @@ export async function getAdditionalSurvey(): Promise<{
       other2Fte: data?.other2_fte ?? null,
       other3Specify: data?.other3_specify ?? null,
       other3Fte: data?.other3_fte ?? null,
+      telehealthAsp: data?.telehealth_asp ?? null,
       saarValue: data?.saar_value ?? null,
       saarCategory: data?.saar_category ?? null,
       effectivenessOptions: Array.isArray(data?.effectiveness_options)
@@ -109,6 +111,7 @@ export async function saveAdditionalSurvey(
       other2_fte: input.other2Fte ?? null,
       other3_specify: input.other3Specify?.trim() || null,
       other3_fte: input.other3Fte ?? null,
+      telehealth_asp: input.telehealthAsp || null,
       saar_value: input.saarValue ?? null,
       saar_category: input.saarCategory || null,
       effectiveness_options: input.effectivenessOptions ?? [],

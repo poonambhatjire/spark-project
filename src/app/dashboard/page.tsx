@@ -28,7 +28,7 @@ const createEmptyTotals = (): TodayTotals => ({
   'Tracking - Antibiotic Appropriateness': 0,
   'Tracking - Intervention Acceptance': 0,
   'Reporting - sharing data with prescribers/decision makers': 0,
-  'Education - Providing Education': 0,
+  'Education - Providing Education/Teaching': 0,
   'Education - Receiving Education (e.g. CE)': 0,
   'Administrative - Committee Work': 0,
   'Administrative - QI projects/research': 0,
@@ -36,7 +36,8 @@ const createEmptyTotals = (): TodayTotals => ({
   'Administrative - Other (please specify under comment section)': 0,
   'Tracking - Other (please specify under comment section)': 0,
   'Reporting - Other (please specify under comment section)': 0,
-  'Education - Other (please specify under comment section)': 0
+  'Education - Other (please specify under comment section)': 0,
+  'Work Interruptions/ Miscellaneous/ Non-ASP time': 0
 })
 
 const DataEntryPage = () => {
