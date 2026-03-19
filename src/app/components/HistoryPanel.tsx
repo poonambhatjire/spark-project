@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 
-import { Badge } from "@/app/components/ui/badge"
 import { Checkbox } from "@/app/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
@@ -93,7 +92,7 @@ const TASK_OPTIONS = [
   { value: "Education - Providing Education/Teaching", label: "Education - Providing Education/Teaching" },
   { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
   { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" },
-  // Work Interruptions
+  // Work Interruptions (at bottom)
   { value: "Work Interruptions/ Miscellaneous/ Non-ASP time", label: "Work Interruptions/ Miscellaneous/ Non-ASP time" }
 ]
 
@@ -118,6 +117,7 @@ export function HistoryPanel({
 const [editingTask, setEditingTask] = useState<Activity | null>(null)
 const [editingPatientCount, setEditingPatientCount] = useState('')
 const [editingIsTypicalDay, setEditingIsTypicalDay] = useState<boolean>(true)
+const [editingIsTelehealth, setEditingIsTelehealth] = useState<boolean>(false)
 const [editingOccurredOn, setEditingOccurredOn] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
@@ -260,6 +260,7 @@ const [editingOccurredOn, setEditingOccurredOn] = useState('')
   setEditingTask(null)
   setEditingPatientCount('')
   setEditingIsTypicalDay(true)
+  setEditingIsTelehealth(false)
   setEditingOccurredOn('')
   }, [])
 
@@ -345,6 +346,7 @@ const [editingOccurredOn, setEditingOccurredOn] = useState('')
         : ''
   )
   setEditingIsTypicalDay(entry.isTypicalDay)
+  setEditingIsTelehealth(entry.isTelehealth ?? false)
   setEditingOccurredOn(toDateTimeLocalValue(entry.occurredOn))
     // Focus the minutes input after a short delay
     setTimeout(() => editingMinutesRef.current?.focus(), 100)
@@ -395,6 +397,7 @@ const handleSaveEdit = useCallback(async () => {
         minutes: minutesValue,
         patientCount: patientCountValue,
         isTypicalDay: editingIsTypicalDay,
+        isTelehealth: editingIsTelehealth,
         occurredOn: occurredOnDate.toISOString(),
         comment: trimmedComment || undefined
       })
@@ -417,6 +420,7 @@ const handleSaveEdit = useCallback(async () => {
   editingComment,
   editingPatientCount,
   editingIsTypicalDay,
+  editingIsTelehealth,
   editingOccurredOn,
   onUpdateEntry,
   showToast,
@@ -676,7 +680,7 @@ const handleSaveEdit = useCallback(async () => {
                       aria-label={allSelected ? "Deselect all entries" : "Select all entries"}
                     />
                   </th>
-                  <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">
+                  <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300 min-w-[11rem]">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -709,7 +713,7 @@ const handleSaveEdit = useCallback(async () => {
                       Minutes {getSortIcon('minutes')}
                     </Button>
                   </th>
-                  <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">End Date & Time</th>
+                  <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300 min-w-[11rem]">End Date & Time</th>
                   <th className="text-left py-2 px-2 font-medium text-slate-700 dark:text-slate-300">Comment</th>
                   <th className="text-right py-2 px-2 font-medium text-slate-700 dark:text-slate-300">Actions</th>
                 </tr>
@@ -737,20 +741,19 @@ const handleSaveEdit = useCallback(async () => {
                         })()}`}
                       />
                     </td>
-                    <td className="py-2 px-2 text-slate-600 dark:text-slate-300">
+                    <td className="py-2 px-2 text-slate-600 dark:text-slate-300 min-w-[11rem]">
                       {(() => {
-                        // Handle both date and datetime formats
+                        // Handle both date and datetime formats - single line
                         if (entry.occurredOn.includes('T')) {
                           const date = new Date(entry.occurredOn)
                           return (
-                            <div className="text-sm">
-                              <div className="font-medium">{date.toLocaleDateString()}</div>
-                              <div className="text-xs text-slate-500">{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                            </div>
+                            <span className="text-sm whitespace-nowrap">
+                              {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           )
                         } else {
                           const [year, month, day] = entry.occurredOn.split('-').map(Number)
-                          return new Date(year, month - 1, day).toLocaleDateString()
+                          return <span className="text-sm">{new Date(year, month - 1, day).toLocaleDateString()}</span>
                         }
                       })()}
                     </td>
@@ -808,7 +811,7 @@ const handleSaveEdit = useCallback(async () => {
                           type="datetime-local"
                           value={editingOccurredOn}
                           onChange={(e) => setEditingOccurredOn(e.target.value)}
-                          className="min-h-9 border-slate-300 dark:border-slate-600 text-sm"
+                          className="min-h-9 min-w-[12rem] border-slate-300 dark:border-slate-600 text-sm"
                           aria-label="Edit start date and time"
                         />
                         <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -844,19 +847,30 @@ const handleSaveEdit = useCallback(async () => {
                           <span>No</span>
                         </label>
                       </div>
+
+                      <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                        <Checkbox
+                          checked={editingIsTelehealth}
+                          onCheckedChange={setEditingIsTelehealth}
+                          aria-label="Is this tele-health?"
+                          className="h-4 w-4 shrink-0"
+                        />
+                        <span>Is this tele-health?</span>
+                      </label>
                     </div>
                   ) : (
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
+                        <span className="text-sm text-slate-700 dark:text-slate-300">
                           {entry.task}
-                        </Badge>
+                        </span>
                       </div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-4">
                         {isPatientCareTask(entry.task) && (
                           <span>Patients: {entry.patientCount ?? '—'}</span>
                         )}
                         <span>Typical Day: {entry.isTypicalDay ? 'Yes' : 'No'}</span>
+                        <span>Tele-health: {entry.isTelehealth ? 'Yes' : 'No'}</span>
                       </div>
                     </div>
                   )}
@@ -878,10 +892,12 @@ const handleSaveEdit = useCallback(async () => {
                         <span className="text-slate-600 dark:text-slate-300">{entry.minutes}</span>
                       )}
                     </td>
-                    <td className="py-2 px-2 text-slate-600 dark:text-slate-300">
-                      {editingId === entry.id
-                        ? formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10) || 0)
-                        : getEndDateTimeDisplay(entry)}
+                    <td className="py-2 px-2 text-slate-600 dark:text-slate-300 min-w-[11rem]">
+                      <span className="text-sm whitespace-nowrap">
+                        {editingId === entry.id
+                          ? formatEndDateTime(editingOccurredOn, parseInt(editingMinutes, 10) || 0)
+                          : getEndDateTimeDisplay(entry)}
+                      </span>
                     </td>
                     <td className="py-2 px-2">
                       {editingId === entry.id ? (

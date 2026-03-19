@@ -40,6 +40,7 @@ export const csvUtils = {
       csvUtils.getEndedAt(entry),
       entry.patientCount ?? '',
       entry.isTypicalDay ? 'Yes' : 'No',
+      entry.isTelehealth ? 'Yes' : 'No',
       entry.comment || '',
       entry.createdAt,
       entry.updatedAt
@@ -58,6 +59,7 @@ export const csvUtils = {
       'End Date & Time',
       'Patient Count',
       'Typical Day',
+      'Tele-health',
       'Comment',
       'Created At',
       'Updated At'

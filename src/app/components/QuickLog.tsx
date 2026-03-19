@@ -8,6 +8,7 @@ import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
 import { Textarea } from "@/app/components/ui/textarea"
+import { Checkbox } from "@/app/components/ui/checkbox"
 
 import { CreateEntryInput, isPatientCareTask, isOtherTask } from "@/app/dashboard/data/client"
 import { telemetry } from "@/lib/telemetry"
@@ -61,7 +62,8 @@ const quickLogSchema = z.object({
     .optional(),
   occurredOn: z.string().min(1, "Date and time are required"),
   comment: z.string().optional(),
-  isTypicalDay: z.boolean()
+  isTypicalDay: z.boolean(),
+  isTelehealth: z.boolean().optional()
 }).refine((data) => {
   if (isOtherTask(data.task) && (!data.comment || data.comment.trim() === "")) {
     return false
@@ -109,7 +111,7 @@ const TASK_OPTIONS = [
   { value: "Education - Providing Education/Teaching", label: "Education - Providing Education/Teaching" },
   { value: "Education - Receiving Education (e.g. CE)", label: "Education - Receiving Education (e.g. CE)" },
   { value: "Education - Other (please specify under comment section)", label: "Education - Other (please specify under comment section)" },
-  // Work Interruptions
+  // Work Interruptions (at bottom)
   { value: "Work Interruptions/ Miscellaneous/ Non-ASP time", label: "Work Interruptions/ Miscellaneous/ Non-ASP time" },
 ]
 
@@ -152,7 +154,8 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
       patientCount: 0,
       occurredOn: getCurrentDateTime(),
       comment: "",
-      isTypicalDay: true
+      isTypicalDay: true,
+      isTelehealth: false
     }
   })
 
@@ -192,13 +195,17 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
 
     // Convert datetime-local format to ISO datetime string
     const patientCount = isPatientCareTask(data.task) ? (data.patientCount ?? 0) : null
-    const comment = data.comment?.trim() ? data.comment.trim() : undefined
+    let comment = data.comment?.trim() ? data.comment.trim() : undefined
+    if (data.isTelehealth) {
+      comment = comment ? `${comment} Tele-health` : "Tele-health"
+    }
 
     const formattedData: CreateEntryInput = {
       task: data.task,
       minutes: data.minutes,
       patientCount,
       isTypicalDay: data.isTypicalDay,
+      isTelehealth: data.isTelehealth ?? false,
       occurredOn: new Date(data.occurredOn).toISOString(),
       comment
     }
@@ -218,7 +225,8 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
         patientCount: isPatientCareTask(data.task) ? 0 : null,
         occurredOn: getCurrentDateTime(),
         comment: "",
-        isTypicalDay: true
+        isTypicalDay: true,
+        isTelehealth: false
       })
       // Hide success message after 1.5s
       setTimeout(() => setShowSuccess(false), 1500)
@@ -243,7 +251,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
         <div className="space-y-3">
           <h2 className="page-title font-semibold text-slate-900 dark:text-slate-100">Quick Log</h2>
           <p className="text-base text-slate-700 dark:text-slate-300">
-            Please log only <strong className="font-semibold">Antimicrobial Stewardship</strong> specific activities
+            Please only log tasks during designated <strong className="font-semibold">Antimicrobial Stewardship</strong> shifts
           </p>
         </div>
 
@@ -397,45 +405,64 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
               </div>
             )}
 
-            {/* Typical Day Selection */}
-            <div className="space-y-2">
-              <span id="typical-day-label" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                This is a typical day *
-              </span>
-              <Controller
-                name="isTypicalDay"
-                control={control}
-                render={({ field }) => (
-                  <div
-                    className="flex items-center gap-4"
-                    role="radiogroup"
-                    aria-labelledby="typical-day-label"
-                  >
-                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                      <input
-                        type="radio"
-                        name="isTypicalDay"
-                        value="yes"
-                        checked={field.value === true}
-                        onChange={() => field.onChange(true)}
-                        className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+            {/* Tele-health & Typical Day - grouped row */}
+            <div className="md:col-span-2 p-4 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-800/50 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/** Tele-health */}
+                <Controller
+                  name="isTelehealth"
+                  control={control}
+                  render={({ field }) => (
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <Checkbox
+                        checked={field.value ?? false}
+                        onCheckedChange={field.onChange}
+                        aria-label="Is this tele-health?"
+                        className="h-4 w-4 shrink-0"
                       />
-                      <span>Yes</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100">
+                        Is this tele-health?
+                      </span>
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                      <input
-                        type="radio"
-                        name="isTypicalDay"
-                        value="no"
-                        checked={field.value === false}
-                        onChange={() => field.onChange(false)}
-                        className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                      />
-                      <span>No (Please specify under comment section)</span>
-                    </label>
-                  </div>
-                )}
-              />
+                  )}
+                />
+                {/** Typical Day */}
+                <div className="flex items-center gap-4" role="radiogroup" aria-label="This is a typical day">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 shrink-0">
+                    This is a typical day *
+                  </span>
+                  <Controller
+                    name="isTypicalDay"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-slate-700 dark:hover:text-slate-300">
+                          <input
+                            type="radio"
+                            name="isTypicalDay"
+                            value="yes"
+                            checked={field.value === true}
+                            onChange={() => field.onChange(true)}
+                            className="h-4 w-4 text-red-900 border-slate-300 focus:ring-red-600/70"
+                          />
+                          <span>Yes</span>
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-slate-700 dark:hover:text-slate-300">
+                          <input
+                            type="radio"
+                            name="isTypicalDay"
+                            value="no"
+                            checked={field.value === false}
+                            onChange={() => field.onChange(false)}
+                            className="h-4 w-4 text-red-900 border-slate-300 focus:ring-red-600/70"
+                          />
+                          <span>No (Please specify under comment section)</span>
+                        </label>
+                      </div>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Date and Time */}

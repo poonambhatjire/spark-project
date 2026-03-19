@@ -20,6 +20,7 @@ const mapSupabaseRowToTimeEntry = (row: Record<string, unknown>): TimeEntry => {
     minutes: Number(row.minutes || 0),
     patientCount: row.patient_count !== null && row.patient_count !== undefined ? Number(row.patient_count) : null,
     isTypicalDay: Boolean(row.is_typical_day ?? true),
+    isTelehealth: Boolean(row.is_telehealth ?? false),
     occurredOn: String(row.occurred_on || ''),
     endedAt: row.ended_at ? String(row.ended_at) : undefined,
     comment: row.comment ? String(row.comment) : undefined,
@@ -62,6 +63,7 @@ async function mapTimeEntryToSupabaseRow(supabase: SupabaseClient, entry: Create
   if ('minutes' in entry) row.minutes = entry.minutes;
   if ('patientCount' in entry) row.patient_count = entry.patientCount ?? null;
   if ('isTypicalDay' in entry) row.is_typical_day = entry.isTypicalDay ?? true;
+  if ('isTelehealth' in entry) row.is_telehealth = entry.isTelehealth ?? false;
   if ('occurredOn' in entry) row.occurred_on = entry.occurredOn;
   if ('comment' in entry) row.comment = entry.comment;
   
@@ -92,6 +94,7 @@ export async function createTimeEntry(input: CreateEntryInput): Promise<{ succes
       minutes: input.minutes,
       patient_count: input.patientCount ?? null,
       is_typical_day: input.isTypicalDay ?? true,
+      is_telehealth: input.isTelehealth ?? false,
       occurred_on: input.occurredOn,
       comment: input.comment
     };

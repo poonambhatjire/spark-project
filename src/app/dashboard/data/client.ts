@@ -60,6 +60,7 @@ export interface TimeEntry {
   minutes: number;          // 1..480
   patientCount?: number | null;
   isTypicalDay: boolean;
+  isTelehealth?: boolean;
   occurredOn: string;       // ISO datetime (YYYY-MM-DDTHH:mm:ssZ)
   endedAt?: string;         // ISO datetime - computed from occurredOn + minutes (from DB)
   comment?: string;
@@ -74,6 +75,7 @@ export interface CreateEntryInput {
   minutes: number;
   patientCount?: number | null;
   isTypicalDay?: boolean;
+  isTelehealth?: boolean;
   occurredOn: string;
   comment?: string;
 }
@@ -84,6 +86,7 @@ export interface UpdateEntryInput {
   minutes?: number;
   patientCount?: number | null;
   isTypicalDay?: boolean;
+  isTelehealth?: boolean;
   occurredOn?: string;
   comment?: string;
 }

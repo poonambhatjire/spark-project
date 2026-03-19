@@ -58,6 +58,7 @@ export const excelUtils = {
       'End Date & Time': endedAt ? formatDateTimeForExcel(endedAt) : '',
       'Patient Count': entry.patientCount ?? '',
       'Typical Day': entry.isTypicalDay ? 'Yes' : 'No',
+      'Tele-health': entry.isTelehealth ? 'Yes' : 'No',
       'Comment': entry.comment || '',
       'Created At': formatDateTimeForExcel(entry.createdAt),
       'Updated At': formatDateTimeForExcel(entry.updatedAt)
@@ -123,6 +124,7 @@ export const exportEntriesToExcel = async (
       { wch: 20 }, // End Date & Time
       { wch: 14 }, // Patient Count
       { wch: 14 }, // Typical Day
+      { wch: 12 }, // Tele-health
       { wch: 30 }, // Comment
       { wch: 20 }, // Created At
       { wch: 20 }  // Updated At
