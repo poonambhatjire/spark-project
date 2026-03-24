@@ -3,6 +3,64 @@
 import { useEffect, useRef, useState } from "react"
 import { renderAsync } from "docx-preview"
 
+/** Italicize C. difficile in rendered docx text */
+function italicizeDifficile(root: HTMLElement) {
+  const textNodes: Text[] = []
+  const collect = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      textNodes.push(node as Text)
+      return
+    }
+    node.childNodes.forEach((child) => collect(child))
+  }
+  collect(root)
+
+  for (const textNode of textNodes) {
+    if (textNode.parentElement?.closest("em")) continue
+    const text = textNode.textContent ?? ""
+    if (!/C\.\s*difficile/i.test(text)) continue
+
+    const bits = text.split(/(C\.\s*difficile)/gi)
+    const frag = document.createDocumentFragment()
+    for (const bit of bits) {
+      if (!bit) continue
+      if (/^C\.\s*difficile$/i.test(bit)) {
+        const em = document.createElement("em")
+        em.textContent = bit
+        frag.appendChild(em)
+      } else {
+        frag.appendChild(document.createTextNode(bit))
+      }
+    }
+    textNode.parentNode?.replaceChild(frag, textNode)
+  }
+}
+
+/** Remove leading empty table rows (Word often exports blank header rows as empty cells) */
+function trimDocxTopWhitespace(root: HTMLElement) {
+  const tables = root.querySelectorAll("table")
+  for (const table of tables) {
+    let row: HTMLTableRowElement | null = table.querySelector("tr")
+    while (row) {
+      const cells = row.querySelectorAll("td, th")
+      if (cells.length === 0) break
+      const allEmpty = Array.from(cells).every((cell) => {
+        const t = (cell.textContent ?? "").replace(/\u00a0/g, " ").trim()
+        return t.length === 0
+      })
+      if (!allEmpty) break
+      const next = row.nextElementSibling as HTMLTableRowElement | null
+      row.remove()
+      row = next
+    }
+  }
+  const firstBlock = root.querySelector("p, table, section, article")
+  if (firstBlock instanceof HTMLElement) {
+    firstBlock.style.marginTop = "0"
+    firstBlock.style.paddingTop = "0"
+  }
+}
+
 export default function AppendicesPage() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
@@ -21,6 +79,9 @@ export default function AppendicesPage() {
         containerRef.current.innerHTML = ""
         await renderAsync(blob, containerRef.current, undefined, { inWrapper: false })
 
+        italicizeDifficile(containerRef.current)
+        trimDocxTopWhitespace(containerRef.current)
+
         setStatus("ready")
       } catch (err) {
         setStatus("error")
@@ -32,8 +93,8 @@ export default function AppendicesPage() {
   }, [])
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
+    <div className="container mx-auto px-4 pt-2 pb-8 max-w-4xl">
+      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
         Antimicrobial Stewardship Program Activity Definitions
       </h1>
 
@@ -57,7 +118,7 @@ export default function AppendicesPage() {
       <div
         ref={containerRef}
         className={`docx-wrapper bg-white dark:bg-slate-800 rounded-lg ${status === "ready" ? "block" : "hidden"}`}
-        style={{ minHeight: status === "ready" ? 400 : 0 }}
+        style={{ minHeight: status === "ready" ? undefined : 0 }}
       />
     </div>
   )

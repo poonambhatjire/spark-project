@@ -241,7 +241,51 @@ p {
 
 /* docx-preview (Appendices page) - override library's gray bg and dark box-shadow */
 .docx-wrapper {
-  padding: 1.5rem 0;
+  padding: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.docx-wrapper > *:first-child,
+.docx-wrapper p:first-child,
+.docx-wrapper section:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Tighten first table — Word often adds top margin */
+.docx-wrapper table:first-of-type {
+  margin-top: 0 !important;
+  margin-bottom: 1rem;
+}
+
+.docx-wrapper p.docx,
+.docx-wrapper p {
+  margin-top: 0.35em;
+  margin-bottom: 0.35em;
+}
+
+.docx-wrapper > *:first-child p:first-child,
+.docx-wrapper table:first-of-type tr:first-child td,
+.docx-wrapper table:first-of-type tr:first-child th {
+  padding-top: 0.25rem !important;
+}
+
+/* Lists: bullets to the side (outside), aligned with body text */
+.docx-wrapper ul,
+.docx-wrapper ol {
+  list-style-position: outside;
+  padding-left: 1.25rem;
+  margin-left: 0;
+}
+
+.docx-wrapper li {
+  padding-left: 0.25rem;
+  margin-top: 0.25em;
+}
+
+.docx-wrapper li::marker {
+  color: inherit;
 }
 
 /* Remove docx-preview's gray wrapper background and dark "selected" shadow overlay */
@@ -259,7 +303,7 @@ p {
 .docx-wrapper table {
   border-collapse: collapse;
   width: 100%;
-  margin: 1rem 0;
+  margin: 0 0 1rem;
 }
 
 .docx-wrapper th,

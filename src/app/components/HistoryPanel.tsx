@@ -819,44 +819,74 @@ const handleSaveEdit = useCallback(async () => {
                         </p>
                       </div>
 
-                      <div
-                        className="flex items-center gap-4 text-sm text-slate-700 dark:text-slate-300"
-                        role="radiogroup"
-                        aria-label="This is a typical day"
-                      >
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name={`typical-day-${entry.id}`}
-                            value="yes"
-                            checked={editingIsTypicalDay === true}
-                            onChange={() => setEditingIsTypicalDay(true)}
-                            className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                          />
-                          <span>Yes</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name={`typical-day-${entry.id}`}
-                            value="no"
-                            checked={editingIsTypicalDay === false}
-                            onChange={() => setEditingIsTypicalDay(false)}
-                            className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                          />
-                          <span>No</span>
-                        </label>
+                      <div className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                        <div>
+                          <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                            This is a typical day *
+                          </p>
+                          <div
+                            className="flex flex-wrap items-center gap-3"
+                            role="radiogroup"
+                            aria-label="This is a typical day"
+                          >
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`typical-day-${entry.id}`}
+                                value="yes"
+                                checked={editingIsTypicalDay === true}
+                                onChange={() => setEditingIsTypicalDay(true)}
+                                className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                              />
+                              <span>Yes</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`typical-day-${entry.id}`}
+                                value="no"
+                                checked={editingIsTypicalDay === false}
+                                onChange={() => setEditingIsTypicalDay(false)}
+                                className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                              />
+                              <span>No (Please specify under comment section)</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-slate-200 dark:border-slate-600">
+                          <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                            Is this tele-health?
+                          </p>
+                          <div
+                            className="flex flex-wrap items-center gap-3"
+                            role="radiogroup"
+                            aria-label="Is this tele-health?"
+                          >
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`telehealth-${entry.id}`}
+                                value="yes"
+                                checked={editingIsTelehealth === true}
+                                onChange={() => setEditingIsTelehealth(true)}
+                                className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                              />
+                              <span>Yes</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`telehealth-${entry.id}`}
+                                value="no"
+                                checked={editingIsTelehealth === false}
+                                onChange={() => setEditingIsTelehealth(false)}
+                                className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                              />
+                              <span>No (Please specify under comment section)</span>
+                            </label>
+                          </div>
+                        </div>
                       </div>
-
-                      <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
-                        <Checkbox
-                          checked={editingIsTelehealth}
-                          onCheckedChange={setEditingIsTelehealth}
-                          aria-label="Is this tele-health?"
-                          className="h-4 w-4 shrink-0"
-                        />
-                        <span>Is this tele-health?</span>
-                      </label>
                     </div>
                   ) : (
                     <div className="space-y-1">

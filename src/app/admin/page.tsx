@@ -8,6 +8,7 @@ import UsersList from '@/app/components/admin/UsersList'
 import ActivityAnalytics from '@/app/components/admin/ActivityAnalytics'
 import SystemSettings from '@/app/components/admin/SystemSettings'
 import AdvancedAnalytics from '@/app/components/admin/AdvancedAnalytics'
+import AdminDataExport from '@/app/components/admin/AdminDataExport'
 
 export default function AdminPage() {
   const [user, setUser] = useState<AdminUser | null>(null)
@@ -201,6 +202,10 @@ export default function AdminPage() {
                   </Button>
                 </CardContent>
               </Card>
+            </div>
+
+            <div className="mt-8">
+              <AdminDataExport />
             </div>
 
             <div className="mt-8">
