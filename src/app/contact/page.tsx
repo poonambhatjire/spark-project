@@ -1,6 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { CONTACT_EMAILS } from "@/lib/contact-emails"
+
+const contactLinkClass =
+  "text-[#D25555] font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555] focus-visible:ring-offset-2 rounded"
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -38,6 +42,18 @@ const ContactPage = () => {
             <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
               Get in touch with our team for support, questions, or partnership opportunities
             </p>
+            <div className="mt-4 text-base text-slate-700 space-y-2">
+              <p className="font-semibold text-slate-800">Email</p>
+              <ul className="flex flex-col items-center gap-1.5 list-none p-0 m-0">
+                {CONTACT_EMAILS.map((addr) => (
+                  <li key={addr}>
+                    <a href={`mailto:${addr}`} className={contactLinkClass}>
+                      {addr}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -167,8 +183,15 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-slate-900 mb-1">Email</h3>
-                    <p className="text-slate-600 text-sm">support@sparc-calculator.com</p>
-                    <p className="text-slate-600 text-sm">info@sparc-calculator.com</p>
+                    <ul className="text-slate-600 text-sm space-y-1 list-none p-0 m-0">
+                      {CONTACT_EMAILS.map((addr) => (
+                        <li key={addr}>
+                          <a href={`mailto:${addr}`} className={contactLinkClass}>
+                            {addr}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 

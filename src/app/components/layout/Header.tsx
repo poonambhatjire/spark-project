@@ -5,6 +5,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { signOut } from "@/lib/auth/supabase-actions"
 import { createClient } from "@/lib/supabase/client"
+import { CONTACT_EMAILS_TOOLTIP } from "@/lib/contact-emails"
 import { useEffect, useState } from "react"
 
 export default function Header() {
@@ -87,6 +88,13 @@ export default function Header() {
                   About Us
                 </Link>
                 <Link
+                  href="/contact"
+                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+                  title={CONTACT_EMAILS_TOOLTIP}
+                >
+                  Contact Us
+                </Link>
+                <Link
                   href="/"
                   className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
                 >
@@ -112,6 +120,7 @@ export default function Header() {
                 <Link
                   href="/contact"
                   className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/70 focus-visible:ring-offset-2 focus-visible:rounded"
+                  title={CONTACT_EMAILS_TOOLTIP}
                 >
                   Contact Us
                 </Link>
