@@ -475,7 +475,7 @@ export function QuickLog({ onSubmit }: QuickLogProps) {
                           onChange={() => field.onChange(false)}
                           className="h-4 w-4 text-red-900 border-slate-300 focus:ring-red-600/70"
                         />
-                        <span>No (Please specify under comment section)</span>
+                        <span>No</span>
                       </label>
                     </div>
                   )}

@@ -1,38 +1,125 @@
-const steeringCommitteeMembers: Array<{ name: string; organization?: string }> = [
-  { name: "Priya Nori, MD", organization: "Montefiore Health System" },
-  { name: "Michael Bolaris, MD", organization: "LA County – DHS" },
-  { name: "Star Cervantes, PharmD", organization: "Chicago Department of Public Health" },
-  { name: "Marcia Glick, PharmD", organization: "California / LA County Department of Public Health" },
-  { name: "Rekha Murthy, MD", organization: "California / LA County Department of Public Health" },
-  { name: "Melinda Neuhauser, PharmD", organization: "Centers for Disease Control and Prevention" },
-  { name: "Kevin Brown, PhD", organization: "University of Toronto" },
-  { name: "Christina Rivera, PharmD", organization: "Mayo Clinic" },
-  { name: "Valerie Leung, PharmD", organization: "Public Health Ontario" },
-  { name: "William Simmons, MD", organization: "UCSF" },
-  { name: "Julianne Joo, PharmD", organization: "Harbor-UCLA Medical Center" },
-  { name: "Loren Miller, MD", organization: "UCLA / Lundquist Institute" },
-  { name: "Betsy Hirsch, PharmD", organization: "University of Minnesota College of Pharmacy" },
-  { name: "Kelly Echevarria", organization: "" },
-  { name: "Stephanie May", organization: "" },
-  { name: "Eric Lofgren, PhD", organization: "Washington State University" },
-  { name: "Kevin Schwartz, MD", organization: "Public Health Ontario" },
-  { name: "David Ha, PharmD", organization: "" }
+type SteeringCommitteeMember = {
+  name: string
+  /** Professional role or title line under the name */
+  role?: string
+  organization?: string
+  /** Optional longer description (e.g. areas of expertise) */
+  bio?: string
+  contact: string
+}
+
+const steeringCommitteeMembers: SteeringCommitteeMember[] = [
+  { name: "Amy Kang, PharmD", organization: "Chapman School of Pharmacy", contact: "amkang@chapman.edu" },
+  { name: "Brad Langford, PharmD", organization: "University of Toronto", contact: "Brad.langford@utoronto.ca" },
+  {
+    name: "Beth Leung, PharmD",
+    organization: "University of Toronto/Unity Health",
+    contact: "Elizabeth.Leung@unityhealth.to",
+  },
+  { name: "Priya Nori, MD", organization: "Montefiore Health System", contact: "pnori@montefiore.org" },
+  { name: "Michael Bolaris, MD", organization: "LA County – DHS", contact: "MBolaris@dhs.lacounty.gov" },
+  {
+    name: "Star (Estrella) Cervantes, PharmD, BCPS, AAHIVP",
+    role: "Infectious Disease - Antimicrobial Stewardship Pharmacist",
+    organization:
+      "Project Administrator\nHealthcare Settings Program | Disease Control Bureau",
+    contact: "Estrella.Cervantes@cityofchicago.org",
+  },
+  {
+    name: "Marcia Glick, PharmD",
+    organization: "California/LA County Department of Public Health",
+    contact: "MGlick@ph.lacounty.gov",
+  },
+  {
+    name: "Rekha Murthy, MD",
+    organization: "California/LA County Department of Public Health",
+    contact: "RMurthy@ph.lacounty.gov",
+  },
+  {
+    name: "Melinda Neuhauser, PharmD",
+    organization: "Centers for Disease Control and Prevention",
+    contact: "ikf5@cdc.gov",
+  },
+  { name: "Kevin Brown, PhD", organization: "University of Toronto", contact: "Kevin.brown@oahpp.ca" },
+  { name: "Christina Rivera, PharmD", organization: "Mayo Clinic", contact: "rivera.christina@mayo.edu" },
+  { name: "Valerie Leung, PharmD", organization: "Public Health Ontario", contact: "Valerie.leung@oahpp.ca" },
+  { name: "William Simmons, MD", organization: "UCSF", contact: "William.Simmons@ucsf.edu" },
+  {
+    name: "Julianne Joo, PharmD",
+    organization: "Harbor-UCLA Medical Center",
+    contact: "jujoo@dhs.lacounty.gov",
+  },
+  { name: "Loren Miller, MD", organization: "UCLA/Lundquist Institute", contact: "lgmiller@ucla.edu" },
+  {
+    name: "Betsy Hirsch, Pharm D",
+    organization: "University of Minnesota College of Pharmacy",
+    contact: "Ebhirsch@umn.edu",
+  },
+  {
+    name: "Kelly Echevarria, PharmD, BCIDP",
+    role: "Infectious Diseases Pharmacist",
+    organization: "National Program Expert for Clinical Stewardship Solutions, Bitscopic",
+    bio: "Infectious Diseases Pharmacist with expertise in enterprise-level antimicrobial stewardship program management, formulary management and clinical surveillance software for antimicrobial stewardship.",
+    contact: "Kechev@gmail.com",
+  },
+  { name: "Stephanie May", contact: "stephanie.may@imail.org" },
+  {
+    name: "Eric Lofgren, PhD",
+    organization: "Associate Professor Washington State University",
+    contact: "eric.lofgren@wsu.edu",
+  },
+  { name: "Kevin Schwartz, MD", contact: "Kevin.Schwartz@oahpp.ca" },
+  { name: "David Ha, PharmD", contact: "dha@stanfordhealthcare.org" },
 ]
 
 const AboutPage = () => {
-  const renderCommitteeMember = (member: { name: string; organization?: string }) => {
-    const organizationText =
+  const renderCommitteeMember = (member: SteeringCommitteeMember) => {
+    const orgLines =
       member.organization && member.organization.trim().length > 0
         ? member.organization
-        : "Organization forthcoming"
+            .split("\n")
+            .map((l) => l.trim())
+            .filter(Boolean)
+        : []
 
     return (
       <article
-        key={member.name}
-        className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-shadow hover:shadow-md"
+        key={`${member.name}-${member.contact}`}
+        className="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm transition-shadow hover:shadow-md flex flex-col h-full"
       >
-        <h3 className="text-base font-semibold text-slate-900">{member.name}</h3>
-        <p className="mt-2 text-sm text-slate-600">{organizationText}</p>
+        <h3 className="text-base font-semibold text-slate-900 leading-snug">{member.name}</h3>
+        {member.role && (
+          <p className="mt-2 text-sm font-medium text-slate-700 leading-snug">{member.role}</p>
+        )}
+        <div className="mt-4 space-y-3 text-sm flex-1">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Organization</p>
+            {orgLines.length > 0 ? (
+              <div className="text-slate-700 leading-relaxed space-y-1">
+                {orgLines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-700 leading-relaxed">—</p>
+            )}
+          </div>
+          {member.bio && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">About</p>
+              <p className="text-slate-600 leading-relaxed">{member.bio}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Contact</p>
+            <a
+              href={`mailto:${member.contact}`}
+              className="inline-block font-medium text-[#D25555] hover:text-[#B84444] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555] focus-visible:ring-offset-2 rounded break-all"
+            >
+              {member.contact}
+            </a>
+          </div>
+        </div>
       </article>
     )
   }

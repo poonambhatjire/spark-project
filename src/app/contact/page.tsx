@@ -1,297 +1,299 @@
-"use client"
-
-import { useState } from "react"
 import { CONTACT_EMAILS } from "@/lib/contact-emails"
 
-const contactLinkClass =
-  "text-[#D25555] font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555] focus-visible:ring-offset-2 rounded"
+const accent = "#D25555"
+
+function MailIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  )
+}
+
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+      />
+    </svg>
+  )
+}
+
+function MapIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  )
+}
+
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.75}
+        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  )
+}
+
+const faqs = [
+  {
+    q: "How accurate is SPARC?",
+    a: "SPARC is built on extensive time-in-motion studies and peer-reviewed research. Our calculations have been validated across many healthcare institutions.",
+  },
+  {
+    q: "Is SPARC free to use?",
+    a: "Yes. SPARC is offered to support antimicrobial stewardship programs and reduce barriers to evidence-based staffing guidance.",
+  },
+  {
+    q: "Can I customize the calculations?",
+    a: "You can enter your institutional data—including bed count, patient volume, and staffing context—to tailor recommendations to your setting.",
+  },
+  {
+    q: "Do you offer training?",
+    a: "We provide documentation and can connect you with resources for rollout. Reach out by email for partnership or training questions.",
+  },
+] as const
 
 const ContactPage = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    organization: '',
-    subject: '',
-    message: ''
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted:', formData)
-    alert('Thank you for your message! We will get back to you soon.')
-    setFormData({ name: '', email: '', organization: '', subject: '', message: '' })
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative py-16 lg:py-20 bg-gradient-to-br from-slate-50 to-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight text-balance">
-              Contact <span className="text-[#D25555]">Us</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
-              Get in touch with our team for support, questions, or partnership opportunities
-            </p>
-            <div className="mt-4 text-base text-slate-700 space-y-2">
-              <p className="font-semibold text-slate-800">Email</p>
-              <ul className="flex flex-col items-center gap-1.5 list-none p-0 m-0">
-                {CONTACT_EMAILS.map((addr) => (
-                  <li key={addr}>
-                    <a href={`mailto:${addr}`} className={contactLinkClass}>
-                      {addr}
-                    </a>
-                  </li>
-                ))}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-slate-200/80 dark:border-slate-800">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(210,85,85,0.12),transparent)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(210,85,85,0.18),transparent)]"
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:48px_48px] dark:bg-[linear-gradient(to_right,rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.06)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,white_50%,transparent)]" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 md:pt-20 md:pb-24">
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#D25555] dark:text-[#e87373] mb-4">
+            SPARC Calculator
+          </p>
+          <h1 className="text-center text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-white text-balance max-w-3xl mx-auto leading-[1.1]">
+            Contact{" "}
+            <span className="text-[#D25555] dark:text-[#e87373]">our team</span>
+          </h1>
+          <p className="mt-6 text-center text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed font-medium">
+            Questions about the calculator, stewardship staffing, or collaborations—we&apos;re happy
+            to hear from you.
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
+            {CONTACT_EMAILS.map((addr) => (
+              <a
+                key={addr}
+                href={`mailto:${addr}`}
+                className="group inline-flex items-center gap-2.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-5 py-3 text-sm font-medium text-slate-800 dark:text-slate-100 shadow-sm hover:border-[#D25555]/40 hover:shadow-md hover:shadow-[#D25555]/5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D25555]/10 text-[#D25555] dark:bg-[#D25555]/20 dark:text-[#e87373]">
+                  <MailIcon className="h-4 w-4" />
+                </span>
+                <span className="font-mono text-[13px] sm:text-sm tracking-tight group-hover:text-[#D25555] dark:group-hover:text-[#e87373] transition-colors">
+                  {addr}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Main grid */}
+      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+        <div className="grid gap-10 lg:gap-14 lg:grid-cols-12">
+          {/* Left column — narrative + hours */}
+          <div className="lg:col-span-5 space-y-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                Get in touch
+              </h2>
+              <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed text-[17px]">
+                We support teams implementing and scaling antimicrobial stewardship programs. Use the
+                email addresses above for the fastest response, or review additional details on this
+                page.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 md:p-8 shadow-sm">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  <ClockIcon className="h-5 w-5" />
+                </span>
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white">Support hours</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-500">General inquiries</p>
+                </div>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                <li className="flex justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <span className="text-slate-500 dark:text-slate-500">Monday – Friday</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200 tabular-nums">
+                    9:00 AM – 6:00 PM EST
+                  </span>
+                </li>
+                <li className="flex justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <span className="text-slate-500 dark:text-slate-500">Saturday</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200 tabular-nums">
+                    10:00 AM – 2:00 PM EST
+                  </span>
+                </li>
+                <li className="flex justify-between gap-4">
+                  <span className="text-slate-500 dark:text-slate-500">Sunday</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200">Closed</span>
+                </li>
               </ul>
+              <p className="mt-5 text-xs text-slate-500 dark:text-slate-500 leading-relaxed">
+                For urgent clinical systems issues, contact your institution&apos;s IT or internal
+                support channels as applicable.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Contact Form & Info Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <div className="bg-slate-50 p-8 rounded-2xl">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Send us a Message</h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#D25555] focus:border-transparent transition-colors"
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#D25555] focus:border-transparent transition-colors"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
+          {/* Right column — contact cards */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 md:p-8 shadow-sm">
+              <div className="flex items-start gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D25555] to-[#B84444] text-white shadow-md shadow-[#D25555]/20">
+                  <MailIcon className="h-6 w-6" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Email</h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Write us directly—we typically respond within a few business days.
+                  </p>
+                  <ul className="mt-5 space-y-2">
+                    {CONTACT_EMAILS.map((addr) => (
+                      <li key={addr}>
+                        <a
+                          href={`mailto:${addr}`}
+                          className="flex items-center gap-2 rounded-lg border border-transparent px-3 py-2.5 -mx-3 text-sm font-mono text-[#D25555] dark:text-[#e87373] hover:bg-[#D25555]/5 dark:hover:bg-[#D25555]/10 hover:border-slate-200/80 dark:hover:border-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D25555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
+                        >
+                          <span className="truncate">{addr}</span>
+                          <svg
+                            className="h-4 w-4 shrink-0 opacity-60"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                <div>
-                  <label htmlFor="organization" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Organization
-                  </label>
-                  <input
-                    type="text"
-                    id="organization"
-                    name="organization"
-                    value={formData.organization}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#D25555] focus:border-transparent transition-colors"
-                    placeholder="Your healthcare institution"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Subject *
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#D25555] focus:border-transparent transition-colors"
-                  >
-                    <option value="">Select a subject</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="support">Technical Support</option>
-                    <option value="partnership">Partnership Opportunity</option>
-                    <option value="demo">Request a Demo</option>
-                    <option value="feedback">Product Feedback</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#D25555] focus:border-transparent transition-colors resize-none"
-                    placeholder="Tell us how we can help you..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-[#D25555] text-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-[#B84444] transition-colors duration-200 focus:ring-4 focus:ring-[#D25555] focus:ring-offset-2"
-                >
-                  Send Message
-                </button>
-              </form>
+              </div>
             </div>
 
-            {/* Contact Information */}
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Get in Touch</h2>
-                <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                  We&apos;re here to help you optimize your antimicrobial stewardship program. 
-                  Reach out to us for support, questions, or to learn more about how SPARC 
-                  can benefit your healthcare institution.
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-4">
+                  <PhoneIcon className="h-5 w-5" />
+                </span>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Phone</h3>
+                <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 tabular-nums">
+                  +1 (555) 123-4567
                 </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">Mon–Fri, 9 AM–6 PM EST</p>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-[#D25555] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900 mb-1">Email</h3>
-                    <ul className="text-slate-600 text-sm space-y-1 list-none p-0 m-0">
-                      {CONTACT_EMAILS.map((addr) => (
-                        <li key={addr}>
-                          <a href={`mailto:${addr}`} className={contactLinkClass}>
-                            {addr}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-[#D25555] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900 mb-1">Phone</h3>
-                    <p className="text-slate-600 text-sm">+1 (555) 123-4567</p>
-                    <p className="text-slate-600 text-sm">Mon-Fri 9AM-6PM EST</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-[#D25555] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900 mb-1">Address</h3>
-                    <p className="text-slate-600 text-sm">
-                      SPARC Healthcare Solutions<br />
-                      123 Medical Plaza Drive<br />
-                      Suite 400<br />
-                      Boston, MA 02115
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Support Hours */}
-              <div className="bg-gradient-to-br from-[#D25555] to-[#B84444] rounded-2xl p-6 text-white">
-                <h3 className="text-lg font-bold mb-3">Support Hours</h3>
-                <div className="space-y-1 text-red-100 text-sm">
-                  <p><span className="font-semibold">Monday - Friday:</span> 9:00 AM - 6:00 PM EST</p>
-                  <p><span className="font-semibold">Saturday:</span> 10:00 AM - 2:00 PM EST</p>
-                  <p><span className="font-semibold">Sunday:</span> Closed</p>
-                </div>
-                <p className="text-red-100 mt-3 text-xs">
-                  Emergency support available 24/7 for critical issues
-                </p>
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm sm:col-span-2 lg:col-span-1">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-4">
+                  <MapIcon className="h-5 w-5" />
+                </span>
+                <h3 className="font-semibold text-slate-900 dark:text-white">Mailing address</h3>
+                <address className="mt-3 text-sm text-slate-600 dark:text-slate-400 not-italic leading-relaxed">
+                  SPARC Healthcare Solutions
+                  <br />
+                  123 Medical Plaza Drive, Suite 400
+                  <br />
+                  Boston, MA 02115
+                </address>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 text-balance">
-              Frequently Asked Questions
+      {/* FAQ */}
+      <section className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 py-16 md:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-2xl mb-12 md:mb-14">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D25555] dark:text-[#e87373] mb-3">
+              FAQ
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight text-balance">
+              Common questions
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Quick answers to common questions about SPARC
+            <p className="mt-4 text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+              Short answers about SPARC and how teams use it.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-3">How accurate is SPARC?</h3>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                SPARC is built on extensive time-in-motion studies and peer-reviewed research. 
-                Our calculations have been validated across 500+ healthcare institutions with 
-                an average accuracy rate of 95%.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-3">Is SPARC free to use?</h3>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                Yes, SPARC is completely free for healthcare institutions. We believe in 
-                supporting antimicrobial stewardship programs without financial barriers.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-3">Can I customize the calculations?</h3>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                Absolutely! SPARC allows you to input your specific institutional data, 
-                including bed count, patient volume, and existing staffing levels for 
-                personalized recommendations.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-3">Do you offer training?</h3>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                Yes, we provide comprehensive training sessions for your team, including 
-                webinars, documentation, and one-on-one support to ensure successful 
-                implementation.
-              </p>
-            </div>
+          <div className="grid md:grid-cols-2 gap-5 md:gap-6">
+            {faqs.map(({ q, a }) => (
+              <article
+                key={q}
+                className="group rounded-2xl border border-slate-200 dark:border-slate-800 border-l-4 border-l-transparent bg-slate-50/80 dark:bg-slate-900/60 p-6 md:p-7 pl-5 md:pl-6 transition-all hover:border-l-[#D25555] hover:border-[#D25555]/20 dark:hover:border-slate-700 dark:hover:border-l-[#e87373] hover:bg-white dark:hover:bg-slate-900"
+              >
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white leading-snug">
+                  {q}
+                </h3>
+                <p className="mt-3 text-sm md:text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {a}
+                </p>
+              </article>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA strip */}
+      <section className="py-14 md:py-16 bg-gradient-to-br from-[#D25555] via-[#c75151] to-[#B84444]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-balance">
+            Ready to explore staffing for your ASP?
+          </h2>
+          <p className="mt-3 text-red-100/95 text-base md:text-lg max-w-xl mx-auto">
+            Open the calculator to enter your data and see evidence-based guidance.
+          </p>
+          <a
+            href="/dashboard"
+            className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-base font-semibold shadow-lg hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#D25555]"
+            style={{ color: accent }}
+          >
+            Go to data entry
+            <span aria-hidden>→</span>
+          </a>
         </div>
       </section>
     </div>

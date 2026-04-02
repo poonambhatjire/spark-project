@@ -243,7 +243,10 @@ p {
 .docx-wrapper {
   padding: 0;
   margin-top: 0;
-  overflow: hidden;
+  /* Allow horizontal scroll on small screens instead of crushing columns / mid-word breaks */
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
 }
 
 .docx-wrapper > *:first-child,
@@ -304,6 +307,8 @@ p {
   border-collapse: collapse;
   width: 100%;
   margin: 0 0 1rem;
+  /* Let columns size from content; avoids equal-width columns that crush the last cell */
+  table-layout: auto;
 }
 
 .docx-wrapper th,
@@ -311,12 +316,41 @@ p {
   border: 1px solid #e2e8f0;
   padding: 0.5rem 0.75rem;
   text-align: left;
+  vertical-align: top;
+  /* Prefer breaking between words, not inside them */
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+  white-space: normal;
 }
 
-.docx-wrapper th {
-  background: #f8fafc;
-  font-weight: 600;
-  color: #334155;
+.dark .docx-wrapper th,
+.dark .docx-wrapper td {
+  border-color: #475569;
+}
+
+/* Last column often holds long definitions; keep a sensible minimum width */
+.docx-wrapper tr > th:last-child,
+.docx-wrapper tr > td:last-child {
+  min-width: 12rem;
+}
+
+@media (min-width: 640px) {
+  .docx-wrapper tr > th:last-child,
+  .docx-wrapper tr > td:last-child {
+    min-width: 16rem;
+  }
+}
+
+/* Nested blocks inside cells (Word exports <p>, <span>, lists) */
+.docx-wrapper td p,
+.docx-wrapper td li,
+.docx-wrapper td span,
+.docx-wrapper th p {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+  white-space: normal;
 }
 
 /* Print styles */

@@ -882,7 +882,7 @@ const handleSaveEdit = useCallback(async () => {
                                 onChange={() => setEditingIsTelehealth(false)}
                                 className="h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                               />
-                              <span>No (Please specify under comment section)</span>
+                              <span>No</span>
                             </label>
                           </div>
                         </div>

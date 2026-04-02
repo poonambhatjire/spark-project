@@ -93,7 +93,7 @@ export default function AppendicesPage() {
   }, [])
 
   return (
-    <div className="container mx-auto px-4 pt-2 pb-8 max-w-4xl">
+    <div className="container mx-auto px-4 pt-2 pb-8 max-w-6xl">
       <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
         Antimicrobial Stewardship Program Activity Definitions
       </h1>
