@@ -7,6 +7,8 @@ export interface AdditionalSurveyData {
   occupiedBedsCount?: number | null
   occupiedBedsPercent?: number | null
   icuBeds?: number | null
+  /** Hospital services: level1_trauma, burn_unit, solid_organ_transplant, bone_marrow_transplant, none */
+  hospitalServices?: string[]
   aspFte?: number | null
   pharmacistFte?: number | null
   physicianFte?: number | null
@@ -57,6 +59,9 @@ export async function getAdditionalSurvey(): Promise<{
       occupiedBedsCount: data?.occupied_beds_count ?? null,
       occupiedBedsPercent: data?.occupied_beds_percent ?? null,
       icuBeds: data?.icu_beds ?? null,
+      hospitalServices: Array.isArray(data?.hospital_services)
+        ? (data.hospital_services as string[])
+        : [],
       aspFte: data?.asp_fte ?? null,
       pharmacistFte: data?.pharmacist_fte ?? null,
       physicianFte: data?.physician_fte ?? null,
@@ -102,6 +107,7 @@ export async function saveAdditionalSurvey(
       occupied_beds_count: input.occupiedBedsCount ?? null,
       occupied_beds_percent: input.occupiedBedsPercent ?? null,
       icu_beds: input.icuBeds ?? null,
+      hospital_services: input.hospitalServices ?? [],
       asp_fte: input.aspFte ?? null,
       pharmacist_fte: input.pharmacistFte ?? null,
       physician_fte: input.physicianFte ?? null,

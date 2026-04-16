@@ -28,6 +28,25 @@ const SAAR_OPTIONS = [
   { value: "not_available", label: "SAAR not available" },
 ]
 
+const HOSPITAL_SERVICE_OPTIONS = [
+  { id: "level1_trauma", label: "Level 1 trauma center" },
+  { id: "burn_unit", label: "Burn unit" },
+  { id: "solid_organ_transplant", label: "Solid organ transplant program" },
+  { id: "bone_marrow_transplant", label: "Bone marrow transplant program" },
+  { id: "none", label: "None of the above" },
+] as const
+
+function toggleHospitalServiceSelection(current: string[], id: string): string[] {
+  if (id === "none") {
+    return current.includes("none") ? [] : ["none"]
+  }
+  const withoutNone = current.filter((x) => x !== "none")
+  if (withoutNone.includes(id)) {
+    return withoutNone.filter((x) => x !== id)
+  }
+  return [...withoutNone, id]
+}
+
 const EFFECTIVENESS_OPTIONS = [
   { value: "cost_savings", label: "Cost savings/cost avoidance" },
   { value: "decreased_utilization", label: "Decreased antibiotic utilization" },
@@ -52,6 +71,7 @@ const userProfileSchema = z.object({
   occupiedBedsCount: z.number().optional().nullable(),
   occupiedBedsPercent: z.number().optional().nullable(),
   icuBeds: z.number().optional().nullable(),
+  hospitalServices: z.array(z.string()).optional(),
   aspFte: z.number().optional().nullable(),
   pharmacistFte: z.number().optional().nullable(),
   physicianFte: z.number().optional().nullable(),
@@ -120,6 +140,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       occupiedBedsCount: null,
       occupiedBedsPercent: null,
       icuBeds: null,
+      hospitalServices: [],
       aspFte: null,
       pharmacistFte: null,
       physicianFte: null,
@@ -166,6 +187,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
           occupiedBedsCount: d.occupiedBedsCount ?? null,
           occupiedBedsPercent: d.occupiedBedsPercent ?? null,
           icuBeds: d.icuBeds ?? null,
+          hospitalServices: d.hospitalServices ?? [],
           aspFte: d.aspFte ?? null,
           pharmacistFte: d.pharmacistFte ?? null,
           physicianFte: d.physicianFte ?? null,
@@ -191,6 +213,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
   const watchedTitle = watch("title")
   const watchedInstitution = watch("institution")
   const watchedEffectiveness = watch("effectivenessOptions") ?? []
+  const watchedHospitalServices = watch("hospitalServices") ?? []
 
   const handleIntegerInput = (value: string) => {
     const filtered = value.replace(/[^0-9]/g, "")
@@ -242,6 +265,7 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
       occupiedBedsCount: occupiedMode === "exact" ? data.occupiedBedsCount ?? null : null,
       occupiedBedsPercent: occupiedMode === "percent" ? data.occupiedBedsPercent ?? null : null,
       icuBeds: data.icuBeds ?? null,
+      hospitalServices: data.hospitalServices ?? [],
       aspFte: data.aspFte ?? null,
       pharmacistFte: data.pharmacistFte ?? null,
       physicianFte: data.physicianFte ?? null,
@@ -546,6 +570,31 @@ export default function UserProfileForm({ onSubmit, initialData, isEditing = fal
                 )}
               />
               <span className="text-slate-500 text-sm">beds</span>
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-800/30 p-4">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              Please select the services that your hospital offers. Select all that apply.
+            </p>
+            <div className="space-y-2" role="group" aria-label="Hospital services offered">
+              {HOSPITAL_SERVICE_OPTIONS.map((opt) => (
+                <label
+                  key={opt.id}
+                  className="flex items-start gap-3 cursor-pointer text-sm text-slate-700 dark:text-slate-300"
+                >
+                  <Checkbox
+                    checked={watchedHospitalServices.includes(opt.id)}
+                    onCheckedChange={() => {
+                      const next = toggleHospitalServiceSelection(watchedHospitalServices, opt.id)
+                      setValue("hospitalServices", next, { shouldDirty: true })
+                    }}
+                    className="mt-0.5"
+                    aria-label={opt.label}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
             </div>
           </div>
 

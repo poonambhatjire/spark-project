@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
     "db:setup": "echo 'Database setup complete. See database/schema.sql and database/setup-instructions.md'",
-    "db:migrate:additional-survey": "node scripts/run-additional-survey-migration.js"
+    "db:migrate:additional-survey": "node scripts/run-additional-survey-migration.js",
+    "db:migrate:hospital-services": "node scripts/run-hospital-services-migration.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
