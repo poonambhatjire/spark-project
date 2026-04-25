@@ -1,4 +1,5 @@
 import { CONTACT_EMAILS } from "@/lib/contact-emails"
+import ContactMessageForm from "@/app/components/ContactMessageForm"
 
 const accent = "#D25555"
 
@@ -23,25 +24,6 @@ function PhoneIcon({ className }: { className?: string }) {
         strokeLinejoin="round"
         strokeWidth={1.75}
         d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-      />
-    </svg>
-  )
-}
-
-function MapIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.75}
-        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.75}
-        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
       />
     </svg>
   )
@@ -132,8 +114,7 @@ const ContactPage = () => {
               </h2>
               <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed text-[17px]">
                 We support teams implementing and scaling antimicrobial stewardship programs. Use the
-                email addresses above for the fastest response, or review additional details on this
-                page.
+                message form to reach us by email, or use the addresses above for a direct link.
               </p>
             </div>
 
@@ -172,8 +153,10 @@ const ContactPage = () => {
             </div>
           </div>
 
-          {/* Right column — contact cards */}
+          {/* Right column — message form + contact cards */}
           <div className="lg:col-span-7 space-y-4">
+            <ContactMessageForm />
+
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 md:p-8 shadow-sm">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D25555] to-[#B84444] text-white shadow-md shadow-[#D25555]/20">
@@ -214,31 +197,15 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-4">
-                  <PhoneIcon className="h-5 w-5" />
-                </span>
-                <h3 className="font-semibold text-slate-900 dark:text-white">Phone</h3>
-                <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 tabular-nums">
-                  +1 (555) 123-4567
-                </p>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">Mon–Fri, 9 AM–6 PM EST</p>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm sm:col-span-2 lg:col-span-1">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-4">
-                  <MapIcon className="h-5 w-5" />
-                </span>
-                <h3 className="font-semibold text-slate-900 dark:text-white">Mailing address</h3>
-                <address className="mt-3 text-sm text-slate-600 dark:text-slate-400 not-italic leading-relaxed">
-                  SPARC Healthcare Solutions
-                  <br />
-                  123 Medical Plaza Drive, Suite 400
-                  <br />
-                  Boston, MA 02115
-                </address>
-              </div>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm max-w-md">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 mb-4">
+                <PhoneIcon className="h-5 w-5" />
+              </span>
+              <h3 className="font-semibold text-slate-900 dark:text-white">Phone</h3>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 tabular-nums">
+                +1 (555) 123-4567
+              </p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">Mon–Fri, 9 AM–6 PM EST</p>
             </div>
           </div>
         </div>
