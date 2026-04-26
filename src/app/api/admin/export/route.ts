@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 import { checkAdminAccess } from '@/lib/actions/admin'
 import {
   ADMIN_EXPORT_TABLES,
+  ANALYSIS_BURNOUT_SCORES_SHEET,
+  ANALYSIS_DATA_QUALITY_SHEET,
+  ANALYSIS_USERS_SHEET,
+  LOGGED_ITEMS_WITH_PROFILE_SHEET,
+  buildAnalysisBurnoutScoresRows,
+  buildAnalysisDataQualityRows,
+  buildAnalysisUsersRows,
+  buildLoggedItemsWithProfileRows,
   rowToSheetRow,
   type AdminExportTableName,
 } from '@/lib/admin/export-tables'
@@ -67,6 +75,29 @@ export async function GET() {
     const sheet = XLSX.utils.json_to_sheet(sheetRows)
     const safeName = table.slice(0, 31)
     XLSX.utils.book_append_sheet(workbook, sheet, safeName)
+  }
+
+  const loggedItemsRows = buildLoggedItemsWithProfileRows(payload)
+  const loggedItemsSheet = XLSX.utils.json_to_sheet(
+    loggedItemsRows.length > 0
+      ? loggedItemsRows.map((row) => rowToSheetRow(row))
+      : [{ '(empty)': 'No logged items found' }]
+  )
+  XLSX.utils.book_append_sheet(workbook, loggedItemsSheet, LOGGED_ITEMS_WITH_PROFILE_SHEET)
+
+  const analysisSheets = [
+    { name: ANALYSIS_USERS_SHEET, rows: buildAnalysisUsersRows(payload) },
+    { name: ANALYSIS_BURNOUT_SCORES_SHEET, rows: buildAnalysisBurnoutScoresRows(payload) },
+    { name: ANALYSIS_DATA_QUALITY_SHEET, rows: buildAnalysisDataQualityRows(payload) },
+  ]
+
+  for (const { name, rows } of analysisSheets) {
+    const sheet = XLSX.utils.json_to_sheet(
+      rows.length > 0
+        ? rows.map((row) => rowToSheetRow(row))
+        : [{ '(empty)': 'No analysis rows found' }]
+    )
+    XLSX.utils.book_append_sheet(workbook, sheet, name)
   }
 
   if (fetchErrors.length) {

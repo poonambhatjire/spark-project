@@ -14,6 +14,8 @@ import { exportEntriesToCsv } from "@/app/lib/utils/csv"
 import { exportEntriesToExcel } from "@/app/lib/utils/excel"
 import { Toast, useToast } from "@/app/components/ui/toast"
 import { telemetry } from "@/lib/telemetry"
+import { getUserProfile } from "@/lib/actions/user-profile"
+import { getAdditionalSurvey } from "@/lib/actions/additional-survey"
 
 // Types
 interface HistoryPanelProps {
@@ -219,9 +221,17 @@ const [editingOccurredOn, setEditingOccurredOn] = useState('')
   }, [entries, dateRange, selectedTasks, debouncedSearch, sortField, sortDirection])
 
   // Export functions
-  const handleExportCsv = useCallback(() => {
+  const handleExportCsv = useCallback(async () => {
     try {
-      exportEntriesToCsv(filteredAndSortedEntries, dateRange)
+      const [profileResult, surveyResult] = await Promise.all([
+        getUserProfile(),
+        getAdditionalSurvey(),
+      ])
+
+      exportEntriesToCsv(filteredAndSortedEntries, dateRange, {
+        profile: profileResult.success ? profileResult.data : undefined,
+        additionalSurvey: surveyResult.success ? surveyResult.data : undefined,
+      })
       
       // Track telemetry
       telemetry.trackExportCsv(filteredAndSortedEntries.length)
@@ -238,7 +248,15 @@ const [editingOccurredOn, setEditingOccurredOn] = useState('')
 
   const handleExportExcel = useCallback(async () => {
     try {
-      await exportEntriesToExcel(filteredAndSortedEntries, dateRange)
+      const [profileResult, surveyResult] = await Promise.all([
+        getUserProfile(),
+        getAdditionalSurvey(),
+      ])
+
+      await exportEntriesToExcel(filteredAndSortedEntries, dateRange, {
+        profile: profileResult.success ? profileResult.data : undefined,
+        additionalSurvey: surveyResult.success ? surveyResult.data : undefined,
+      })
       
       // Track telemetry
       telemetry.trackExportCsv(filteredAndSortedEntries.length) // Reuse CSV tracking for now

@@ -13,9 +13,11 @@ CREATE TABLE IF NOT EXISTS additional_survey_responses (
   occupied_beds_percent NUMERIC(5,2) CHECK (occupied_beds_percent IS NULL OR (occupied_beds_percent >= 0 AND occupied_beds_percent <= 100)),
   -- Q3: ICU beds
   icu_beds INTEGER CHECK (icu_beds IS NULL OR icu_beds >= 0),
-  -- Q4: Current ASP FTE (0-1)
+  -- Q4: Hospital service offerings
+  hospital_services JSONB,
+  -- Q5: Current ASP FTE (0-1)
   asp_fte NUMERIC(4,2) CHECK (asp_fte IS NULL OR (asp_fte >= 0 AND asp_fte <= 1)),
-  -- Q5: Total FTEs by position
+  -- Q6: Total FTEs by position
   pharmacist_fte NUMERIC(6,2) CHECK (pharmacist_fte IS NULL OR pharmacist_fte >= 0),
   physician_fte NUMERIC(6,2) CHECK (physician_fte IS NULL OR physician_fte >= 0),
   other1_specify TEXT,
@@ -24,12 +26,17 @@ CREATE TABLE IF NOT EXISTS additional_survey_responses (
   other2_fte NUMERIC(6,2) CHECK (other2_fte IS NULL OR other2_fte >= 0),
   other3_specify TEXT,
   other3_fte NUMERIC(6,2) CHECK (other3_fte IS NULL OR other3_fte >= 0),
-  -- Q6: SAAR / antibacterial use
+  -- Q7: Telehealth ASP utilization
+  telehealth_asp TEXT CHECK (
+    telehealth_asp IS NULL OR telehealth_asp IN ('provides', 'receives', 'none')
+  ),
+  -- Q8: SAAR / antibacterial use
   saar_value NUMERIC(8,2),
   saar_category TEXT,
-  -- Q7: Demonstrated effectiveness (stored as JSONB array)
-  effectiveness_options JSONB DEFAULT '[]',
+  -- Q9: Demonstrated effectiveness (stored as JSONB array)
+  effectiveness_options JSONB,
   effectiveness_other TEXT,
+  profile_survey_submitted_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id)

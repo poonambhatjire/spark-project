@@ -8,7 +8,7 @@ export interface AdditionalSurveyData {
   occupiedBedsPercent?: number | null
   icuBeds?: number | null
   /** Hospital services: level1_trauma, burn_unit, solid_organ_transplant, bone_marrow_transplant, none */
-  hospitalServices?: string[]
+  hospitalServices?: string[] | null
   aspFte?: number | null
   pharmacistFte?: number | null
   physicianFte?: number | null
@@ -21,8 +21,13 @@ export interface AdditionalSurveyData {
   telehealthAsp?: string | null
   saarValue?: number | null
   saarCategory?: string | null
-  effectivenessOptions?: string[]
+  effectivenessOptions?: string[] | null
   effectivenessOther?: string | null
+  profileSurveySubmittedAt?: string | null
+}
+
+function normalizeOptionalSelection(values: string[] | null | undefined): string[] | null {
+  return values && values.length > 0 ? values : null
 }
 
 export async function getAdditionalSurvey(): Promise<{
@@ -61,7 +66,7 @@ export async function getAdditionalSurvey(): Promise<{
       icuBeds: data?.icu_beds ?? null,
       hospitalServices: Array.isArray(data?.hospital_services)
         ? (data.hospital_services as string[])
-        : [],
+        : null,
       aspFte: data?.asp_fte ?? null,
       pharmacistFte: data?.pharmacist_fte ?? null,
       physicianFte: data?.physician_fte ?? null,
@@ -76,8 +81,9 @@ export async function getAdditionalSurvey(): Promise<{
       saarCategory: data?.saar_category ?? null,
       effectivenessOptions: Array.isArray(data?.effectiveness_options)
         ? data.effectiveness_options
-        : [],
+        : null,
       effectivenessOther: data?.effectiveness_other ?? null,
+      profileSurveySubmittedAt: data?.profile_survey_submitted_at ?? null,
     }
 
     return { success: true, data: map }
@@ -107,7 +113,7 @@ export async function saveAdditionalSurvey(
       occupied_beds_count: input.occupiedBedsCount ?? null,
       occupied_beds_percent: input.occupiedBedsPercent ?? null,
       icu_beds: input.icuBeds ?? null,
-      hospital_services: input.hospitalServices ?? [],
+      hospital_services: normalizeOptionalSelection(input.hospitalServices),
       asp_fte: input.aspFte ?? null,
       pharmacist_fte: input.pharmacistFte ?? null,
       physician_fte: input.physicianFte ?? null,
@@ -120,8 +126,9 @@ export async function saveAdditionalSurvey(
       telehealth_asp: input.telehealthAsp || null,
       saar_value: input.saarValue ?? null,
       saar_category: input.saarCategory || null,
-      effectiveness_options: input.effectivenessOptions ?? [],
+      effectiveness_options: normalizeOptionalSelection(input.effectivenessOptions),
       effectiveness_other: input.effectivenessOther?.trim() || null,
+      profile_survey_submitted_at: new Date().toISOString(),
     }
 
     const { error } = await supabase.from("additional_survey_responses").upsert(row, {

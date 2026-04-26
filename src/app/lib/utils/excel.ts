@@ -1,5 +1,123 @@
 import { TimeEntry } from "@/app/dashboard/data/client"
 
+export interface LoggedItemsExportContext {
+  profile?: Record<string, unknown>
+  additionalSurvey?: {
+    licensedBeds?: number | null
+    occupiedBedsCount?: number | null
+    occupiedBedsPercent?: number | null
+    icuBeds?: number | null
+    hospitalServices?: string[] | null
+    aspFte?: number | null
+    pharmacistFte?: number | null
+    physicianFte?: number | null
+    other1Specify?: string | null
+    other1Fte?: number | null
+    other2Specify?: string | null
+    other2Fte?: number | null
+    other3Specify?: string | null
+    other3Fte?: number | null
+    telehealthAsp?: string | null
+    saarValue?: number | null
+    saarCategory?: string | null
+    effectivenessOptions?: string[] | null
+    effectivenessOther?: string | null
+    profileSurveySubmittedAt?: string | null
+  }
+}
+
+const HOSPITAL_SERVICE_LABELS: Record<string, string> = {
+  level1_trauma: 'Level 1 trauma center',
+  burn_unit: 'Burn unit',
+  solid_organ_transplant: 'Solid organ transplant program',
+  bone_marrow_transplant: 'Bone marrow transplant program',
+  none: 'None of the above',
+}
+
+const EFFECTIVENESS_LABELS: Record<string, string> = {
+  cost_savings: 'Cost savings/cost avoidance',
+  decreased_utilization: 'Decreased antibiotic utilization',
+  decreased_cdiff: 'Decreased Clostridium difficile infection',
+  decreased_resistance: 'Decreased rate of drug-resistant organisms',
+  none: 'Our ASP has not demonstrated any of the above',
+  other: 'Other (please specify)',
+}
+
+const TELEHEALTH_ASP_LABELS: Record<string, string> = {
+  provides: 'My hospital provides telehealth ASP',
+  receives: 'My hospital receives telehealth ASP',
+  none: 'None of the above',
+}
+
+const SAAR_CATEGORY_LABELS: Record<string, string> = {
+  much_lower: 'Much lower than predicted (<0.7)',
+  slightly_lower: 'Slightly lower than predicted (0.7 to <1)',
+  about_predicted: 'About as predicted (around 1.0)',
+  slightly_higher: 'Slightly higher than predicted (>1 to 1.3)',
+  much_higher: 'Much higher than predicted (>1.3)',
+  dont_know: "Don't know",
+  not_available: 'SAAR not available',
+}
+
+const getStringValue = (value: unknown): string => {
+  return typeof value === 'string' ? value : ''
+}
+
+const labelsForValues = (
+  values: string[] | null | undefined,
+  labels: Record<string, string>
+): string => {
+  return (values ?? []).map((value) => labels[value] ?? value).join(', ')
+}
+
+const hasSelection = (values: string[] | null | undefined): string => {
+  return values && values.length > 0 ? 'Yes' : 'No'
+}
+
+const buildLoggedItemsProfileColumns = (
+  context?: LoggedItemsExportContext
+): Record<string, string | number> => {
+  const profile = context?.profile
+  const survey = context?.additionalSurvey
+
+  return {
+    'Profile - Full Name': getStringValue(profile?.name),
+    'Profile - Email': getStringValue(profile?.email),
+    'Profile - Job Title': getStringValue(profile?.title),
+    'Profile - Experience Level': getStringValue(profile?.experience_level),
+    'Profile - Institution': getStringValue(profile?.institution),
+    'Profile - Licensed Beds': survey?.licensedBeds ?? '',
+    'Profile - Occupied Beds Count': survey?.occupiedBedsCount ?? '',
+    'Profile - Occupied Beds Percent': survey?.occupiedBedsPercent ?? '',
+    'Profile - ICU Beds': survey?.icuBeds ?? '',
+    'Profile - Additional Survey Submitted At': survey?.profileSurveySubmittedAt ?? '',
+    'Profile - Hospital Services Answered': hasSelection(survey?.hospitalServices),
+    'Profile - Hospital Services Offered': labelsForValues(survey?.hospitalServices, HOSPITAL_SERVICE_LABELS),
+    'Profile - Current ASP FTE': survey?.aspFte ?? '',
+    'Profile - Pharmacist FTE': survey?.pharmacistFte ?? '',
+    'Profile - Physician FTE': survey?.physicianFte ?? '',
+    'Profile - Other FTE 1 Role': survey?.other1Specify ?? '',
+    'Profile - Other FTE 1': survey?.other1Fte ?? '',
+    'Profile - Other FTE 2 Role': survey?.other2Specify ?? '',
+    'Profile - Other FTE 2': survey?.other2Fte ?? '',
+    'Profile - Other FTE 3 Role': survey?.other3Specify ?? '',
+    'Profile - Other FTE 3': survey?.other3Fte ?? '',
+    'Profile - Telehealth ASP Utilization': survey?.telehealthAsp
+      ? TELEHEALTH_ASP_LABELS[survey.telehealthAsp] ?? survey.telehealthAsp
+      : '',
+    'Profile - SAAR Value': survey?.saarValue ?? '',
+    'Profile - SAAR Category': survey?.saarCategory
+      ? SAAR_CATEGORY_LABELS[survey.saarCategory] ?? survey.saarCategory
+      : '',
+    'Profile - Demonstrated Effectiveness Answered': hasSelection(survey?.effectivenessOptions),
+    'Profile - Demonstrated Effectiveness': labelsForValues(
+      survey?.effectivenessOptions,
+      EFFECTIVENESS_LABELS
+    ),
+    'Profile - Effectiveness Other': survey?.effectivenessOther ?? '',
+  }
+}
+
 // Excel export utilities
 export const excelUtils = {
   // Get end datetime: prefer entry.endedAt from DB, else compute from occurredOn + minutes
@@ -15,7 +133,10 @@ export const excelUtils = {
   },
 
   // Convert TimeEntry to Excel row
-  entryToExcelRow: (entry: TimeEntry): Record<string, string | number> => {
+  entryToExcelRow: (
+    entry: TimeEntry,
+    context?: LoggedItemsExportContext
+  ): Record<string, string | number> => {
     // Format date only (no time) in browser's timezone
     const formatDateForExcel = (dateString: string): string => {
       try {
@@ -61,7 +182,8 @@ export const excelUtils = {
       'Tele-health': entry.isTelehealth ? 'Yes' : 'No',
       'Comment': entry.comment || '',
       'Created At': formatDateTimeForExcel(entry.createdAt),
-      'Updated At': formatDateTimeForExcel(entry.updatedAt)
+      'Updated At': formatDateTimeForExcel(entry.updatedAt),
+      ...buildLoggedItemsProfileColumns(context),
     }
   },
 
@@ -95,7 +217,8 @@ export const excelUtils = {
 // Export function for TimeEntry array to Excel
 export const exportEntriesToExcel = async (
   entries: TimeEntry[], 
-  range: 'today' | 'week' | 'all' = 'all'
+  range: 'today' | 'week' | 'all' = 'all',
+  context?: LoggedItemsExportContext
 ): Promise<void> => {
   try {
     // Dynamically import xlsx library
@@ -110,7 +233,7 @@ export const exportEntriesToExcel = async (
     }))
     
     // Convert to Excel format
-    const worksheetData = processedEntries.map(entry => excelUtils.entryToExcelRow(entry))
+    const worksheetData = processedEntries.map(entry => excelUtils.entryToExcelRow(entry, context))
     
     // Create worksheet
     const worksheet = XLSX.utils.json_to_sheet(worksheetData)
@@ -127,7 +250,34 @@ export const exportEntriesToExcel = async (
       { wch: 12 }, // Tele-health
       { wch: 30 }, // Comment
       { wch: 20 }, // Created At
-      { wch: 20 }  // Updated At
+      { wch: 20 }, // Updated At
+      { wch: 22 }, // Profile - Full Name
+      { wch: 28 }, // Profile - Email
+      { wch: 24 }, // Profile - Job Title
+      { wch: 20 }, // Profile - Experience Level
+      { wch: 24 }, // Profile - Institution
+      { wch: 18 }, // Profile - Licensed Beds
+      { wch: 24 }, // Profile - Occupied Beds Count
+      { wch: 26 }, // Profile - Occupied Beds Percent
+      { wch: 18 }, // Profile - ICU Beds
+      { wch: 28 }, // Profile - Additional Survey Submitted At
+      { wch: 28 }, // Profile - Hospital Services Answered
+      { wch: 48 }, // Profile - Hospital Services Offered
+      { wch: 22 }, // Profile - Current ASP FTE
+      { wch: 22 }, // Profile - Pharmacist FTE
+      { wch: 22 }, // Profile - Physician FTE
+      { wch: 24 }, // Profile - Other FTE 1 Role
+      { wch: 18 }, // Profile - Other FTE 1
+      { wch: 24 }, // Profile - Other FTE 2 Role
+      { wch: 18 }, // Profile - Other FTE 2
+      { wch: 24 }, // Profile - Other FTE 3 Role
+      { wch: 18 }, // Profile - Other FTE 3
+      { wch: 34 }, // Profile - Telehealth ASP Utilization
+      { wch: 18 }, // Profile - SAAR Value
+      { wch: 34 }, // Profile - SAAR Category
+      { wch: 36 }, // Profile - Demonstrated Effectiveness Answered
+      { wch: 48 }, // Profile - Demonstrated Effectiveness
+      { wch: 30 }, // Profile - Effectiveness Other
     ]
     worksheet['!cols'] = columnWidths
     
@@ -165,15 +315,28 @@ export const exportEntriesToExcel = async (
 
 // Export function for any data array to Excel
 export const exportDataToExcel = async (
-  data: Record<string, string | number>[],
+  data: Record<string, unknown>[],
   sheetName: string = 'Data',
   filename: string = 'export.xlsx'
 ): Promise<void> => {
   try {
     // Dynamically import xlsx library
     const XLSX = await import('xlsx')
+
+    const worksheetData = data.map((row) => {
+      const out: Record<string, string | number | null> = {}
+      for (const [key, value] of Object.entries(row)) {
+        if (value === null || value === undefined) out[key] = null
+        else if (Array.isArray(value)) out[key] = value.join(', ')
+        else if (value instanceof Date) out[key] = value.toISOString()
+        else if (typeof value === 'object') out[key] = JSON.stringify(value)
+        else if (typeof value === 'boolean') out[key] = value ? 'true' : 'false'
+        else out[key] = value as string | number
+      }
+      return out
+    })
     
-    const worksheet = XLSX.utils.json_to_sheet(data)
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
     
