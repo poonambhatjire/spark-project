@@ -6,6 +6,7 @@
 
 const fs = require("fs")
 const path = require("path")
+const { fetchAllTableRows } = require("./fetch-all-table-rows")
 
 // Load .env.local
 const envPath = path.join(__dirname, "..", ".env.local")
@@ -306,14 +307,14 @@ async function main() {
   ]
 
   for (const table of tables) {
-    const { data, error } = await supabase.from(table).select("*")
+    const { data, error } = await fetchAllTableRows(supabase, table)
 
     if (error) {
-      if (error.code === "42P01" || error.message?.includes("does not exist")) {
+      if (error.includes("does not exist")) {
         console.log(`Skipping ${table} (table not found)`)
         continue
       }
-      console.error(`Error fetching ${table}:`, error.message)
+      console.error(`Error fetching ${table}:`, error)
       continue
     }
 

@@ -13,6 +13,7 @@ import {
   rowToSheetRow,
   type AdminExportTableName,
 } from '@/lib/admin/export-tables'
+import { fetchAllTableRows } from '@/lib/admin/fetch-all-table-rows'
 import { createServiceRoleClient, isServiceRoleConfigured } from '@/lib/supabase/service'
 
 export const dynamic = 'force-dynamic'
@@ -51,14 +52,14 @@ export async function GET() {
   const fetchErrors: { table: string; message: string }[] = []
 
   for (const table of tables) {
-    const { data, error } = await supabase.from(table).select('*')
+    const { data, error } = await fetchAllTableRows(supabase, table)
     if (error) {
-      console.error(`Admin export: ${table}`, error.message)
-      fetchErrors.push({ table, message: error.message })
+      console.error(`Admin export: ${table}`, error)
+      fetchErrors.push({ table, message: error })
       payload[table] = []
       continue
     }
-    payload[table] = data ?? []
+    payload[table] = data
   }
 
   const stem = filenameStem()

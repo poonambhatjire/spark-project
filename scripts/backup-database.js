@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { fetchAllTableRows } = require("./fetch-all-table-rows");
 
 const envPath = path.join(__dirname, "..", ".env.local");
 if (fs.existsSync(envPath)) {
@@ -309,15 +310,14 @@ async function main() {
   const payload = {};
 
   for (const table of TABLES) {
-    const { data, error } = await supabase.from(table).select("*");
+    const { data: rows, error } = await fetchAllTableRows(supabase, table);
 
     if (error) {
-      console.log(`  ${table}: ERROR - ${error.message}`);
-      summary.tables[table] = { error: error.message };
+      console.log(`  ${table}: ERROR - ${error}`);
+      summary.tables[table] = { error };
       continue;
     }
 
-    const rows = data || [];
     payload[table] = rows;
     console.log(`  ${table}: ${rows.length} rows`);
 
