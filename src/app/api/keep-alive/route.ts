@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient, isServiceRoleConfigured } from '@/lib/supabase/service';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -6,7 +6,20 @@ export async function GET() {
   let queriesExecuted = 0;
   
   try {
-    const supabase = await createClient();
+    // Service role is required after RLS hardening so keep-alive can still
+    // exercise the DB without depending on an authenticated user session.
+    if (!isServiceRoleConfigured()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SUPABASE_SERVICE_ROLE_KEY is not configured',
+          timestamp: new Date().toISOString(),
+        },
+        { status: 503 }
+      );
+    }
+
+    const supabase = createServiceRoleClient();
     
     console.log('[Keep-Alive] Starting Level 2 database activity generation...');
     

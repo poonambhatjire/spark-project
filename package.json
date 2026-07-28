@@ -13,7 +13,9 @@
     "db:migrate:additional-survey": "node scripts/run-additional-survey-migration.js",
     "db:migrate:hospital-services": "node scripts/run-hospital-services-migration.js",
     "db:migrate:survey-analysis-metadata": "node scripts/run-survey-analysis-metadata-migration.js",
-    "db:migrate:analysis-views": "node scripts/run-analysis-views-migration.js"
+    "db:migrate:analysis-views": "node scripts/run-analysis-views-migration.js",
+    "db:migrate:rls-security": "node scripts/run-rls-security-hardening-migration.js",
+    "db:migrate:fix-rls-admin-recursion": "node scripts/run-fix-rls-admin-policy-recursion.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
